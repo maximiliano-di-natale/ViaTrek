@@ -88,7 +88,7 @@ export default function MapScreen() {
       if (status !== 'granted') {
         Alert.alert(
           'Permiso denegado',
-          'Se requiere permiso de ubicación para mostrar tu posición actual en los senderos de Mendoza.'
+          'Se requiere permiso de ubicación para que ViaTrek muestre tu posición actual en los senderos de Mendoza.'
         );
         setIsLocating(false);
         return;
@@ -360,7 +360,7 @@ export default function MapScreen() {
         {/* Resumen badge de rutas activas */}
         <View style={styles.statsBadge}>
           <Text style={styles.statsBadgeText}>
-            {visibleRoutes.length} rutas • {visiblePois.length} POIs en Mendoza
+            ViaTrek • {visibleRoutes.length} rutas • {visiblePois.length} POIs en Mendoza
           </Text>
         </View>
       </View>

@@ -1,8 +1,8 @@
-# 🏔️ Senderos Mendoza - App Móvil
+# 🏔️ ViaTrek - App Móvil de Rutas, Ciclovías & Senderos (Mendoza)
 
-Aplicación móvil de alto rendimiento estilo Google Maps / Wikiloc / Strava especializada en senderos de montaña, ciclovías urbanas y puntos de interés (POIs) en Gran Mendoza y Precordillera (Mendoza, Argentina).
+**ViaTrek** es una aplicación móvil de alto rendimiento estilo Google Maps / Wikiloc / Strava especializada en senderos de montaña, ciclovías urbanas y puntos de interés (POIs) en Gran Mendoza y Precordillera (Mendoza, Argentina).
 
-Desarrollada con **React Native**, **Expo SDK 52**, **TypeScript** y **Google Maps API Nativo** (`react-native-maps`).
+Diseñada y desarrollada con **React Native**, **Expo SDK 52**, **TypeScript** y **Google Maps API Nativo** (`react-native-maps`).
 
 ---
 
@@ -46,7 +46,7 @@ app de senderos/
 ├── types/
 │   └── map.ts               # Tipos TypeScript para rutas, POIs y mapas
 ├── App.tsx                  # Componente raíz con SafeAreaProvider
-├── app.json                 # Configuración de Expo, package Android y API Key
+├── app.json                 # Configuración de Expo, package com.viatrek.app y API Key
 ├── eas.json                 # Configuración de EAS Build para generar APK directa
 ├── package.json             # Dependencias del proyecto
 ├── tsconfig.json            # Configuración de TypeScript
@@ -72,7 +72,7 @@ npm install
 npx expo start
 ```
 - Presiona **`a`** para abrir en emulador de Android conectado.
-- O escanea el código QR desde tu teléfono con la app **Expo Go** (para pruebas básicas) o compila una versión de desarrollo.
+- O escanea el código QR desde tu teléfono con la app **Expo Go** o compila una versión de desarrollo.
 
 ---
 
@@ -94,7 +94,7 @@ Para que el mapa nativo (`PROVIDER_GOOGLE`) cargue los mapas satelitales y vecto
    }
    ```
 6. *(Recomendado para producción)* Restringe la clave de API con el nombre de paquete:
-   - **Package name:** `com.senderosmendoza.app`
+   - **Package name:** `com.viatrek.app`
    - Agrega la huella digital SHA-1 de tu certificado de desarrollo o EAS.
 
 ---
@@ -131,17 +131,15 @@ eas build -p android --profile preview
 
 ---
 
-## 🐙 Sincronización con GitHub
+## 🐙 Sincronización con GitHub (Repositorio ViaTrek)
 
-Para mantener este repositorio sincronizado con tu cuenta de GitHub (al igual que tu repositorio `DinAcitY`):
+Para mantener este repositorio sincronizado con tu cuenta de GitHub (`maximiliano-di-natale`):
 
 1. Ve a [GitHub - Crear nuevo repositorio](https://github.com/new).
-2. Ponle de nombre `senderos-mendoza` (o el nombre que elijas) y déjalo **Público** o **Privado** (sin inicializar con README).
-3. En la terminal de este proyecto ejecuta:
+2. Ponle de nombre **`ViaTrek`** (o `viatrek`) y déjalo sin inicializar con README ni `.gitignore` (ya están creados aquí).
+3. En la consola ejecuta:
 ```bash
-git add .
-git commit -m "feat: inicialización completa de App Senderos Mendoza con Google Maps y soporte APK"
-git branch -M main
-git remote set-url origin https://github.com/maximiliano-di-natale/senderos-mendoza.git
+git remote set-url origin https://github.com/maximiliano-di-natale/ViaTrek.git
 git push -u origin main
 ```
+*(Si creaste el repositorio con minúsculas como `viatrek`, usa `https://github.com/maximiliano-di-natale/viatrek.git`)*.

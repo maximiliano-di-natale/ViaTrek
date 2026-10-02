@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "Senderos Mendoza",
-    "slug": "senderos-mendoza",
+    "name": "ViaTrek",
+    "slug": "viatrek",
+    "scheme": "viatrek",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,9 +15,9 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.senderosmendoza.app",
+      "bundleIdentifier": "com.viatrek.app",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Senderos Mendoza necesita acceder a tu ubicación para mostrar tu posición en el mapa y guiarte en los senderos."
+        "NSLocationWhenInUseUsageDescription": "ViaTrek necesita acceder a tu ubicación para mostrar tu posición en el mapa y guiarte en los senderos."
       }
     },
     "android": {
@@ -24,7 +25,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0F172A"
       },
-      "package": "com.senderosmendoza.app",
+      "package": "com.viatrek.app",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION"
@@ -42,7 +43,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Permite que Senderos Mendoza use tu ubicación en tiempo real mientras exploras las rutas."
+          "locationAlwaysAndWhenInUsePermission": "Permite que ViaTrek use tu ubicación en tiempo real mientras exploras las rutas."
         }
       ]
     ]
