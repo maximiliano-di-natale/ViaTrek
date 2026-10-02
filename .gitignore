@@ -1,0 +1,28 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native builds
+android/
+ios/
+*.apk
+*.aab
+
+# Environment & credentials
+.env
+.env.local
+*.jks
+*.keystore
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
