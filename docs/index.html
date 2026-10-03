@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ViaTrek Mendoza - Senderos, Ciclovías & POIs</title>
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #0F172A;
+      color: #0F172A;
+      overflow: hidden;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
+
+    /* TOP HEADER: MODO DE TRANSPORTE */
+    .header-container {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+    .mode-tabs-wrapper {
+      pointer-events: auto;
+      display: flex;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 28px;
+      padding: 5px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      gap: 4px;
+    }
+    .mode-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border-radius: 22px;
+      border: none;
+      background: transparent;
+      color: #94A3B8;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      gap: 6px;
+    }
+    .mode-tab:hover {
+      color: #E2E8F0;
+    }
+    .mode-tab.active {
+      background: #2563EB;
+      color: #FFFFFF;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+    .stats-badge {
+      pointer-events: auto;
+      margin-top: 8px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      padding: 5px 14px;
+      border-radius: 14px;
+      color: #E2E8F0;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* FLOATING ACTION BUTTONS (FABs) */
+    .fab-container {
+      position: absolute;
+      top: 100px;
+      right: 16px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .fab-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 23px;
+      background: #FFFFFF;
+      border: none;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+    .fab-btn:hover {
+      transform: scale(1.05);
+      background: #F8FAFC;
+    }
+    .fab-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* MAP TYPE MENU */
+    .map-type-menu {
+      position: absolute;
+      right: 56px;
+      top: 0;
+      background: #FFFFFF;
+      border-radius: 14px;
+      padding: 6px;
+      width: 160px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 1001;
+    }
+    .map-type-menu.open {
+      display: flex;
+    }
+    .map-type-option {
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .map-type-option:hover {
+      background: #F1F5F9;
+    }
+    .map-type-option.active {
+      background: #EFF6FF;
+      color: #2563EB;
+      font-weight: 700;
+    }
+
+    /* BOTTOM CARD / BOTTOM SHEET */
+    .bottom-card {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 20px;
+      max-width: 480px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+      z-index: 1000;
+      display: none;
+      animation: slideUp 0.25s ease-out forwards;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0F172A;
+    }
+    .card-subtitle {
+      font-size: 13px;
+      color: #64748B;
+    }
+    .close-btn {
+      background: #F1F5F9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748B;
+      font-size: 16px;
+    }
+    .close-btn:hover {
+      background: #E2E8F0;
+    }
+
+    /* METRICS CONTAINER */
+    .metrics-container {
+      display: flex;
+      background: #F8FAFC;
+      border-radius: 14px;
+      padding: 10px 14px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border: 1px solid #E2E8F0;
+    }
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    .metric-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #94A3B8;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .metric-val {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0F172A;
+    }
+    .metric-divider {
+      width: 1px;
+      height: 24px;
+      background: #E2E8F0;
+    }
+
+    .card-description {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+
+    .badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .badge-pill {
+      background: #F1F5F9;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #2563EB;
+      color: #FFFFFF;
+      text-decoration: none;
+      padding: 13px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      transition: background 0.2s;
+    }
+    .nav-button:hover {
+      background: #1D4ED8;
+    }
+
+    .route-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .btn-focus {
+      background: #EFF6FF;
+      color: #2563EB;
+      border: 1px solid #BFDBFE;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-focus:hover {
+      background: #DBEAFE;
+    }
+
+    /* CUSTOM MARKER STYLES */
+    .custom-marker {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+      color: #FFFFFF;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .custom-marker:hover {
+      transform: scale(1.2);
+    }
+    .user-pulse-marker {
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      background: #2563EB;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4);
+      animation: pulseUser 1.8s infinite;
+    }
+    @keyframes pulseUser {
+      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6); }
+      70% { box-shadow: 0 0 0 14px rgba(37, 99, 235, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header-container">
+    <div class="mode-tabs-wrapper">
+      <button class="mode-tab active" id="tab-bike" onclick="selectMode('bike')">
+        🚴 Bici
+      </button>
+      <button class="mode-tab" id="tab-moto" onclick="selectMode('moto')">
+        🏍️ Moto
+      </button>
+      <button class="mode-tab" id="tab-trekking" onclick="selectMode('trekking')">
+        🥾 Trekking
+      </button>
+    </div>
+    <div class="stats-badge" id="stats-badge">
+      ViaTrek • 4 rutas • 6 POIs en Mendoza
+    </div>
+  </div>
+
+  <!-- FLOATING BUTTONS -->
+  <div class="fab-container">
+    <button class="fab-btn" onclick="toggleMapTypeMenu()" title="Tipo de mapa">
+      🗺️
+    </button>
+    <div class="map-type-menu" id="map-type-menu">
+      <button class="map-type-option active" id="opt-topo" onclick="changeMapLayer('topo')">
+        ⛰️ Relieve / Curvas
+      </button>
+      <button class="map-type-option" id="opt-satellite" onclick="changeMapLayer('satellite')">
+        🛰️ Satélite
+      </button>
+      <button class="map-type-option" id="opt-street" onclick="changeMapLayer('street')">
+        📍 Estándar
+      </button>
+    </div>
+
+    <button class="fab-btn" onclick="resetMendozaView()" title="Centrar Mendoza">
+      🧭
+    </button>
+
+    <button class="fab-btn" onclick="locateUser()" title="Mi Ubicación GPS">
+      🎯
+    </button>
+  </div>
+
+  <!-- MAP CONTAINER -->
+  <div id="map"></div>
+
+  <!-- BOTTOM CARD: DETALLE DE RUTA -->
+  <div class="bottom-card" id="route-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title-row">
+          <div class="color-dot" id="route-color-dot"></div>
+          <div class="card-title" id="route-title">Nombre de la Ruta</div>
+        </div>
+        <div class="card-subtitle" id="route-subtitle">Subtítulo</div>
+      </div>
+      <button class="close-btn" onclick="closeCards()">✕</button>
+    </div>
+
+    <div class="metrics-container">
+      <div class="metric-item">
+        <span class="metric-label">Distancia</span>
+        <span class="metric-val" id="route-dist">-- km</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-item">
+        <span class="metric-label">Desnivel</span>
+        <span class="metric-val" style="color: #10B981;" id="route-elev">+-- m</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-item">
+        <span class="metric-label">Tiempo</span>
+        <span class="metric-val" id="route-time">-- min</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-item">
+        <span class="metric-label">Dificultad</span>
+        <span class="metric-val" id="route-diff">--</span>
+      </div>
+    </div>
+
+    <p class="card-description" id="route-desc"></p>
+
+    <div class="route-action-row">
+      <div class="badge-pill" id="route-surface">Superficie: Pavimento</div>
+      <button class="btn-focus" onclick="focusActiveRoute()">Enfocar Trazado</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM CARD: DETALLE DE POI -->
+  <div class="bottom-card" id="poi-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title-row">
+          <div class="color-dot" id="poi-color-dot"></div>
+          <div class="card-title" id="poi-title">Nombre del Punto</div>
+        </div>
+        <div class="card-subtitle" id="poi-address">Dirección o referencia</div>
+      </div>
+      <button class="close-btn" onclick="closeCards()">✕</button>
+    </div>
+
+    <div class="badges-row" id="poi-badges"></div>
+
+    <p class="card-description" id="poi-desc"></p>
+
+    <button class="nav-button" id="poi-nav-btn" onclick="openGoogleMaps()">
+      📍 Cómo llegar con Google Maps
+    </button>
+  </div>
+
+  <script>
+    // --- DATOS MOCK DE MENDOZA (Sincronizados con data/routesAndPois.ts) ---
+    const MENDOZA_ROUTES = [
+      {
+        id: 'route-ciclovia-gc-capital',
+        name: 'Ciclovía Godoy Cruz - Mendoza Capital',
+        subtitle: 'Corredor urbano verde pavimentado',
+        description: 'Eje troncal ciclista que une el Parque Benegas en Godoy Cruz con el centro de la Ciudad de Mendoza a lo largo de las vías del Metrotranvía. Pavimentada, iluminada y con señalización exclusiva.',
+        modes: ['bike', 'trekking'],
+        distanceKm: 8.4,
+        elevationGainM: 45,
+        estimatedTimeMin: 28,
+        difficulty: 'Fácil',
+        surfaceType: 'Pavimento',
+        color: '#10B981',
+        coordinates: [
+          [-32.9515, -68.8540],
+          [-32.9430, -68.8515],
+          [-32.9340, -68.8492],
+          [-32.9230, -68.8475],
+          [-32.9120, -68.8465],
+          [-32.9030, -68.8458],
+          [-32.8940, -68.8452],
+          [-32.8860, -68.8447],
+          [-32.8795, -68.8440]
+        ]
+      },
+      {
+        id: 'route-chacras-mtb-frias',
+        name: 'Senderos de Chacras & Dique Frías',
+        subtitle: 'Singletrack MTB & Trail Running',
+        description: 'Circuito técnico de montaña en los cerros de Chacras de Coria. Huellas naturales de tierra suelta, cañadones secos y subidas empinadas ideales para mountain bike y trekking precordillerano.',
+        modes: ['bike', 'trekking'],
+        distanceKm: 12.8,
+        elevationGainM: 380,
+        estimatedTimeMin: 75,
+        difficulty: 'Moderado',
+        surfaceType: 'Sendero Técnico',
+        color: '#F97316',
+        coordinates: [
+          [-32.9980, -68.8920],
+          [-32.9950, -68.9010],
+          [-32.9910, -68.9085],
+          [-32.9840, -68.9130],
+          [-32.9770, -68.9185],
+          [-32.9690, -68.9220],
+          [-32.9580, -68.9150],
+          [-32.9510, -68.9020]
+        ]
+      },
+      {
+        id: 'route-cerro-arco-enduro',
+        name: 'Ascenso Cerro Arco & Huella Precordillera',
+        subtitle: 'Ripio 4x4, Enduro y Trail Aventura',
+        description: 'Ruta de ripio consolidado y huella de montaña que asciende desde El Challao (Puerta de la Quebrada) hasta las antenas en la cima del Cerro Arco (1.680 msnm). Permite motos trail/enduro y vehículos autorizados.',
+        modes: ['moto'],
+        distanceKm: 15.6,
+        elevationGainM: 790,
+        estimatedTimeMin: 55,
+        difficulty: 'Difícil',
+        surfaceType: 'Ripio / Grava',
+        color: '#6366F1',
+        coordinates: [
+          [-32.8465, -68.9050],
+          [-32.8410, -68.9170],
+          [-32.8385, -68.9260],
+          [-32.8360, -68.9340],
+          [-32.8345, -68.9415],
+          [-32.8335, -68.9485],
+          [-32.8270, -68.9550],
+          [-32.8190, -68.9610]
+        ]
+      },
+      {
+        id: 'route-cerro-de-la-gloria',
+        name: 'Circuito Cerro de la Gloria & Parque San Martín',
+        subtitle: 'Ruta multimodal panorámica',
+        description: 'Recorrido emblemático que comienza en los históricos Portones del Parque San Martín, bordea el Lago del Parque y asciende por la ladera pavimentada hasta el imponente Monumento al Ejército de los Andes en el Cerro de la Gloria.',
+        modes: ['bike', 'moto', 'trekking'],
+        distanceKm: 6.2,
+        elevationGainM: 140,
+        estimatedTimeMin: 22,
+        difficulty: 'Fácil',
+        surfaceType: 'Pavimento',
+        color: '#06B6D4',
+        coordinates: [
+          [-32.8875, -68.8605],
+          [-32.8885, -68.8685],
+          [-32.8930, -68.8740],
+          [-32.8910, -68.8795],
+          [-32.8890, -68.8840],
+          [-32.8906, -68.8872],
+          [-32.8935, -68.8860]
+        ]
+      }
+    ];
+
+    const MENDOZA_POIS = [
+      {
+        id: 'poi-benegas-trailhead',
+        name: 'Estación Benegas (Trailhead & Parking)',
+        category: 'trailhead',
+        icon: '🏁',
+        color: '#0284C7',
+        description: 'Punto de inicio seguro de la Ciclovía Godoy Cruz. Cuenta con amplio estacionamiento vigilado, bicicleteros, baños públicos y zona de calistenia.',
+        coordinate: [-32.9515, -68.8540],
+        modes: ['bike', 'trekking'],
+        elevationM: 860,
+        parkingAvailable: true,
+        waterAvailable: true,
+        addressOrReference: 'Av. del Trabajo y Panamericana, Godoy Cruz'
+      },
+      {
+        id: 'poi-monumento-gloria',
+        name: 'Mirador Monumento al Ejército de los Andes',
+        category: 'viewpoint',
+        icon: '👁️',
+        color: '#8B5CF6',
+        description: 'Punto panorámico sobre la cumbre del Cerro de la Gloria con vista 360° al Gran Mendoza, viñedos y la Cordillera de los Andes.',
+        coordinate: [-32.8906, -68.8872],
+        modes: ['bike', 'moto', 'trekking'],
+        elevationM: 990,
+        parkingAvailable: true,
+        waterAvailable: true,
+        addressOrReference: 'Cima Cerro de la Gloria, Parque San Martín'
+      },
+      {
+        id: 'poi-cerro-arco-base',
+        name: 'Base Cerro Arco (Puerta de la Quebrada)',
+        category: 'trailhead',
+        icon: '🏁',
+        color: '#0284C7',
+        description: 'Punto de reunión principal para senderistas, pilotos de parapente y motociclistas de enduro. Restaurante de montaña y puestos de sombra.',
+        coordinate: [-32.8410, -68.9170],
+        modes: ['moto', 'trekking'],
+        elevationM: 1120,
+        parkingAvailable: true,
+        waterAvailable: true,
+        addressOrReference: 'Circuito El Challao s/n, Las Heras'
+      },
+      {
+        id: 'poi-portones-agua',
+        name: 'Puesto de Hidratación Portones del Parque',
+        category: 'water',
+        icon: '💧',
+        color: '#06B6D4',
+        description: 'Bebederos públicos de agua potable fresca, estación de recarga de botellas y punto de encuentro habitual para deportistas y ciclistas.',
+        coordinate: [-32.8878, -68.8612],
+        modes: ['bike', 'trekking'],
+        elevationM: 820,
+        parkingAvailable: false,
+        waterAvailable: true,
+        addressOrReference: 'Av. Emilio Civit y Boulogne Sur Mer, Capital'
+      },
+      {
+        id: 'poi-taller-ciclovia',
+        name: 'Punto Auxilio & Taller Ciclista Parque Central',
+        category: 'repair',
+        icon: '🔧',
+        color: '#EAB308',
+        description: 'Estación de autoservicio con inflador de pie para neumáticos, kit de herramientas multiuso para bicicletas y asistencia rápida.',
+        coordinate: [-32.8810, -68.8445],
+        modes: ['bike'],
+        elevationM: 775,
+        parkingAvailable: false,
+        waterAvailable: false,
+        addressOrReference: 'Paseo Di Benedetto & Ciclovía Belgrano, Capital'
+      },
+      {
+        id: 'poi-vertiente-crucesita',
+        name: 'Vertiente Natural & Puesto La Crucesita',
+        category: 'water',
+        icon: '💧',
+        color: '#06B6D4',
+        description: 'Agua natural de deshielo de vertiente precordillerana en la base de senderos hacia Cerro Arenales y Quebrada de la Manga.',
+        coordinate: [-32.9650, -68.9800],
+        modes: ['trekking', 'moto'],
+        elevationM: 1420,
+        parkingAvailable: true,
+        waterAvailable: true,
+        addressOrReference: 'Camino a La Crucesita, Precordillera'
+      }
+    ];
+
+    // --- INICIALIZACIÓN DEL MAPA ---
+    const initialCoords = [-32.8895, -68.8458];
+    const map = L.map('map', {
+      center: initialCoords,
+      zoom: 12,
+      zoomControl: false
+    });
+
+    // CAPAS DE MAPA
+    const baseLayers = {
+      topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        attribution: '© OpenTopoMap, OpenStreetMap'
+      }),
+      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 18,
+        attribution: '© Esri, Maxar, Earthstar Geographics'
+      }),
+      street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '© CartoDB, OpenStreetMap'
+      })
+    };
+
+    let activeLayerName = 'topo';
+    baseLayers.topo.addTo(map);
+
+    function changeMapLayer(layerName) {
+      if (layerName === activeLayerName) return;
+      map.removeLayer(baseLayers[activeLayerName]);
+      baseLayers[layerName].addTo(map);
+      activeLayerName = layerName;
+
+      document.querySelectorAll('.map-type-option').forEach(el => el.classList.remove('active'));
+      document.getElementById('opt-' + layerName).classList.add('active');
+      document.getElementById('map-type-menu').classList.remove('open');
+    }
+
+    function toggleMapTypeMenu() {
+      document.getElementById('map-type-menu').classList.toggle('open');
+    }
+
+    function resetMendozaView() {
+      map.flyTo(initialCoords, 12, { duration: 1.2 });
+    }
+
+    // --- VARIABLES DE ESTADO ---
+    let currentMode = 'bike';
+    let currentActiveRoute = null;
+    let currentActivePoi = null;
+    let polylineLayers = [];
+    let markerLayers = [];
+    let userMarker = null;
+
+    // --- RENDERIZADO DINÁMICO DE RUTAS Y POIS ---
+    function renderMapElements() {
+      // Limpiar capas previas
+      polylineLayers.forEach(p => map.removeLayer(p));
+      polylineLayers = [];
+      markerLayers.forEach(m => map.removeLayer(m));
+      markerLayers = [];
+
+      const filteredRoutes = MENDOZA_ROUTES.filter(r => r.modes.includes(currentMode));
+      const filteredPois = MENDOZA_POIS.filter(p => p.modes.includes(currentMode));
+
+      document.getElementById('stats-badge').innerText = `ViaTrek • ${filteredRoutes.length} rutas • ${filteredPois.length} POIs en Mendoza`;
+
+      // Dibujar Polylines
+      filteredRoutes.forEach(route => {
+        const polyline = L.polyline(route.coordinates, {
+          color: route.color,
+          weight: 6,
+          opacity: 0.9,
+          lineJoin: 'round'
+        }).addTo(map);
+
+        polyline.on('click', () => {
+          showRouteCard(route);
+        });
+
+        polylineLayers.push(polyline);
+      });
+
+      // Dibujar Marcadores de POIs
+      filteredPois.forEach(poi => {
+        const customIcon = L.divIcon({
+          className: '',
+          html: `<div class="custom-marker" style="background-color: ${poi.color};">${poi.icon}</div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
+        });
+
+        const marker = L.marker(poi.coordinate, { icon: customIcon }).addTo(map);
+        marker.on('click', () => {
+          showPoiCard(poi);
+        });
+
+        markerLayers.push(marker);
+      });
+    }
+
+    // --- GESTIÓN DE MODOS ---
+    function selectMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById('tab-' + mode).classList.add('active');
+      closeCards();
+      renderMapElements();
+    }
+
+    // --- TARJETAS INFERIORES (BOTTOM CARDS) ---
+    function showRouteCard(route) {
+      currentActiveRoute = route;
+      closeCards();
+      
+      document.getElementById('route-color-dot').style.backgroundColor = route.color;
+      document.getElementById('route-title').innerText = route.name;
+      document.getElementById('route-subtitle').innerText = route.subtitle;
+      document.getElementById('route-dist').innerText = route.distanceKm + ' km';
+      document.getElementById('route-elev').innerText = '+' + route.elevationGainM + ' m';
+      document.getElementById('route-time').innerText = route.estimatedTimeMin + ' min';
+      document.getElementById('route-diff').innerText = route.difficulty;
+      document.getElementById('route-desc').innerText = route.description;
+      document.getElementById('route-surface').innerText = 'Superficie: ' + route.surfaceType;
+
+      document.getElementById('route-card').style.display = 'block';
+    }
+
+    function focusActiveRoute() {
+      if (currentActiveRoute) {
+        const bounds = L.latLngBounds(currentActiveRoute.coordinates);
+        map.fitBounds(bounds, { padding: [80, 80], maxZoom: 15 });
+      }
+    }
+
+    function showPoiCard(poi) {
+      currentActivePoi = poi;
+      closeCards();
+
+      document.getElementById('poi-color-dot').style.backgroundColor = poi.color;
+      document.getElementById('poi-title').innerText = poi.name;
+      document.getElementById('poi-address').innerText = poi.addressOrReference;
+      document.getElementById('poi-desc').innerText = poi.description;
+
+      const badgesContainer = document.getElementById('poi-badges');
+      badgesContainer.innerHTML = '';
+
+      if (poi.elevationM) {
+        badgesContainer.innerHTML += `<div class="badge-pill">⛰️ ${poi.elevationM} msnm</div>`;
+      }
+      if (poi.parkingAvailable) {
+        badgesContainer.innerHTML += `<div class="badge-pill" style="color: #10B981;">🅿️ Parking seguro</div>`;
+      }
+      if (poi.waterAvailable) {
+        badgesContainer.innerHTML += `<div class="badge-pill" style="color: #0284C7;">💧 Agua potable</div>`;
+      }
+
+      document.getElementById('poi-card').style.display = 'block';
+    }
+
+    function openGoogleMaps() {
+      if (!currentActivePoi) return;
+      const [lat, lng] = currentActivePoi.coordinate;
+      let travelmode = 'bicycling';
+      if (currentMode === 'moto') travelmode = 'driving';
+      if (currentMode === 'trekking') travelmode = 'walking';
+
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${travelmode}`;
+      window.open(url, '_blank');
+    }
+
+    function closeCards() {
+      document.getElementById('route-card').style.display = 'none';
+      document.getElementById('poi-card').style.display = 'none';
+    }
+
+    // --- GEOLOCALIZACIÓN DEL USUARIO ---
+    function locateUser() {
+      if (!navigator.geolocation) {
+        alert('La geolocalización no está soportada en tu navegador.');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+
+          if (userMarker) {
+            map.removeLayer(userMarker);
+          }
+
+          const userIcon = L.divIcon({
+            className: '',
+            html: '<div class="user-pulse-marker"></div>',
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+          });
+
+          userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+          map.flyTo([lat, lng], 15, { duration: 1.5 });
+        },
+        (err) => {
+          alert('No se pudo obtener la ubicación GPS.');
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+
+    // Inicializar elementos
+    renderMapElements();
+  </script>
+</body>
+</html>
