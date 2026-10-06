@@ -9,6 +9,9 @@ import {
   Alert,
   ActivityIndicator,
   Dimensions,
+  Modal,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import MapView, {
   Polyline,
@@ -32,6 +35,12 @@ import {
   TrendingUp,
   LocateFixed,
   Sparkles,
+  AlertTriangle,
+  CheckCircle2,
+  ThumbsUp,
+  Plus,
+  Clock,
+  ShieldAlert,
 } from 'lucide-react-native';
 
 import {
@@ -41,11 +50,15 @@ import {
   POICategory,
   Coordinate,
   MapTypeOption,
+  TrailIncident,
+  IncidentType,
+  IncidentSeverity,
 } from '../types/map';
 import {
   INITIAL_MENDOZA_REGION,
   MENDOZA_ROUTES,
   MENDOZA_POIS,
+  INITIAL_INCIDENTS,
   HIGH_CONTRAST_MAP_STYLE,
 } from '../data/routesAndPois';
 
@@ -66,11 +79,141 @@ export default function MapScreen() {
   const [selectedRoute, setSelectedRoute] = useState<RouteItem | null>(null);
   const [selectedPoi, setSelectedPoi] = useState<POIItem | null>(null);
 
+  // Estados de incidentes comunitarios (Waze de la Montaña)
+  const [incidents, setIncidents] = useState<TrailIncident[]>(INITIAL_INCIDENTS);
+  const [selectedIncident, setSelectedIncident] = useState<TrailIncident | null>(null);
+  const [isReportModalVisible, setIsReportModalVisible] = useState<boolean>(false);
+
+  // Estados del formulario para nuevo reporte
+  const [newType, setNewType] = useState<IncidentType>('landslide');
+  const [newSeverity, setNewSeverity] = useState<IncidentSeverity>('media');
+  const [newTitle, setNewTitle] = useState<string>('');
+  const [newDescription, setNewDescription] = useState<string>('');
+
   // Rutas filtradas
   const visibleRoutes = useMemo(() => {
     if (selectedFilter === 'todas') return MENDOZA_ROUTES;
     return MENDOZA_ROUTES.filter((route) => route.type === selectedFilter);
   }, [selectedFilter]);
+
+  // Incidentes filtrados según el modo seleccionado
+  const visibleIncidents = useMemo(() => {
+    if (selectedFilter === 'todas') return incidents;
+    return incidents.filter((inc) => inc.affectedModes.includes(selectedFilter));
+  }, [selectedFilter, incidents]);
+
+  // Voto: Sigue ahí (+1)
+  const handleUpvoteIncident = (id: string) => {
+    setIncidents((prev) =>
+      prev.map((inc) => {
+        if (inc.id === id) {
+          const updated = { ...inc, upvotes: inc.upvotes + 1 };
+          if (selectedIncident?.id === id) setSelectedIncident(updated);
+          return updated;
+        }
+        return inc;
+      })
+    );
+    Alert.alert('¡Gracias!', 'Confirmaste que esta alerta comunitaria sigue activa.');
+  };
+
+  // Voto: Ya se despejó (+1)
+  const handleResolveIncident = (id: string) => {
+    setIncidents((prev) =>
+      prev.map((inc) => {
+        if (inc.id === id) {
+          const updated = { ...inc, resolvedVotes: inc.resolvedVotes + 1 };
+          if (selectedIncident?.id === id) setSelectedIncident(updated);
+          return updated;
+        }
+        return inc;
+      })
+    );
+    Alert.alert('¡Excelente noticia!', 'Reportaste que este obstáculo ya fue despejado.');
+  };
+
+  // Publicar nuevo reporte comunitario
+  const handleSubmitIncident = () => {
+    if (!newTitle.trim()) {
+      Alert.alert('Falta título', 'Por favor ingresa un título o descripción breve para la alerta.');
+      return;
+    }
+
+    const coordinate = userLocation || {
+      latitude: INITIAL_MENDOZA_REGION.latitude + (Math.random() - 0.5) * 0.03,
+      longitude: INITIAL_MENDOZA_REGION.longitude + (Math.random() - 0.5) * 0.03,
+    };
+
+    const newIncident: TrailIncident = {
+      id: `inc-${Date.now()}`,
+      type: newType,
+      title: newTitle.trim(),
+      description: newDescription.trim() || 'Reportado en tiempo real por la comunidad ViaTrek.',
+      severity: newSeverity,
+      latitude: coordinate.latitude,
+      longitude: coordinate.longitude,
+      reportedAt: 'Recién',
+      affectedModes:
+        selectedFilter === 'todas'
+          ? ['ciclovia', 'sendero_mtb', 'moto_trail']
+          : [selectedFilter],
+      upvotes: 1,
+      resolvedVotes: 0,
+      author: 'Tú (Explorador ViaTrek)',
+    };
+
+    setIncidents((prev) => [newIncident, ...prev]);
+    setSelectedRoute(null);
+    setSelectedPoi(null);
+    setSelectedIncident(newIncident);
+    setIsReportModalVisible(false);
+    setNewTitle('');
+    setNewDescription('');
+
+    mapRef.current?.animateToRegion(
+      {
+        latitude: coordinate.latitude,
+        longitude: coordinate.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      },
+      700
+    );
+
+    Alert.alert('¡Alerta publicada!', 'Tu reporte ya está visible en el mapa para todos los usuarios.');
+  };
+
+  const getIncidentIcon = (type: IncidentType) => {
+    switch (type) {
+      case 'landslide':
+        return '⚠️';
+      case 'thorns':
+        return '🌵';
+      case 'water':
+        return '💧';
+      case 'animals':
+        return '🐕';
+      case 'blocked':
+        return '🚧';
+      case 'caution':
+        return '⚡';
+      default:
+        return '⚠️';
+    }
+  };
+
+  const getSeverityColor = (severity: IncidentSeverity) => {
+    switch (severity) {
+      case 'alta':
+        return '#FF1744';
+      case 'media':
+        return '#FF9100';
+      case 'baja':
+        return '#00E5FF';
+      default:
+        return '#FF9100';
+    }
+  };
 
   // POIs filtrados (visibles según relevancia de la categoría o si están en 'todas')
   const visiblePois = useMemo(() => {
@@ -325,6 +468,50 @@ export default function MapScreen() {
             </Marker>
           );
         })}
+
+        {/* REPORTES COMUNITARIOS EN TIEMPO REAL (WAZE DE LA MONTAÑA) */}
+        {visibleIncidents.map((incident) => {
+          const isSelected = selectedIncident?.id === incident.id;
+          const severityColor = getSeverityColor(incident.severity);
+
+          return (
+            <Marker
+              key={incident.id}
+              coordinate={{ latitude: incident.latitude, longitude: incident.longitude }}
+              title={incident.title}
+              description={incident.description}
+              onPress={() => {
+                setSelectedRoute(null);
+                setSelectedPoi(null);
+                setSelectedIncident(incident);
+              }}
+            >
+              <View
+                style={[
+                  styles.incidentMarkerCasing,
+                  { borderColor: severityColor },
+                  isSelected && styles.incidentMarkerSelected,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.incidentMarkerInner,
+                    { backgroundColor: severityColor },
+                  ]}
+                >
+                  <Text style={styles.incidentMarkerEmoji}>
+                    {getIncidentIcon(incident.type)}
+                  </Text>
+                </View>
+                {incident.severity === 'alta' && (
+                  <View style={styles.incidentBadgeAlert}>
+                    <Text style={styles.incidentBadgeAlertText}>!</Text>
+                  </View>
+                )}
+              </View>
+            </Marker>
+          );
+        })}
       </MapView>
 
       {/* HEADER SUPERIOR: FILTRO DE RUTAS */}
@@ -435,16 +622,30 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Badge contador de rutas activas */}
+        {/* Badge contador de rutas activas e incidentes en vivo */}
         <View style={styles.statsBadge}>
           <Text style={styles.statsBadgeText}>
-            Mendoza • {visibleRoutes.length} rutas activas • {visiblePois.length} POIs
+            Mendoza • {visibleRoutes.length} rutas • {visiblePois.length} POIs • ⚠️ {visibleIncidents.length} alertas en vivo
           </Text>
         </View>
       </View>
 
       {/* FABs: BOTONES LATERALES DE ACCIÓN */}
       <View style={[styles.fabContainer, { top: insets.top + 80 }]}>
+        {/* Botón Waze de la Montaña: Reportar Alerta en tiempo real */}
+        <TouchableOpacity
+          style={[styles.fabButton, styles.fabReportButton]}
+          onPress={() => setIsReportModalVisible(true)}
+          activeOpacity={0.85}
+        >
+          <AlertTriangle size={20} color="#FFD600" />
+          {visibleIncidents.length > 0 && (
+            <View style={styles.fabReportBadge}>
+              <Text style={styles.fabReportBadgeText}>{visibleIncidents.length}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+
         {/* Selector de capa de mapa */}
         <TouchableOpacity
           style={styles.fabButton}
@@ -725,6 +926,216 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
       )}
+
+      {/* TARJETA INFERIOR: DETALLES DE INCIDENTE COMUNITARIO (WAZE DE LA MONTAÑA) */}
+      {selectedIncident && (
+        <View style={[styles.bottomCard, { paddingBottom: insets.bottom + 16 }]}>
+          <View style={styles.cardHeader}>
+            <View style={{ flex: 1 }}>
+              <View style={styles.cardHeaderTopRow}>
+                <View
+                  style={[
+                    styles.severityBadge,
+                    { backgroundColor: getSeverityColor(selectedIncident.severity) },
+                  ]}
+                >
+                  <Text style={styles.severityBadgeText}>
+                    ALERTA {selectedIncident.severity.toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={styles.incidentTimeText}>
+                  🕒 {selectedIncident.reportedAt} • {selectedIncident.author}
+                </Text>
+              </View>
+
+              <View style={styles.incidentTitleRow}>
+                <Text style={styles.incidentEmojiLarge}>
+                  {getIncidentIcon(selectedIncident.type)}
+                </Text>
+                <Text style={styles.cardTitle} numberOfLines={2}>
+                  {selectedIncident.title}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => setSelectedIncident(null)}
+              style={styles.closeBtn}
+            >
+              <X size={20} color="#94A3B8" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.cardDescription}>{selectedIncident.description}</Text>
+
+          {/* Modos afectados */}
+          <View style={styles.affectedModesRow}>
+            <Text style={styles.affectedModesLabel}>Afecta a:</Text>
+            {selectedIncident.affectedModes.map((m) => (
+              <View key={m} style={styles.affectedModeBadge}>
+                <Text style={styles.affectedModeBadgeText}>
+                  {m === 'ciclovia' ? '🚴 Ciclovía' : m === 'sendero_mtb' ? '🚵 MTB' : '🏍️ Moto'}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Botones de validación comunitaria */}
+          <View style={styles.incidentVotesRow}>
+            <TouchableOpacity
+              style={styles.voteStayBtn}
+              onPress={() => handleUpvoteIncident(selectedIncident.id)}
+              activeOpacity={0.85}
+            >
+              <ThumbsUp size={16} color="#FFD600" />
+              <Text style={styles.voteStayBtnText}>
+                ¡Sigue ahí! ({selectedIncident.upvotes})
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.voteResolvedBtn}
+              onPress={() => handleResolveIncident(selectedIncident.id)}
+              activeOpacity={0.85}
+            >
+              <CheckCircle2 size={16} color="#00E676" />
+              <Text style={styles.voteResolvedBtnText}>
+                Ya se despejó ({selectedIncident.resolvedVotes})
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* MODAL: REPORTAR NUEVA ALERTA COMUNITARIA */}
+      <Modal
+        visible={isReportModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsReportModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderTitleRow}>
+                <AlertTriangle size={20} color="#FFD600" />
+                <Text style={styles.modalTitle}>Reportar Alerta en Sendero</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setIsReportModalVisible(false)}
+                style={styles.modalCloseBtn}
+              >
+                <X size={20} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.modalSubtitle}>
+                Advierte a la comunidad en tiempo real sobre obstáculos, agua o peligros en la montaña.
+              </Text>
+
+              {/* Selector de Tipo de Incidente */}
+              <Text style={styles.inputSectionLabel}>TIPO DE ALERTA</Text>
+              <View style={styles.typeGrid}>
+                {[
+                  { type: 'landslide' as IncidentType, label: 'Derrumbe', icon: '⚠️' },
+                  { type: 'thorns' as IncidentType, label: 'Espinas', icon: '🌵' },
+                  { type: 'water' as IncidentType, label: 'Agua/Vertiente', icon: '💧' },
+                  { type: 'animals' as IncidentType, label: 'Animales', icon: '🐕' },
+                  { type: 'blocked' as IncidentType, label: 'Paso Cerrado', icon: '🚧' },
+                  { type: 'caution' as IncidentType, label: 'Precaución', icon: '⚡' },
+                ].map((item) => {
+                  const isChosen = newType === item.type;
+                  return (
+                    <TouchableOpacity
+                      key={item.type}
+                      style={[styles.typeOption, isChosen && styles.typeOptionActive]}
+                      onPress={() => setNewType(item.type)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.typeOptionIcon}>{item.icon}</Text>
+                      <Text
+                        style={[
+                          styles.typeOptionLabel,
+                          isChosen && styles.typeOptionLabelActive,
+                        ]}
+                      >
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {/* Selector de Severidad */}
+              <Text style={styles.inputSectionLabel}>NIVEL DE SEVERIDAD</Text>
+              <View style={styles.severityRow}>
+                {[
+                  { sev: 'baja' as IncidentSeverity, label: 'Baja', color: '#00E5FF' },
+                  { sev: 'media' as IncidentSeverity, label: 'Media', color: '#FF9100' },
+                  { sev: 'alta' as IncidentSeverity, label: 'Alta', color: '#FF1744' },
+                ].map((item) => {
+                  const isChosen = newSeverity === item.sev;
+                  return (
+                    <TouchableOpacity
+                      key={item.sev}
+                      style={[
+                        styles.severityOption,
+                        isChosen && { borderColor: item.color, backgroundColor: `${item.color}22` },
+                      ]}
+                      onPress={() => setNewSeverity(item.sev)}
+                      activeOpacity={0.8}
+                    >
+                      <Text
+                        style={[
+                          styles.severityOptionLabel,
+                          isChosen && { color: item.color, fontWeight: '700' },
+                        ]}
+                      >
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {/* Título de la alerta */}
+              <Text style={styles.inputSectionLabel}>TÍTULO CORTO</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Ej: Piedras sueltas tras lluvia en curva 3"
+                placeholderTextColor="#64748B"
+                value={newTitle}
+                onChangeText={setNewTitle}
+              />
+
+              {/* Descripción detallada */}
+              <Text style={styles.inputSectionLabel}>DETALLES / RECOMENDACIÓN</Text>
+              <TextInput
+                style={[styles.textInput, styles.textArea]}
+                placeholder="Ej: Bajar despacio en moto, llevar líquido tubeless..."
+                placeholderTextColor="#64748B"
+                value={newDescription}
+                onChangeText={setNewDescription}
+                multiline
+                numberOfLines={3}
+              />
+
+              {/* Botón de Publicar */}
+              <TouchableOpacity
+                style={styles.submitIncidentButton}
+                onPress={handleSubmitIncident}
+                activeOpacity={0.88}
+              >
+                <Plus size={18} color="#05080E" strokeWidth={3} />
+                <Text style={styles.submitIncidentButtonText}>
+                  Publicar Alerta Comunitaria
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1106,5 +1517,308 @@ const styles = StyleSheet.create({
     color: '#05080E',
     fontSize: 14,
     fontWeight: '800',
+  },
+
+  // FAB Report Button (Waze de la Montaña)
+  fabReportButton: {
+    borderColor: '#FFD600',
+    backgroundColor: '#1E293B',
+  },
+  fabReportBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#FF1744',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 1.5,
+    borderColor: '#05080E',
+  },
+  fabReportBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+
+  // Marcadores de incidentes en el mapa
+  incidentMarkerCasing: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2.5,
+    backgroundColor: '#05080E',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.45,
+    shadowRadius: 5,
+    elevation: 7,
+  },
+  incidentMarkerSelected: {
+    transform: [{ scale: 1.25 }],
+    borderColor: '#FFFFFF',
+    borderWidth: 3,
+  },
+  incidentMarkerInner: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  incidentMarkerEmoji: {
+    fontSize: 13,
+  },
+  incidentBadgeAlert: {
+    position: 'absolute',
+    top: -3,
+    right: -3,
+    backgroundColor: '#FF1744',
+    width: 13,
+    height: 13,
+    borderRadius: 6.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+  },
+  incidentBadgeAlertText: {
+    color: '#FFFFFF',
+    fontSize: 8,
+    fontWeight: '900',
+  },
+
+  // Tarjeta de Incidente
+  severityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  severityBadgeText: {
+    color: '#05080E',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  incidentTimeText: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  incidentTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  incidentEmojiLarge: {
+    fontSize: 22,
+  },
+  affectedModesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 14,
+    flexWrap: 'wrap',
+  },
+  affectedModesLabel: {
+    color: '#64748B',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  affectedModeBadge: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  affectedModeBadgeText: {
+    color: '#F8FAFC',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  incidentVotesRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  voteStayBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1E293B',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FFD600',
+    gap: 6,
+  },
+  voteStayBtnText: {
+    color: '#FFD600',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  voteResolvedBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1E293B',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#00E676',
+    gap: 6,
+  },
+  voteResolvedBtnText: {
+    color: '#00E676',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+
+  // Modal de Reportar Alerta
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(5, 8, 14, 0.85)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#0F172A',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    maxHeight: '90%',
+    borderTopWidth: 1,
+    borderColor: 'rgba(255, 214, 0, 0.3)',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  modalHeaderTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  modalTitle: {
+    color: '#F8FAFC',
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  modalCloseBtn: {
+    padding: 6,
+  },
+  modalSubtitle: {
+    color: '#94A3B8',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 16,
+  },
+  inputSectionLabel: {
+    color: '#64748B',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  typeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  typeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    gap: 6,
+  },
+  typeOptionActive: {
+    backgroundColor: '#334155',
+    borderColor: '#FFD600',
+  },
+  typeOptionIcon: {
+    fontSize: 16,
+  },
+  typeOptionLabel: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  typeOptionLabelActive: {
+    color: '#FFD600',
+    fontWeight: '800',
+  },
+  severityRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  severityOption: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1E293B',
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  severityOptionLabel: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  textInput: {
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: '#F8FAFC',
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: 8,
+  },
+  textArea: {
+    minHeight: 70,
+    textAlignVertical: 'top',
+  },
+  submitIncidentButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFD600',
+    paddingVertical: 15,
+    borderRadius: 14,
+    gap: 8,
+    marginTop: 14,
+    marginBottom: 10,
+    shadowColor: '#FFD600',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  submitIncidentButtonText: {
+    color: '#05080E',
+    fontSize: 15,
+    fontWeight: '900',
   },
 });

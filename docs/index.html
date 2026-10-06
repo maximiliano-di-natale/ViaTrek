@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ViaTrek Mendoza - Senderos, Ciclovías & POIs de Alto Contraste</title>
+  <title>ViaTrek Mendoza - Senderos, Ciclovías & Alertas en Vivo</title>
   
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -12,7 +12,7 @@
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -58,8 +58,8 @@
       padding: 4px;
       width: 100%;
       max-width: 480px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.12);
-      gap: 4px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      gap: 3px;
     }
     .filter-pill {
       flex: 1;
@@ -67,15 +67,16 @@
       align-items: center;
       justify-content: center;
       padding: 9px 8px;
-      border-radius: 22px;
-      border: 1px solid transparent;
+      border-radius: 20px;
+      border: none;
       background: transparent;
       color: #94A3B8;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      gap: 5px;
+      gap: 4px;
+      white-space: nowrap;
     }
     .filter-pill:hover {
       color: #F8FAFC;
@@ -83,44 +84,45 @@
     .filter-pill.active-todas {
       background: #1E293B;
       color: #FFFFFF;
-      font-weight: 700;
+      font-weight: 800;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
     .filter-pill.active-ciclovia {
-      background: rgba(0, 230, 118, 0.16);
-      border-color: #00E676;
+      background: rgba(0, 230, 118, 0.15);
       color: #00E676;
-      font-weight: 700;
+      font-weight: 800;
+      border: 1px solid rgba(0, 230, 118, 0.5);
     }
     .filter-pill.active-sendero_mtb {
-      background: rgba(255, 109, 0, 0.16);
-      border-color: #FF6D00;
+      background: rgba(255, 109, 0, 0.15);
       color: #FF6D00;
-      font-weight: 700;
+      font-weight: 800;
+      border: 1px solid rgba(255, 109, 0, 0.5);
     }
     .filter-pill.active-moto_trail {
-      background: rgba(41, 121, 255, 0.16);
-      border-color: #2979FF;
+      background: rgba(41, 121, 255, 0.15);
       color: #2979FF;
-      font-weight: 700;
+      font-weight: 800;
+      border: 1px solid rgba(41, 121, 255, 0.5);
     }
     .stats-badge {
       pointer-events: auto;
-      margin-top: 8px;
+      margin-top: 7px;
       background: rgba(11, 15, 23, 0.88);
       backdrop-filter: blur(8px);
-      padding: 5px 14px;
-      border-radius: 14px;
-      color: #CBD5E1;
+      padding: 4px 14px;
+      border-radius: 12px;
+      color: #E2E8F0;
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 600;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      letter-spacing: 0.3px;
     }
 
-    /* FLOATING BUTTONS (FABs) */
+    /* FLOATING ACTION BUTTONS */
     .fab-container {
       position: absolute;
-      top: 90px;
+      top: 96px;
       right: 14px;
       z-index: 1000;
       display: flex;
@@ -131,94 +133,115 @@
       width: 44px;
       height: 44px;
       border-radius: 22px;
-      background: #131B2E;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #F8FAFC;
+      background: #101622;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-      transition: all 0.2s ease;
-      font-size: 18px;
+      color: #F8FAFC;
+      font-size: 17px;
+      transition: transform 0.15s ease, background 0.2s ease;
+      position: relative;
     }
     .fab-btn:hover {
-      transform: scale(1.05);
+      transform: scale(1.06);
       background: #1E293B;
-      border-color: #00E676;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .fab-btn.report-btn {
+      border-color: #FFD600;
+      background: #1E293B;
+    }
+    .fab-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #FF1744;
+      color: #FFFFFF;
+      font-size: 9px;
+      font-weight: 900;
+      border-radius: 9px;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #0B0F17;
     }
 
-    /* MENÚ DE CAPAS DE MAPA */
     .map-type-menu {
       position: absolute;
-      right: 52px;
+      right: 54px;
       top: 0;
-      background: #131B2E;
+      background: #101622;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 14px;
       padding: 6px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      width: 160px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
       display: none;
       flex-direction: column;
       gap: 4px;
-      width: 160px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      z-index: 1001;
     }
     .map-type-menu.open {
       display: flex;
     }
     .map-type-option {
-      background: transparent;
+      padding: 8px 12px;
       border: none;
-      padding: 8px 10px;
+      background: transparent;
       border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #94A3B8;
+      text-align: left;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #94A3B8;
-      cursor: pointer;
-      text-align: left;
+      transition: all 0.15s;
     }
     .map-type-option:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: #1E293B;
       color: #F8FAFC;
     }
     .map-type-option.active {
-      background: rgba(0, 230, 118, 0.12);
+      background: rgba(0, 230, 118, 0.15);
       color: #00E676;
       font-weight: 700;
     }
 
-    /* TARJETA INFERIOR (BOTTOM CARD) */
+    /* BOTTOM CARDS */
     .bottom-card {
       position: absolute;
-      bottom: 0;
-      left: 12px;
-      right: 12px;
-      background: #101726;
-      border-top-left-radius: 24px;
-      border-top-right-radius: 24px;
-      padding: 20px 20px 24px 20px;
-      z-index: 1000;
-      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      display: none;
-      max-width: 540px;
+      left: 14px;
+      right: 14px;
+      bottom: 20px;
+      max-width: 480px;
       margin: 0 auto;
-      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      background: #101622;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      display: none;
+      animation: slideUp 0.22s ease-out forwards;
     }
     .bottom-card.open {
       display: block;
     }
     @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
     .card-header {
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
+      align-items: flex-start;
       margin-bottom: 12px;
     }
     .card-title-row {
@@ -232,58 +255,67 @@
       height: 10px;
       border-radius: 5px;
     }
+    .card-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #F8FAFC;
+      letter-spacing: -0.2px;
+    }
+    .close-btn {
+      background: #1E293B;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94A3B8;
+      font-size: 14px;
+    }
+    .close-btn:hover {
+      color: #FFFFFF;
+      background: #334155;
+    }
     .zone-badge {
       font-size: 11px;
       color: #94A3B8;
-      font-weight: 500;
+      font-weight: 600;
     }
     .diff-pill {
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10px;
+      font-weight: 800;
       padding: 2px 7px;
       border-radius: 6px;
       border: 1px solid;
     }
-    .card-title {
-      font-size: 17px;
-      font-weight: 800;
-      color: #F8FAFC;
-    }
-    .close-btn {
-      background: transparent;
-      border: none;
-      font-size: 18px;
-      color: #94A3B8;
-      cursor: pointer;
-      padding: 4px;
-    }
 
-    /* MÉTRICAS */
     .metrics-container {
       display: flex;
-      background: #162033;
-      border-radius: 12px;
-      padding: 10px;
-      justify-content: space-around;
+      background: #080C14;
+      border-radius: 14px;
+      padding: 10px 12px;
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
     .metric-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      flex: 1;
     }
     .metric-label {
       font-size: 10px;
-      color: #64748B;
       font-weight: 600;
-      text-transform: uppercase;
+      color: #64748B;
+      margin-bottom: 2px;
     }
     .metric-val {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       color: #F8FAFC;
     }
     .metric-divider {
@@ -294,9 +326,9 @@
 
     .card-description {
       font-size: 13px;
-      line-height: 1.4;
       color: #CBD5E1;
-      margin-bottom: 16px;
+      line-height: 1.45;
+      margin-bottom: 14px;
     }
 
     .action-row {
@@ -305,59 +337,142 @@
     }
     .btn-focus {
       flex: 1;
+      padding: 11px;
       background: #1E293B;
+      border: 1px solid rgba(0, 230, 118, 0.35);
       color: #00E676;
-      border: 1px solid rgba(0, 230, 118, 0.3);
-      padding: 12px;
-      border-radius: 12px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn-focus:hover {
-      background: rgba(0, 230, 118, 0.12);
+      text-align: center;
     }
     .btn-nav {
       flex: 1;
+      padding: 11px;
       background: #00E676;
       color: #05080E;
-      border: none;
-      padding: 12px;
-      border-radius: 12px;
       font-weight: 800;
-      font-size: 13px;
+      font-size: 12px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
+    }
+
+    /* SEVERITY BADGES & INCIDENT CARD */
+    .severity-badge {
+      font-size: 10px;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 5px;
+      color: #05080E;
+      letter-spacing: 0.5px;
+    }
+    .incident-meta-text {
+      font-size: 11px;
+      color: #94A3B8;
+      font-weight: 500;
+    }
+    .incident-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .affected-modes-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .affected-tag {
+      background: #1E293B;
+      color: #F8FAFC;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .vote-btn-stay {
+      flex: 1;
+      padding: 11px;
+      background: #1E293B;
+      border: 1px solid #FFD600;
+      color: #FFD600;
+      font-weight: 800;
+      font-size: 12px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      text-decoration: none;
-      box-shadow: 0 4px 12px rgba(0, 230, 118, 0.35);
+      gap: 5px;
     }
-    .btn-nav:hover {
-      background: #00C853;
+    .vote-btn-resolved {
+      flex: 1;
+      padding: 11px;
+      background: #1E293B;
+      border: 1px solid #00E676;
+      color: #00E676;
+      font-weight: 800;
+      font-size: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
 
-    /* CUSTOM MARKER */
+    /* MARKER STYLES */
     .custom-poi-marker {
       width: 34px;
       height: 34px;
       border-radius: 17px;
       background: #05080E;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      border: 2px solid #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: transform 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
     .custom-poi-marker:hover {
       transform: scale(1.2);
-      border-color: #00E676;
     }
     .poi-inner-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .custom-incident-marker {
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      background: #05080E;
+      border: 2.5px solid;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
+      transition: transform 0.2s;
+    }
+    .custom-incident-marker:hover {
+      transform: scale(1.25);
+    }
+    .incident-inner-circle {
       width: 26px;
       height: 26px;
       border-radius: 13px;
@@ -381,6 +496,156 @@
       70% { box-shadow: 0 0 0 14px rgba(0, 230, 118, 0); }
       100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
     }
+
+    /* MODAL: REPORTAR ALERTA */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(5, 8, 14, 0.85);
+      z-index: 2000;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-content {
+      background: #0F172A;
+      border-top-left-radius: 26px;
+      border-top-right-radius: 26px;
+      padding: 22px;
+      width: 100%;
+      max-width: 500px;
+      border-top: 1px solid rgba(255, 214, 0, 0.3);
+      max-height: 88vh;
+      overflow-y: auto;
+      animation: slideUpModal 0.25s ease-out;
+    }
+    @keyframes slideUpModal {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .modal-subtitle {
+      font-size: 12px;
+      color: #94A3B8;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .input-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748B;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .type-btn {
+      padding: 8px 6px;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #94A3B8;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .type-btn.active {
+      background: #334155;
+      border-color: #FFD600;
+      color: #FFD600;
+      font-weight: 800;
+    }
+    .severity-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .sev-btn {
+      flex: 1;
+      padding: 9px;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #94A3B8;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .sev-btn.active-baja {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: #00E5FF;
+      color: #00E5FF;
+      font-weight: 800;
+    }
+    .sev-btn.active-media {
+      background: rgba(255, 145, 0, 0.15);
+      border-color: #FF9100;
+      color: #FF9100;
+      font-weight: 800;
+    }
+    .sev-btn.active-alta {
+      background: rgba(255, 23, 68, 0.15);
+      border-color: #FF1744;
+      color: #FF1744;
+      font-weight: 800;
+    }
+    .form-input {
+      width: 100%;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #F8FAFC;
+      font-size: 13px;
+      font-family: inherit;
+      margin-bottom: 10px;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #FFD600;
+    }
+    .btn-submit-incident {
+      width: 100%;
+      padding: 13px;
+      background: #FFD600;
+      color: #05080E;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255, 214, 0, 0.35);
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
@@ -402,12 +667,18 @@
       </button>
     </div>
     <div class="stats-badge" id="stats-badge">
-      Mendoza • 5 rutas • 5 POIs
+      Mendoza • 5 rutas • 5 POIs • ⚠️ 5 alertas en vivo
     </div>
   </div>
 
   <!-- FLOATING BUTTONS -->
   <div class="fab-container">
+    <!-- Botón Waze de la Montaña: Reportar Alerta -->
+    <button class="fab-btn report-btn" onclick="openReportModal()" title="Reportar Alerta en Sendero">
+      ⚠️
+      <div class="fab-badge" id="fab-badge-count">5</div>
+    </button>
+
     <button class="fab-btn" onclick="toggleMapTypeMenu()" title="Tipo de mapa">
       🗺️
     </button>
@@ -492,6 +763,76 @@
     </a>
   </div>
 
+  <!-- BOTTOM CARD: DETALLE DE INCIDENTE (WAZE) -->
+  <div class="bottom-card" id="incident-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title-row">
+          <span class="severity-badge" id="inc-sev-badge">ALERTA MEDIA</span>
+          <span class="incident-meta-text" id="inc-meta-text">🕒 Hace 2h • Facundo MTB</span>
+        </div>
+        <div class="incident-title-row">
+          <span style="font-size: 20px;" id="inc-icon-emoji">⚠️</span>
+          <div class="card-title" id="inc-title">Derrumbe de piedras</div>
+        </div>
+      </div>
+      <button class="close-btn" onclick="closeCards()">✕</button>
+    </div>
+
+    <p class="card-description" id="inc-desc"></p>
+
+    <div class="affected-modes-row" id="inc-modes-row"></div>
+
+    <div class="action-row">
+      <button class="vote-btn-stay" onclick="voteStayCurrentIncident()">
+        👍 ¡Sigue ahí! (<span id="inc-upvotes-count">0</span>)
+      </button>
+      <button class="vote-btn-resolved" onclick="voteResolvedCurrentIncident()">
+        ✅ Ya se despejó (<span id="inc-resolved-count">0</span>)
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: REPORTAR ALERTA EN SENDERO -->
+  <div class="modal-overlay" id="report-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">⚠️ Reportar Alerta en Sendero</div>
+        <button class="close-btn" onclick="closeReportModal()">✕</button>
+      </div>
+      <p class="modal-subtitle">
+        Comparte con la comunidad obstáculos, animales sueltos, agua o peligros en la montaña en tiempo real.
+      </p>
+
+      <label class="input-label">TIPO DE ALERTA</label>
+      <div class="type-grid">
+        <button class="type-btn active" id="type-landslide" onclick="selectIncidentType('landslide')">⚠️ Derrumbe</button>
+        <button class="type-btn" id="type-thorns" onclick="selectIncidentType('thorns')">🌵 Espinas</button>
+        <button class="type-btn" id="type-water" onclick="selectIncidentType('water')">💧 Agua</button>
+        <button class="type-btn" id="type-animals" onclick="selectIncidentType('animals')">🐕 Animales</button>
+        <button class="type-btn" id="type-blocked" onclick="selectIncidentType('blocked')">🚧 Bloqueado</button>
+        <button class="type-btn" id="type-caution" onclick="selectIncidentType('caution')">⚡ Peligro</button>
+      </div>
+
+      <label class="input-label">NIVEL DE SEVERIDAD</label>
+      <div class="severity-row">
+        <button class="sev-btn" id="sev-baja" onclick="selectSeverity('baja')">Baja</button>
+        <button class="sev-btn active-media" id="sev-media" onclick="selectSeverity('media')">Media</button>
+        <button class="sev-btn" id="sev-alta" onclick="selectSeverity('alta')">Alta</button>
+      </div>
+
+      <label class="input-label">TÍTULO</label>
+      <input type="text" class="form-input" id="report-title-input" placeholder="Ej: Piedras sueltas tras lluvia en curva 3">
+
+      <label class="input-label">DETALLES Y RECOMENDACIÓN</label>
+      <textarea class="form-input" id="report-desc-input" rows="3" placeholder="Ej: Precaución con motos de enduro y bicis en la bajada rápida"></textarea>
+
+      <button class="btn-submit-incident" onclick="submitReportWeb()">
+        Publicar Alerta Comunitaria 🚀
+      </button>
+    </div>
+  </div>
+
   <script>
     // DATASET REAL DE MENDOZA
     const MENDOZA_ROUTES = [
@@ -545,46 +886,46 @@
         coordinates: [
           [-33.0035, -68.8920],
           [-32.9920, -68.9055],
-          [-32.9780, -68.9150],
-          [-32.9550, -68.9080],
-          [-32.9210, -68.8890],
-          [-32.9080, -68.8820]
+          [-32.9810, -68.9180],
+          [-32.9730, -68.9240],
+          [-32.9610, -68.9120],
+          [-32.9520, -68.8990]
         ]
       },
       {
-        id: 'sendero-cerro-arco-cumbre',
-        name: 'Ascenso Clásico Cerro Arco',
-        zone: 'Las Heras Precordillera',
-        type: 'sendero_mtb',
-        distanceKm: 4.8,
-        elevationGainM: 520,
+        id: 'sendero-cerro-arco-antenas',
+        name: 'Ascenso al Cerro Arco (1.680 msnm) & Filo Precordillerano',
+        zone: 'El Challao / Las Heras',
+        type: 'moto_trail',
+        distanceKm: 14.8,
+        elevationGainM: 780,
         difficulty: 'Técnico',
         surface: 'Ripio/Tierra',
-        strokeColor: '#FF6D00',
+        strokeColor: '#2979FF',
         coordinates: [
           [-32.8420, -68.9240],
-          [-32.8445, -68.9310],
-          [-32.8465, -68.9375],
-          [-32.8482, -68.9440],
-          [-32.8498, -68.9485]
+          [-32.8395, -68.9320],
+          [-32.8360, -68.9410],
+          [-32.8340, -68.9485],
+          [-32.8280, -68.9560]
         ]
       },
       {
-        id: 'ruta-moto-villavicencio-caracoles',
-        name: 'Ruta Histórica Caracoles de Villavicencio (RP 52)',
-        zone: 'Las Heras / Precordillera Alta',
+        id: 'sendero-quebrada-san-isidro',
+        name: 'Travesía Quebrada de San Isidro & Puesto La Crucesita',
+        zone: 'Precordillera Central',
         type: 'moto_trail',
-        distanceKm: 28.0,
-        elevationGainM: 1100,
-        difficulty: 'Moderado',
+        distanceKm: 18.2,
+        elevationGainM: 620,
+        difficulty: 'Técnico',
         surface: 'Mixto',
         strokeColor: '#2979FF',
         coordinates: [
-          [-32.5310, -69.0180],
-          [-32.5220, -69.0350],
-          [-32.5110, -69.0520],
-          [-32.4980, -69.0730],
-          [-32.4820, -69.0980]
+          [-32.8550, -68.9350],
+          [-32.8680, -68.9480],
+          [-32.8850, -68.9610],
+          [-32.9120, -68.9720],
+          [-32.9645, -68.9790]
         ]
       }
     ];
@@ -592,7 +933,7 @@
     const MENDOZA_POIS = [
       {
         id: 'poi-estacion-benegas',
-        name: 'Estación Benegas (Punto Seguro & Servicios)',
+        name: 'Estación Benegas (Trailhead & Punto Seguro)',
         category: 'taller',
         icon: '🔧',
         color: '#FFD600',
@@ -618,7 +959,7 @@
         color: '#00E5FF',
         latitude: -32.8420,
         longitude: -68.9240,
-        description: 'Estacionamiento, puesto de hidratación y punto de inicio para Cerro Arco y Santo Tomás.'
+        description: 'Estacionamiento, puesto de hidratación y punto de inicio para Cerro Arco.'
       },
       {
         id: 'poi-chacras-entrada',
@@ -639,6 +980,80 @@
         latitude: -32.8868,
         longitude: -68.8930,
         description: 'Mirador panorámico con vista a la Ciudad de Mendoza y Parque San Martín.'
+      }
+    ];
+
+    // DATASET DE ALERTAS COMUNITARIAS EN TIEMPO REAL (WAZE DE LA MONTAÑA)
+    let MENDOZA_INCIDENTS = [
+      {
+        id: 'inc-cerro-arco-derrumbe',
+        type: 'landslide',
+        title: 'Derrumbe de piedras en curva 3',
+        description: 'Piedras sueltas y desmoronamiento de ladera tras la lluvia. Precaución con motos de enduro y bicis en la bajada rápida.',
+        severity: 'media',
+        latitude: -32.8445,
+        longitude: -68.9180,
+        reportedAt: 'Hace 2 horas',
+        affectedModes: ['sendero_mtb', 'moto_trail'],
+        upvotes: 7,
+        resolvedVotes: 1,
+        author: 'Facundo MTB'
+      },
+      {
+        id: 'inc-chacras-rosetas',
+        type: 'thorns',
+        title: 'Sector con rosetas / espinas abundantes',
+        description: 'Mucho cadillo y espinas en el cañadón seco. Obligatorio líquido tubeless o sellador en cámaras.',
+        severity: 'alta',
+        latitude: -32.9880,
+        longitude: -68.9080,
+        reportedAt: 'Hace 4 horas',
+        affectedModes: ['sendero_mtb'],
+        upvotes: 14,
+        resolvedVotes: 0,
+        author: 'Mendoza Trail Club'
+      },
+      {
+        id: 'inc-crucesita-vertiente',
+        type: 'water',
+        title: 'Vertiente natural activa con agua limpia',
+        description: 'Caudal excelente y fresco en la bajada de la vertiente. Excelente para recargar botellas.',
+        severity: 'baja',
+        latitude: -32.9645,
+        longitude: -68.9790,
+        reportedAt: 'Hoy 09:30',
+        affectedModes: ['sendero_mtb', 'moto_trail'],
+        upvotes: 9,
+        resolvedVotes: 0,
+        author: 'Lucía Trekking'
+      },
+      {
+        id: 'inc-ciclovia-obras',
+        type: 'blocked',
+        title: 'Obras de repavimentación y paso angosto',
+        description: 'Vallas amarillas reduciendo el carril de ciclovía por poda y bacheo municipal. Reducir velocidad.',
+        severity: 'media',
+        latitude: -32.9030,
+        longitude: -68.8442,
+        reportedAt: 'Hace 1 hora',
+        affectedModes: ['ciclovia'],
+        upvotes: 5,
+        resolvedVotes: 0,
+        author: 'Seba Urbano'
+      },
+      {
+        id: 'inc-challao-perros',
+        type: 'animals',
+        title: 'Perros de puesto sueltos en huella',
+        description: 'Tres perros pastores ladrando a motociclistas y corredores en la entrada del puesto.',
+        severity: 'alta',
+        latitude: -32.8390,
+        longitude: -68.9240,
+        reportedAt: 'Ayer',
+        affectedModes: ['sendero_mtb', 'moto_trail'],
+        upvotes: 11,
+        resolvedVotes: 2,
+        author: 'Guille Enduro'
       }
     ];
 
@@ -689,25 +1104,55 @@
 
     let currentFilter = 'todas';
     let currentActiveRoute = null;
+    let currentActiveIncident = null;
     let polylineLayers = [];
     let markerLayers = [];
+    let incidentLayers = [];
     let userMarker = null;
 
+    function getIncidentIconEmoji(type) {
+      switch (type) {
+        case 'landslide': return '⚠️';
+        case 'thorns': return '🌵';
+        case 'water': return '💧';
+        case 'animals': return '🐕';
+        case 'blocked': return '🚧';
+        case 'caution': return '⚡';
+        default: return '⚠️';
+      }
+    }
+
+    function getSeverityHex(sev) {
+      switch (sev) {
+        case 'alta': return '#FF1744';
+        case 'media': return '#FF9100';
+        case 'baja': return '#00E5FF';
+        default: return '#FF9100';
+      }
+    }
+
     function renderMapElements() {
+      // Limpiar capas previas
       polylineLayers.forEach(p => map.removeLayer(p));
       polylineLayers = [];
       markerLayers.forEach(m => map.removeLayer(m));
       markerLayers = [];
+      incidentLayers.forEach(i => map.removeLayer(i));
+      incidentLayers = [];
 
       const filteredRoutes = currentFilter === 'todas'
         ? MENDOZA_ROUTES
         : MENDOZA_ROUTES.filter(r => r.type === currentFilter);
 
-      document.getElementById('stats-badge').innerText = `Mendoza • ${filteredRoutes.length} rutas activas • ${MENDOZA_POIS.length} POIs`;
+      const filteredIncidents = currentFilter === 'todas'
+        ? MENDOZA_INCIDENTS
+        : MENDOZA_INCIDENTS.filter(i => i.affectedModes.includes(currentFilter));
+
+      document.getElementById('stats-badge').innerText = `Mendoza • ${filteredRoutes.length} rutas • ${MENDOZA_POIS.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
+      document.getElementById('fab-badge-count').innerText = filteredIncidents.length;
 
       // Renderizar Doble Polyline (Casing negro + Neón)
       filteredRoutes.forEach(route => {
-        // Casing oscuro exterior
         const casing = L.polyline(route.coordinates, {
           color: '#05080E',
           weight: 8,
@@ -716,7 +1161,6 @@
           lineCap: 'round'
         }).addTo(map);
 
-        // Core Neón
         const core = L.polyline(route.coordinates, {
           color: route.strokeColor,
           weight: 4.5,
@@ -725,13 +1169,8 @@
           lineCap: 'round'
         }).addTo(map);
 
-        core.on('click', () => {
-          showRouteCard(route);
-        });
-        casing.on('click', () => {
-          showRouteCard(route);
-        });
-
+        core.on('click', () => showRouteCard(route));
+        casing.on('click', () => showRouteCard(route));
         polylineLayers.push(casing, core);
       });
 
@@ -745,11 +1184,25 @@
         });
 
         const marker = L.marker([poi.latitude, poi.longitude], { icon: customIcon }).addTo(map);
-        marker.on('click', () => {
-          showPoiCard(poi);
+        marker.on('click', () => showPoiCard(poi));
+        markerLayers.push(marker);
+      });
+
+      // Marcadores de Incidentes en Tiempo Real (Waze)
+      filteredIncidents.forEach(incident => {
+        const sevColor = getSeverityHex(incident.severity);
+        const emoji = getIncidentIconEmoji(incident.type);
+
+        const incidentIcon = L.divIcon({
+          className: '',
+          html: `<div class="custom-incident-marker" style="border-color: ${sevColor};"><div class="incident-inner-circle" style="background-color: ${sevColor};">${emoji}</div></div>`,
+          iconSize: [36, 36],
+          iconAnchor: [18, 18]
         });
 
-        markerLayers.push(marker);
+        const marker = L.marker([incident.latitude, incident.longitude], { icon: incidentIcon }).addTo(map);
+        marker.on('click', () => showIncidentCard(incident));
+        incidentLayers.push(marker);
       });
     }
 
@@ -808,9 +1261,50 @@
       document.getElementById('poi-card').classList.add('open');
     }
 
+    function showIncidentCard(incident) {
+      currentActiveIncident = incident;
+      closeCards();
+
+      const sevColor = getSeverityHex(incident.severity);
+      const sevBadge = document.getElementById('inc-sev-badge');
+      sevBadge.innerText = `ALERTA ${incident.severity.toUpperCase()}`;
+      sevBadge.style.backgroundColor = sevColor;
+
+      document.getElementById('inc-meta-text').innerText = `🕒 ${incident.reportedAt} • ${incident.author}`;
+      document.getElementById('inc-icon-emoji').innerText = getIncidentIconEmoji(incident.type);
+      document.getElementById('inc-title').innerText = incident.title;
+      document.getElementById('inc-desc').innerText = incident.description;
+      document.getElementById('inc-upvotes-count').innerText = incident.upvotes;
+      document.getElementById('inc-resolved-count').innerText = incident.resolvedVotes;
+
+      const modesRow = document.getElementById('inc-modes-row');
+      modesRow.innerHTML = '<span style="color:#64748B; font-size:11px; font-weight:600;">Afecta a:</span>';
+      incident.affectedModes.forEach(m => {
+        const label = m === 'ciclovia' ? '🚴 Ciclovía' : m === 'sendero_mtb' ? '🚵 MTB' : '🏍️ Moto';
+        modesRow.innerHTML += `<span class="affected-tag">${label}</span>`;
+      });
+
+      document.getElementById('incident-card').classList.add('open');
+    }
+
+    function voteStayCurrentIncident() {
+      if (!currentActiveIncident) return;
+      currentActiveIncident.upvotes += 1;
+      document.getElementById('inc-upvotes-count').innerText = currentActiveIncident.upvotes;
+      alert('¡Gracias! Confirmaste que este obstáculo sigue presente en el sendero.');
+    }
+
+    function voteResolvedCurrentIncident() {
+      if (!currentActiveIncident) return;
+      currentActiveIncident.resolvedVotes += 1;
+      document.getElementById('inc-resolved-count').innerText = currentActiveIncident.resolvedVotes;
+      alert('¡Excelente! Reportaste que este obstáculo ya fue despejado.');
+    }
+
     function closeCards() {
       document.getElementById('route-card').classList.remove('open');
       document.getElementById('poi-card').classList.remove('open');
+      document.getElementById('incident-card').classList.remove('open');
     }
 
     function focusActiveRoute() {
@@ -839,6 +1333,67 @@
         },
         () => alert('No se pudo acceder a tu ubicación GPS.')
       );
+    }
+
+    // GESTIÓN DEL MODAL DE REPORTE
+    let modalSelectedType = 'landslide';
+    let modalSelectedSeverity = 'media';
+
+    function openReportModal() {
+      document.getElementById('report-modal').classList.add('open');
+    }
+
+    function closeReportModal() {
+      document.getElementById('report-modal').classList.remove('open');
+    }
+
+    function selectIncidentType(type) {
+      modalSelectedType = type;
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('type-' + type).classList.add('active');
+    }
+
+    function selectSeverity(sev) {
+      modalSelectedSeverity = sev;
+      document.querySelectorAll('.sev-btn').forEach(b => b.className = 'sev-btn');
+      document.getElementById('sev-' + sev).classList.add('active-' + sev);
+    }
+
+    function submitReportWeb() {
+      const title = document.getElementById('report-title-input').value.trim();
+      const desc = document.getElementById('report-desc-input').value.trim();
+
+      if (!title) {
+        alert('Por favor ingresa un título para la alerta.');
+        return;
+      }
+
+      // Posición en centro de Mendoza o leve desplazamiento
+      const newInc = {
+        id: 'inc-' + Date.now(),
+        type: modalSelectedType,
+        title: title,
+        description: desc || 'Reportado en tiempo real por la comunidad ViaTrek.',
+        severity: modalSelectedSeverity,
+        latitude: initialCoords[0] + (Math.random() - 0.5) * 0.03,
+        longitude: initialCoords[1] + (Math.random() - 0.5) * 0.03,
+        reportedAt: 'Recién',
+        affectedModes: currentFilter === 'todas' ? ['ciclovia', 'sendero_mtb', 'moto_trail'] : [currentFilter],
+        upvotes: 1,
+        resolvedVotes: 0,
+        author: 'Tú (Web Explorer)'
+      };
+
+      MENDOZA_INCIDENTS.unshift(newInc);
+      renderMapElements();
+      closeReportModal();
+      showIncidentCard(newInc);
+
+      map.flyTo([newInc.latitude, newInc.longitude], 14, { duration: 1 });
+
+      document.getElementById('report-title-input').value = '';
+      document.getElementById('report-desc-input').value = '';
+      alert('¡Alerta publicada! Tu reporte ya es visible para toda la comunidad en el mapa.');
     }
 
     // Inicializar

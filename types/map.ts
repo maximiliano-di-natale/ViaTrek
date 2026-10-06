@@ -43,3 +43,28 @@ export interface MapRegion {
 }
 
 export type MapTypeOption = 'standard' | 'satellite' | 'terrain' | 'high_contrast';
+
+export type IncidentType =
+  | 'landslide' // Derrumbe / Rocas sueltas
+  | 'thorns'    // Rosetas / Espinas punzantes
+  | 'water'     // Agua en huella / Vertiente / Cañadón
+  | 'animals'   // Perros sueltos / Ganado
+  | 'blocked'   // Paso cerrado / Tranquera / Obras
+  | 'caution';  // Precaución general / Terreno erosionado
+
+export type IncidentSeverity = 'baja' | 'media' | 'alta';
+
+export interface TrailIncident {
+  id: string;
+  type: IncidentType;
+  title: string;
+  description: string;
+  severity: IncidentSeverity;
+  latitude: number;
+  longitude: number;
+  reportedAt: string;
+  affectedModes: ('ciclovia' | 'sendero_mtb' | 'moto_trail')[];
+  upvotes: number;
+  resolvedVotes: number;
+  author: string;
+}
