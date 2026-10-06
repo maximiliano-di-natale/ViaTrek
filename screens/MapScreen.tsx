@@ -1,29 +1,25 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   Platform,
   Linking,
   Alert,
   ActivityIndicator,
-  Animated,
   Dimensions,
 } from 'react-native';
 import MapView, {
   Polyline,
   Marker,
   PROVIDER_GOOGLE,
-  Region,
 } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Bike,
   Navigation,
-  Footprints,
   Compass,
   Layers,
   MapPin,
@@ -33,53 +29,71 @@ import {
   Wrench,
   Mountain,
   Eye,
-  ParkingCircle,
-  Clock,
   TrendingUp,
-  AlertCircle,
   LocateFixed,
+  Sparkles,
 } from 'lucide-react-native';
 
 import {
-  TransportMode,
-  MapTypeOption,
+  RouteType,
   RouteItem,
-  PointOfInterest,
-  LatLng,
+  POIItem,
+  POICategory,
+  Coordinate,
+  MapTypeOption,
 } from '../types/map';
 import {
   INITIAL_MENDOZA_REGION,
   MENDOZA_ROUTES,
   MENDOZA_POIS,
+  HIGH_CONTRAST_MAP_STYLE,
 } from '../data/routesAndPois';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+type FilterTab = 'todas' | RouteType;
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView | null>(null);
 
-  // Estados de control
-  const [selectedMode, setSelectedMode] = useState<TransportMode>('bike');
-  const [mapType, setMapType] = useState<MapTypeOption>('terrain');
-  const [showMapTypeSelector, setShowMapTypeSelector] = useState<boolean>(false);
-  const [userLocation, setUserLocation] = useState<LatLng | null>(null);
+  // Estados de interfaz y filtrado
+  const [selectedFilter, setSelectedFilter] = useState<FilterTab>('todas');
+  const [mapStyleOption, setMapStyleOption] = useState<MapTypeOption>('high_contrast');
+  const [showLayerMenu, setShowLayerMenu] = useState<boolean>(false);
+  const [userLocation, setUserLocation] = useState<Coordinate | null>(null);
   const [isLocating, setIsLocating] = useState<boolean>(false);
 
-  // Elementos seleccionados para inspección
+  // Elementos activos seleccionados
   const [selectedRoute, setSelectedRoute] = useState<RouteItem | null>(null);
-  const [selectedPoi, setSelectedPoi] = useState<PointOfInterest | null>(null);
+  const [selectedPoi, setSelectedPoi] = useState<POIItem | null>(null);
 
-  // Filtrado reactivo de rutas y POIs según el modo seleccionado
-  const visibleRoutes = MENDOZA_ROUTES.filter((r) =>
-    r.modes.includes(selectedMode)
-  );
+  // Rutas filtradas
+  const visibleRoutes = useMemo(() => {
+    if (selectedFilter === 'todas') return MENDOZA_ROUTES;
+    return MENDOZA_ROUTES.filter((route) => route.type === selectedFilter);
+  }, [selectedFilter]);
 
-  const visiblePois = MENDOZA_POIS.filter((p) =>
-    p.modes.includes(selectedMode)
-  );
+  // POIs filtrados (visibles según relevancia de la categoría o si están en 'todas')
+  const visiblePois = useMemo(() => {
+    if (selectedFilter === 'todas') return MENDOZA_POIS;
+    if (selectedFilter === 'ciclovia') {
+      return MENDOZA_POIS.filter(
+        (p) => p.category === 'taller' || p.category === 'trailhead' || p.category === 'mirador'
+      );
+    }
+    if (selectedFilter === 'sendero_mtb') {
+      return MENDOZA_POIS.filter(
+        (p) => p.category === 'trailhead' || p.category === 'mirador' || p.category === 'hidratacion'
+      );
+    }
+    if (selectedFilter === 'moto_trail') {
+      return MENDOZA_POIS.filter(
+        (p) => p.category === 'trailhead' || p.category === 'mirador'
+      );
+    }
+    return MENDOZA_POIS;
+  }, [selectedFilter]);
 
-  // Función para solicitar permisos y rastrear ubicación actual
+  // Localización GPS en tiempo real
   const handleLocateUser = async () => {
     try {
       setIsLocating(true);
@@ -88,7 +102,7 @@ export default function MapScreen() {
       if (status !== 'granted') {
         Alert.alert(
           'Permiso denegado',
-          'Se requiere permiso de ubicación para que ViaTrek muestre tu posición actual en los senderos de Mendoza.'
+          'Se necesita acceso a la ubicación GPS para mostrar tu posición actual en los senderos de Mendoza.'
         );
         setIsLocating(false);
         return;
@@ -106,13 +120,13 @@ export default function MapScreen() {
         {
           latitude,
           longitude,
-          latitudeDelta: 0.015,
-          longitudeDelta: 0.015,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
         },
-        1000
+        900
       );
     } catch (error) {
-      Alert.alert('Error', 'No se pudo obtener la ubicación GPS actual.');
+      Alert.alert('Error GPS', 'No fue posible obtener la señal de ubicación actual.');
     } finally {
       setIsLocating(false);
     }
@@ -123,139 +137,171 @@ export default function MapScreen() {
     mapRef.current?.animateToRegion(INITIAL_MENDOZA_REGION, 800);
   };
 
-  // Centrar cámara en una ruta seleccionada
+  // Enfocar trazado de la ruta seleccionada
   const handleFocusRoute = (route: RouteItem) => {
     if (mapRef.current && route.coordinates.length > 0) {
       mapRef.current.fitToCoordinates(route.coordinates, {
-        edgePadding: { top: 120, right: 50, bottom: 280, left: 50 },
+        edgePadding: { top: 130, right: 45, bottom: 290, left: 45 },
         animated: true,
       });
     }
   };
 
-  // Abrir Google Maps nativo mediante Deep Link para navegación directa
-  const handleOpenGoogleMapsNavigation = (poi: PointOfInterest) => {
-    const lat = poi.coordinate.latitude;
-    const lng = poi.coordinate.longitude;
-    const label = encodeURIComponent(poi.name);
-
-    // Mapeo del travelmode según la modalidad
-    let travelmode = 'bicycling';
-    if (selectedMode === 'moto') travelmode = 'driving';
-    if (selectedMode === 'trekking') travelmode = 'walking';
-
-    const googleMapsWebUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${travelmode}`;
-    const googleMapsAppUrl = Platform.select({
-      ios: `comgooglemaps://?daddr=${lat},${lng}&directionsmode=${travelmode}`,
-      android: `google.navigation:q=${lat},${lng}&mode=${travelmode === 'walking' ? 'w' : travelmode === 'bicycling' ? 'b' : 'd'}`,
+  // Navegación directa con Google Maps
+  const handleNavigateWithGoogleMaps = (
+    latitude: number,
+    longitude: number,
+    type: 'bicycling' | 'driving' | 'walking' = 'bicycling'
+  ) => {
+    const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=${type}`;
+    const appUrl = Platform.select({
+      ios: `comgooglemaps://?daddr=${latitude},${longitude}&directionsmode=${type}`,
+      android: `google.navigation:q=${latitude},${longitude}&mode=${type === 'driving' ? 'd' : 'b'}`,
     });
 
-    // Intentar abrir la app nativa primero, con fallback al enlace web oficial de Google Maps
-    if (googleMapsAppUrl) {
-      Linking.canOpenURL(googleMapsAppUrl)
+    if (appUrl) {
+      Linking.canOpenURL(appUrl)
         .then((supported) => {
           if (supported) {
-            Linking.openURL(googleMapsAppUrl);
+            Linking.openURL(appUrl);
           } else {
-            Linking.openURL(googleMapsWebUrl);
+            Linking.openURL(webUrl);
           }
         })
-        .catch(() => {
-          Linking.openURL(googleMapsWebUrl);
-        });
+        .catch(() => Linking.openURL(webUrl));
     } else {
-      Linking.openURL(googleMapsWebUrl);
+      Linking.openURL(webUrl);
     }
   };
 
-  // Color e icono según categoría de POI
-  const renderPoiMarkerIcon = (category: PointOfInterest['category']) => {
+  // Paleta de colores e iconos para POIs de alto contraste
+  const getPoiColor = (category: POICategory) => {
     switch (category) {
       case 'trailhead':
-        return <Compass size={16} color="#FFFFFF" />;
-      case 'viewpoint':
-        return <Eye size={16} color="#FFFFFF" />;
-      case 'water':
-        return <Droplet size={16} color="#FFFFFF" />;
-      case 'repair':
-        return <Wrench size={16} color="#FFFFFF" />;
+        return '#00E5FF'; // Cyan neón
+      case 'hidratacion':
+        return '#00B0FF'; // Azul celeste brillante
+      case 'mirador':
+        return '#E040FB'; // Magenta / Púrpura eléctrico
+      case 'taller':
+        return '#FFD600'; // Amarillo neón
       default:
-        return <MapPin size={16} color="#FFFFFF" />;
+        return '#FF5252';
     }
   };
 
-  const getPoiColor = (category: PointOfInterest['category']) => {
+  const renderPoiIcon = (category: POICategory) => {
     switch (category) {
       case 'trailhead':
-        return '#0284C7'; // Azul
-      case 'viewpoint':
-        return '#8B5CF6'; // Violeta
-      case 'water':
-        return '#06B6D4'; // Cian
-      case 'repair':
-        return '#EAB308'; // Amarillo
+        return <Compass size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'hidratacion':
+        return <Droplet size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'mirador':
+        return <Eye size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'taller':
+        return <Wrench size={16} color="#0B0F17" strokeWidth={2.4} />;
       default:
-        return '#EF4444';
+        return <MapPin size={16} color="#0B0F17" strokeWidth={2.4} />;
     }
   };
+
+  const getDifficultyColor = (difficulty: RouteItem['difficulty']) => {
+    switch (difficulty) {
+      case 'Fácil':
+        return '#00E676';
+      case 'Moderado':
+        return '#FFB300';
+      case 'Técnico':
+        return '#FF3D00';
+      default:
+        return '#94A3B8';
+    }
+  };
+
+  // Determinar propiedades de mapa según el modo seleccionado
+  const mapTypeProp =
+    mapStyleOption === 'high_contrast'
+      ? 'standard'
+      : mapStyleOption === 'terrain'
+      ? 'terrain'
+      : mapStyleOption === 'satellite'
+      ? 'satellite'
+      : 'standard';
+
+  const customStyleProp =
+    mapStyleOption === 'high_contrast' ? HIGH_CONTRAST_MAP_STYLE : undefined;
 
   return (
     <View style={styles.container}>
-      {/* MAPA PRINCIPAL NATIVO DE GOOGLE */}
+      {/* MAPA PRINCIPAL NATIVO */}
       <MapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         initialRegion={INITIAL_MENDOZA_REGION}
-        mapType={mapType}
+        mapType={mapTypeProp}
+        customMapStyle={customStyleProp}
         showsUserLocation={true}
         showsMyLocationButton={false}
         showsCompass={false}
         toolbarEnabled={false}
       >
-        {/* Marcador de ubicación GPS del usuario si está calculada */}
+        {/* Marcador GPS de usuario */}
         {userLocation && (
           <Marker
             coordinate={userLocation}
-            title="Mi Ubicación Actual"
-            description="Estás aquí explorando Mendoza"
+            title="Mi Ubicación GPS"
+            description="Explorando Mendoza"
           >
-            <View style={styles.userMarkerOuter}>
-              <View style={styles.userMarkerInner} />
+            <View style={styles.userMarkerPulse}>
+              <View style={styles.userMarkerDot} />
             </View>
           </Marker>
         )}
 
-        {/* TRAZADOS DE SENDEROS Y CICLOVÍAS (POLYLINES) */}
+        {/* POLYLINES CON RENDERIZADO DE ALTO CONTRASTE */}
         {visibleRoutes.map((route) => {
           const isSelected = selectedRoute?.id === route.id;
           return (
-            <Polyline
-              key={route.id}
-              coordinates={route.coordinates}
-              strokeColor={route.color}
-              strokeWidth={isSelected ? route.strokeWidth + 3 : route.strokeWidth}
-              tappable={true}
-              onPress={() => {
-                setSelectedPoi(null);
-                setSelectedRoute(route);
-                handleFocusRoute(route);
-              }}
-            />
+            <React.Fragment key={route.id}>
+              {/* Capa 1: Borde exterior oscuro de contraste extremo (Casing) */}
+              <Polyline
+                coordinates={route.coordinates}
+                strokeColor="#05080E"
+                strokeWidth={isSelected ? 10 : 7}
+                lineCap="round"
+                lineJoin="round"
+              />
+
+              {/* Capa 2: Trazado Neón vibrante principal */}
+              <Polyline
+                coordinates={route.coordinates}
+                strokeColor={route.strokeColor}
+                strokeWidth={isSelected ? 6 : 4.5}
+                lineCap="round"
+                lineJoin="round"
+                tappable={true}
+                onPress={() => {
+                  setSelectedPoi(null);
+                  setSelectedRoute(route);
+                  handleFocusRoute(route);
+                }}
+              />
+            </React.Fragment>
           );
         })}
 
-        {/* PUNTOS DE INTERÉS EN LA MONTAÑA (POIS / MARKERS) */}
+        {/* PUNTOS DE INTERÉS (POIs) DE ALTO CONTRASTE */}
         {visiblePois.map((poi) => {
           const isSelected = selectedPoi?.id === poi.id;
-          const markerColor = getPoiColor(poi.category);
+          const markerBg = getPoiColor(poi.category);
 
           return (
             <Marker
               key={poi.id}
-              coordinate={poi.coordinate}
+              coordinate={{ latitude: poi.latitude, longitude: poi.longitude }}
               title={poi.name}
-              description={poi.addressOrReference}
+              description={poi.description}
               onPress={() => {
                 setSelectedRoute(null);
                 setSelectedPoi(poi);
@@ -263,197 +309,250 @@ export default function MapScreen() {
             >
               <View
                 style={[
-                  styles.poiMarkerContainer,
-                  { backgroundColor: markerColor },
-                  isSelected && styles.poiMarkerSelected,
+                  styles.poiMarkerCasing,
+                  isSelected && styles.poiMarkerSelectedCasing,
                 ]}
               >
-                {renderPoiMarkerIcon(poi.category)}
+                <View
+                  style={[
+                    styles.poiMarkerInner,
+                    { backgroundColor: markerBg },
+                  ]}
+                >
+                  {renderPoiIcon(poi.category)}
+                </View>
               </View>
             </Marker>
           );
         })}
       </MapView>
 
-      {/* HEADER SUPERIOR: SELECTOR DE MODO DE TRANSPORTE */}
+      {/* HEADER SUPERIOR: FILTRO DE RUTAS */}
       <View style={[styles.headerContainer, { top: insets.top + 8 }]}>
-        <View style={styles.modeTabsWrapper}>
+        <View style={styles.filterPillsWrapper}>
           <TouchableOpacity
             style={[
-              styles.modeTab,
-              selectedMode === 'bike' && styles.modeTabActive,
+              styles.filterPill,
+              selectedFilter === 'todas' && styles.filterPillActive,
             ]}
             onPress={() => {
-              setSelectedMode('bike');
+              setSelectedFilter('todas');
+              setSelectedRoute(null);
+              setSelectedPoi(null);
+            }}
+            activeOpacity={0.8}
+          >
+            <Sparkles
+              size={15}
+              color={selectedFilter === 'todas' ? '#FFFFFF' : '#94A3B8'}
+            />
+            <Text
+              style={[
+                styles.filterPillText,
+                selectedFilter === 'todas' && styles.filterPillTextActive,
+              ]}
+            >
+              Todas
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterPill,
+              selectedFilter === 'ciclovia' && styles.filterPillActiveCiclovia,
+            ]}
+            onPress={() => {
+              setSelectedFilter('ciclovia');
               setSelectedRoute(null);
               setSelectedPoi(null);
             }}
             activeOpacity={0.8}
           >
             <Bike
-              size={18}
-              color={selectedMode === 'bike' ? '#FFFFFF' : '#94A3B8'}
+              size={15}
+              color={selectedFilter === 'ciclovia' ? '#00E676' : '#94A3B8'}
             />
             <Text
               style={[
-                styles.modeTabText,
-                selectedMode === 'bike' && styles.modeTabTextActive,
+                styles.filterPillText,
+                selectedFilter === 'ciclovia' && { color: '#00E676', fontWeight: '700' },
               ]}
             >
-              Bici
+              Ciclovías
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
-              styles.modeTab,
-              selectedMode === 'moto' && styles.modeTabActive,
+              styles.filterPill,
+              selectedFilter === 'sendero_mtb' && styles.filterPillActiveMtb,
             ]}
             onPress={() => {
-              setSelectedMode('moto');
+              setSelectedFilter('sendero_mtb');
+              setSelectedRoute(null);
+              setSelectedPoi(null);
+            }}
+            activeOpacity={0.8}
+          >
+            <Mountain
+              size={15}
+              color={selectedFilter === 'sendero_mtb' ? '#FF6D00' : '#94A3B8'}
+            />
+            <Text
+              style={[
+                styles.filterPillText,
+                selectedFilter === 'sendero_mtb' && { color: '#FF6D00', fontWeight: '700' },
+              ]}
+            >
+              MTB / Cerro
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterPill,
+              selectedFilter === 'moto_trail' && styles.filterPillActiveMoto,
+            ]}
+            onPress={() => {
+              setSelectedFilter('moto_trail');
               setSelectedRoute(null);
               setSelectedPoi(null);
             }}
             activeOpacity={0.8}
           >
             <Navigation
-              size={18}
-              color={selectedMode === 'moto' ? '#FFFFFF' : '#94A3B8'}
+              size={15}
+              color={selectedFilter === 'moto_trail' ? '#2979FF' : '#94A3B8'}
             />
             <Text
               style={[
-                styles.modeTabText,
-                selectedMode === 'moto' && styles.modeTabTextActive,
+                styles.filterPillText,
+                selectedFilter === 'moto_trail' && { color: '#2979FF', fontWeight: '700' },
               ]}
             >
-              Moto
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.modeTab,
-              selectedMode === 'trekking' && styles.modeTabActive,
-            ]}
-            onPress={() => {
-              setSelectedMode('trekking');
-              setSelectedRoute(null);
-              setSelectedPoi(null);
-            }}
-            activeOpacity={0.8}
-          >
-            <Footprints
-              size={18}
-              color={selectedMode === 'trekking' ? '#FFFFFF' : '#94A3B8'}
-            />
-            <Text
-              style={[
-                styles.modeTabText,
-                selectedMode === 'trekking' && styles.modeTabTextActive,
-              ]}
-            >
-              Trekking
+              Moto / Trail
             </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Resumen badge de rutas activas */}
+        {/* Badge contador de rutas activas */}
         <View style={styles.statsBadge}>
           <Text style={styles.statsBadgeText}>
-            ViaTrek • {visibleRoutes.length} rutas • {visiblePois.length} POIs en Mendoza
+            Mendoza • {visibleRoutes.length} rutas activas • {visiblePois.length} POIs
           </Text>
         </View>
       </View>
 
-      {/* BOTONES FLOTANTES LATERALES (FABs) */}
+      {/* FABs: BOTONES LATERALES DE ACCIÓN */}
       <View style={[styles.fabContainer, { top: insets.top + 80 }]}>
-        {/* Botón Selector de Capa de Mapa */}
+        {/* Selector de capa de mapa */}
         <TouchableOpacity
           style={styles.fabButton}
-          onPress={() => setShowMapTypeSelector(!showMapTypeSelector)}
+          onPress={() => setShowLayerMenu(!showLayerMenu)}
           activeOpacity={0.85}
         >
-          <Layers size={22} color="#0F172A" />
+          <Layers size={20} color="#F8FAFC" />
         </TouchableOpacity>
 
-        {/* Menú desplegable de tipo de mapa */}
-        {showMapTypeSelector && (
-          <View style={styles.mapTypeMenu}>
+        {/* Menú flotante de capas */}
+        {showLayerMenu && (
+          <View style={styles.layerMenu}>
             <TouchableOpacity
               style={[
-                styles.mapTypeOption,
-                mapType === 'terrain' && styles.mapTypeOptionActive,
+                styles.layerOption,
+                mapStyleOption === 'high_contrast' && styles.layerOptionActive,
               ]}
               onPress={() => {
-                setMapType('terrain');
-                setShowMapTypeSelector(false);
+                setMapStyleOption('high_contrast');
+                setShowLayerMenu(false);
               }}
             >
-              <Mountain size={14} color={mapType === 'terrain' ? '#2563EB' : '#475569'} />
+              <Sparkles size={14} color={mapStyleOption === 'high_contrast' ? '#00E676' : '#94A3B8'} />
               <Text
                 style={[
-                  styles.mapTypeText,
-                  mapType === 'terrain' && styles.mapTypeTextActive,
+                  styles.layerText,
+                  mapStyleOption === 'high_contrast' && styles.layerTextActive,
                 ]}
               >
-                Relieve / Curvas
+                Alto Contraste
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
-                styles.mapTypeOption,
-                mapType === 'standard' && styles.mapTypeOptionActive,
+                styles.layerOption,
+                mapStyleOption === 'terrain' && styles.layerOptionActive,
               ]}
               onPress={() => {
-                setMapType('standard');
-                setShowMapTypeSelector(false);
+                setMapStyleOption('terrain');
+                setShowLayerMenu(false);
               }}
             >
-              <MapPin size={14} color={mapType === 'standard' ? '#2563EB' : '#475569'} />
+              <Mountain size={14} color={mapStyleOption === 'terrain' ? '#00E676' : '#94A3B8'} />
               <Text
                 style={[
-                  styles.mapTypeText,
-                  mapType === 'standard' && styles.mapTypeTextActive,
+                  styles.layerText,
+                  mapStyleOption === 'terrain' && styles.layerTextActive,
                 ]}
               >
-                Estándar
+                Relieve / Terreno
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
-                styles.mapTypeOption,
-                mapType === 'satellite' && styles.mapTypeOptionActive,
+                styles.layerOption,
+                mapStyleOption === 'satellite' && styles.layerOptionActive,
               ]}
               onPress={() => {
-                setMapType('satellite');
-                setShowMapTypeSelector(false);
+                setMapStyleOption('satellite');
+                setShowLayerMenu(false);
               }}
             >
-              <Eye size={14} color={mapType === 'satellite' ? '#2563EB' : '#475569'} />
+              <Eye size={14} color={mapStyleOption === 'satellite' ? '#00E676' : '#94A3B8'} />
               <Text
                 style={[
-                  styles.mapTypeText,
-                  mapType === 'satellite' && styles.mapTypeTextActive,
+                  styles.layerText,
+                  mapStyleOption === 'satellite' && styles.layerTextActive,
                 ]}
               >
                 Satélite
               </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.layerOption,
+                mapStyleOption === 'standard' && styles.layerOptionActive,
+              ]}
+              onPress={() => {
+                setMapStyleOption('standard');
+                setShowLayerMenu(false);
+              }}
+            >
+              <MapPin size={14} color={mapStyleOption === 'standard' ? '#00E676' : '#94A3B8'} />
+              <Text
+                style={[
+                  styles.layerText,
+                  mapStyleOption === 'standard' && styles.layerTextActive,
+                ]}
+              >
+                Estándar
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
 
-        {/* Botón Reset Centrar Mendoza */}
+        {/* Resetear cámara a Mendoza */}
         <TouchableOpacity
           style={styles.fabButton}
           onPress={handleResetCamera}
           activeOpacity={0.85}
         >
-          <Compass size={22} color="#0F172A" />
+          <Compass size={20} color="#F8FAFC" />
         </TouchableOpacity>
 
-        {/* Botón Mi Ubicación GPS */}
+        {/* Localización GPS */}
         <TouchableOpacity
           style={[styles.fabButton, isLocating && styles.fabButtonActive]}
           onPress={handleLocateUser}
@@ -461,53 +560,72 @@ export default function MapScreen() {
           activeOpacity={0.85}
         >
           {isLocating ? (
-            <ActivityIndicator size="small" color="#2563EB" />
+            <ActivityIndicator size="small" color="#00E676" />
           ) : (
-            <LocateFixed size={22} color={userLocation ? '#2563EB' : '#0F172A'} />
+            <LocateFixed
+              size={20}
+              color={userLocation ? '#00E676' : '#F8FAFC'}
+            />
           )}
         </TouchableOpacity>
       </View>
 
-      {/* TARJETA INFERIOR: DETALLE DE RUTA SELECCIONADA */}
+      {/* TARJETA INFERIOR: DETALLES DE RUTA SELECCIONADA */}
       {selectedRoute && (
         <View style={[styles.bottomCard, { paddingBottom: insets.bottom + 16 }]}>
           <View style={styles.cardHeader}>
             <View style={{ flex: 1 }}>
-              <View style={styles.routeHeaderRow}>
+              <View style={styles.cardHeaderTopRow}>
                 <View
                   style={[
-                    styles.routeColorIndicator,
-                    { backgroundColor: selectedRoute.color },
+                    styles.routeIndicatorPill,
+                    { backgroundColor: selectedRoute.strokeColor },
                   ]}
                 />
-                <Text style={styles.cardTitle} numberOfLines={1}>
-                  {selectedRoute.name}
-                </Text>
+                <Text style={styles.zoneText}>{selectedRoute.zone}</Text>
+                <View
+                  style={[
+                    styles.difficultyBadge,
+                    { borderColor: getDifficultyColor(selectedRoute.difficulty) },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.difficultyText,
+                      { color: getDifficultyColor(selectedRoute.difficulty) },
+                    ]}
+                  >
+                    {selectedRoute.difficulty}
+                  </Text>
+                </View>
               </View>
-              <Text style={styles.cardSubtitle}>{selectedRoute.subtitle}</Text>
+
+              <Text style={styles.cardTitle} numberOfLines={2}>
+                {selectedRoute.name}
+              </Text>
             </View>
 
             <TouchableOpacity
               onPress={() => setSelectedRoute(null)}
-              style={styles.closeButton}
+              style={styles.closeBtn}
             >
-              <X size={20} color="#64748B" />
+              <X size={20} color="#94A3B8" />
             </TouchableOpacity>
           </View>
 
           {/* Métricas clave de la ruta */}
-          <View style={styles.metricsContainer}>
+          <View style={styles.metricsBox}>
             <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>Distancia</Text>
+              <Text style={styles.metricLabel}>DISTANCIA</Text>
               <Text style={styles.metricValue}>{selectedRoute.distanceKm} km</Text>
             </View>
 
             <View style={styles.metricDivider} />
 
             <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>Desnivel</Text>
-              <View style={styles.metricInline}>
-                <TrendingUp size={14} color="#10B981" />
+              <Text style={styles.metricLabel}>DESNIVEL</Text>
+              <View style={styles.metricRow}>
+                <TrendingUp size={13} color="#00E676" />
                 <Text style={styles.metricValue}>+{selectedRoute.elevationGainM} m</Text>
               </View>
             </View>
@@ -515,113 +633,93 @@ export default function MapScreen() {
             <View style={styles.metricDivider} />
 
             <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>Tiempo Est.</Text>
-              <View style={styles.metricInline}>
-                <Clock size={14} color="#64748B" />
-                <Text style={styles.metricValue}>{selectedRoute.estimatedTimeMin} min</Text>
-              </View>
-            </View>
-
-            <View style={styles.metricDivider} />
-
-            <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>Dificultad</Text>
-              <Text
-                style={[
-                  styles.metricValue,
-                  selectedRoute.difficulty === 'Fácil' && { color: '#10B981' },
-                  selectedRoute.difficulty === 'Moderado' && { color: '#F59E0B' },
-                  selectedRoute.difficulty === 'Difícil' && { color: '#EF4444' },
-                ]}
-              >
-                {selectedRoute.difficulty}
-              </Text>
+              <Text style={styles.metricLabel}>SUPERFICIE</Text>
+              <Text style={styles.metricValue}>{selectedRoute.surface}</Text>
             </View>
           </View>
 
-          <Text style={styles.cardDescription} numberOfLines={2}>
-            {selectedRoute.description}
-          </Text>
-
-          <View style={styles.routeFooterRow}>
-            <View style={styles.badgeSurface}>
-              <Text style={styles.badgeSurfaceText}>
-                Superficie: {selectedRoute.surfaceType}
-              </Text>
-            </View>
+          {/* Botones de acción de ruta */}
+          <View style={styles.actionButtonsRow}>
             <TouchableOpacity
-              style={styles.centerRouteBtn}
+              style={styles.focusRouteButton}
               onPress={() => handleFocusRoute(selectedRoute)}
+              activeOpacity={0.85}
             >
-              <Text style={styles.centerRouteBtnText}>Enfocar Trazado</Text>
+              <Compass size={16} color="#00E676" />
+              <Text style={styles.focusRouteButtonText}>Enfocar Trazado</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.navigateButton}
+              onPress={() => {
+                const startPoint = selectedRoute.coordinates[0];
+                const mode =
+                  selectedRoute.type === 'moto_trail'
+                    ? 'driving'
+                    : selectedRoute.type === 'ciclovia'
+                    ? 'bicycling'
+                    : 'walking';
+                handleNavigateWithGoogleMaps(
+                  startPoint.latitude,
+                  startPoint.longitude,
+                  mode
+                );
+              }}
+              activeOpacity={0.88}
+            >
+              <ExternalLink size={16} color="#05080E" />
+              <Text style={styles.navigateButtonText}>Ir al Inicio</Text>
             </TouchableOpacity>
           </View>
         </View>
       )}
 
-      {/* TARJETA INFERIOR: DETALLE DE POI & NAVEGACIÓN GOOGLE MAPS */}
+      {/* TARJETA INFERIOR: DETALLES DE POI SELECCIONADO */}
       {selectedPoi && (
         <View style={[styles.bottomCard, { paddingBottom: insets.bottom + 16 }]}>
           <View style={styles.cardHeader}>
             <View style={{ flex: 1 }}>
-              <View style={styles.routeHeaderRow}>
+              <View style={styles.cardHeaderTopRow}>
                 <View
                   style={[
-                    styles.poiHeaderDot,
+                    styles.poiDot,
                     { backgroundColor: getPoiColor(selectedPoi.category) },
                   ]}
                 />
-                <Text style={styles.cardTitle} numberOfLines={1}>
-                  {selectedPoi.name}
+                <Text style={styles.poiCategoryText}>
+                  {selectedPoi.category.toUpperCase()}
                 </Text>
               </View>
-              <Text style={styles.cardSubtitle}>
-                {selectedPoi.addressOrReference}
+
+              <Text style={styles.cardTitle} numberOfLines={2}>
+                {selectedPoi.name}
               </Text>
             </View>
 
             <TouchableOpacity
               onPress={() => setSelectedPoi(null)}
-              style={styles.closeButton}
+              style={styles.closeBtn}
             >
-              <X size={20} color="#64748B" />
+              <X size={20} color="#94A3B8" />
             </TouchableOpacity>
-          </View>
-
-          {/* Badges de servicios del POI */}
-          <View style={styles.poiBadgesRow}>
-            {selectedPoi.elevationM && (
-              <View style={styles.poiBadge}>
-                <Mountain size={14} color="#0284C7" />
-                <Text style={styles.poiBadgeText}>{selectedPoi.elevationM} msnm</Text>
-              </View>
-            )}
-
-            {selectedPoi.parkingAvailable && (
-              <View style={styles.poiBadge}>
-                <ParkingCircle size={14} color="#10B981" />
-                <Text style={styles.poiBadgeText}>Estacionamiento seguro</Text>
-              </View>
-            )}
-
-            {selectedPoi.waterAvailable && (
-              <View style={styles.poiBadge}>
-                <Droplet size={14} color="#06B6D4" />
-                <Text style={styles.poiBadgeText}>Agua potable</Text>
-              </View>
-            )}
           </View>
 
           <Text style={styles.cardDescription}>{selectedPoi.description}</Text>
 
-          {/* BOTÓN PRINCIPAL DE NAVEGACIÓN EN GOOGLE MAPS */}
+          {/* Botón de navegación directa */}
           <TouchableOpacity
-            style={styles.googleMapsNavButton}
-            onPress={() => handleOpenGoogleMapsNavigation(selectedPoi)}
+            style={styles.navigateFullButton}
+            onPress={() =>
+              handleNavigateWithGoogleMaps(
+                selectedPoi.latitude,
+                selectedPoi.longitude,
+                'bicycling'
+              )
+            }
             activeOpacity={0.88}
           >
-            <ExternalLink size={18} color="#FFFFFF" />
-            <Text style={styles.googleMapsNavButtonText}>
+            <ExternalLink size={17} color="#05080E" />
+            <Text style={styles.navigateFullButtonText}>
               Cómo llegar con Google Maps
             </Text>
           </TouchableOpacity>
@@ -634,143 +732,180 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#0B0F17',
   },
   map: {
     width: '100%',
     height: '100%',
   },
-  // Marcador de usuario
-  userMarkerOuter: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: 'rgba(37, 99, 235, 0.25)',
+
+  // Marcador de ubicación GPS del usuario
+  userMarkerPulse: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(0, 230, 118, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(37, 99, 235, 0.4)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(0, 230, 118, 0.5)',
   },
-  userMarkerInner: {
+  userMarkerDot: {
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#2563EB',
+    backgroundColor: '#00E676',
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: '#05080E',
   },
-  // Marcadores de POI
-  poiMarkerContainer: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+
+  // Marcadores POI de alto contraste
+  poiMarkerCasing: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#05080E',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-    elevation: 6,
-  },
-  poiMarkerSelected: {
-    transform: [{ scale: 1.25 }],
-    borderColor: '#0F172A',
-    borderWidth: 3,
-  },
-  // Header superior
-  headerContainer: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    alignItems: 'center',
-  },
-  modeTabsWrapper: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(15, 23, 42, 0.94)',
-    borderRadius: 24,
-    padding: 4,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  poiMarkerSelectedCasing: {
+    transform: [{ scale: 1.25 }],
+    borderColor: '#00E676',
+    borderWidth: 2.5,
+  },
+  poiMarkerInner: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  // Header superior y filtros
+  headerContainer: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    alignItems: 'center',
+  },
+  filterPillsWrapper: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(11, 15, 23, 0.94)',
+    borderRadius: 26,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 8,
     width: '100%',
-    maxWidth: 380,
+    maxWidth: 420,
+    gap: 4,
   },
-  modeTab: {
+  filterPill: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
+    paddingVertical: 9,
+    paddingHorizontal: 6,
     borderRadius: 20,
-    gap: 6,
+    gap: 5,
   },
-  modeTabActive: {
-    backgroundColor: '#2563EB',
+  filterPillActive: {
+    backgroundColor: '#1E293B',
   },
-  modeTabText: {
-    fontSize: 14,
+  filterPillActiveCiclovia: {
+    backgroundColor: 'rgba(0, 230, 118, 0.16)',
+    borderWidth: 1,
+    borderColor: '#00E676',
+  },
+  filterPillActiveMtb: {
+    backgroundColor: 'rgba(255, 109, 0, 0.16)',
+    borderWidth: 1,
+    borderColor: '#FF6D00',
+  },
+  filterPillActiveMoto: {
+    backgroundColor: 'rgba(41, 121, 255, 0.16)',
+    borderWidth: 1,
+    borderColor: '#2979FF',
+  },
+  filterPillText: {
+    fontSize: 12,
     fontWeight: '600',
     color: '#94A3B8',
   },
-  modeTabTextActive: {
+  filterPillTextActive: {
     color: '#FFFFFF',
     fontWeight: '700',
   },
   statsBadge: {
     marginTop: 8,
-    backgroundColor: 'rgba(15, 23, 42, 0.85)',
+    backgroundColor: 'rgba(11, 15, 23, 0.88)',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   statsBadgeText: {
-    color: '#E2E8F0',
-    fontSize: 12,
+    color: '#CBD5E1',
+    fontSize: 11,
     fontWeight: '500',
   },
-  // FABs laterales
+
+  // Botones flotantes (FABs)
   fabContainer: {
     position: 'absolute',
-    right: 16,
+    right: 14,
     alignItems: 'flex-end',
-    gap: 12,
+    gap: 10,
   },
   fabButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: '#FFFFFF',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#131B2E',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.14)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.35,
     shadowRadius: 5,
     elevation: 6,
   },
   fabButtonActive: {
-    backgroundColor: '#EFF6FF',
+    borderColor: '#00E676',
   },
-  mapTypeMenu: {
+  layerMenu: {
     position: 'absolute',
-    right: 56,
+    right: 52,
     top: 0,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#131B2E',
     borderRadius: 14,
     padding: 6,
-    width: 150,
+    width: 160,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.14)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.4,
     shadowRadius: 8,
-    elevation: 7,
+    elevation: 8,
     gap: 4,
   },
-  mapTypeOption: {
+  layerOption: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
@@ -778,33 +913,36 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: 8,
   },
-  mapTypeOptionActive: {
-    backgroundColor: '#EFF6FF',
+  layerOptionActive: {
+    backgroundColor: 'rgba(0, 230, 118, 0.12)',
   },
-  mapTypeText: {
-    fontSize: 13,
-    color: '#475569',
+  layerText: {
+    fontSize: 12,
+    color: '#94A3B8',
     fontWeight: '500',
   },
-  mapTypeTextActive: {
-    color: '#2563EB',
+  layerTextActive: {
+    color: '#00E676',
     fontWeight: '700',
   },
-  // Tarjetas inferiores (Bottom Cards)
+
+  // Tarjetas inferiores (Bottom Card)
   bottomCard: {
     position: 'absolute',
-    left: 16,
-    right: 16,
+    left: 14,
+    right: 14,
     bottom: 0,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#101726',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
     paddingTop: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
     elevation: 12,
   },
   cardHeader: {
@@ -813,143 +951,160 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 12,
   },
-  routeHeaderRow: {
+  cardHeaderTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     marginBottom: 4,
   },
-  routeColorIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  poiHeaderDot: {
+  routeIndicatorPill: {
     width: 10,
     height: 10,
     borderRadius: 5,
   },
+  zoneText: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '500',
+  },
+  difficultyBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  difficultyText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '800',
-    color: '#0F172A',
-    flex: 1,
+    color: '#F8FAFC',
+    lineHeight: 22,
   },
-  cardSubtitle: {
-    fontSize: 13,
-    color: '#64748B',
-  },
-  closeButton: {
+  closeBtn: {
     padding: 4,
     marginLeft: 8,
   },
-  metricsContainer: {
+
+  // Métricas
+  metricsBox: {
     flexDirection: 'row',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 14,
+    backgroundColor: '#162033',
+    borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 12,
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   metricItem: {
     alignItems: 'center',
     flex: 1,
   },
-  metricInline: {
+  metricRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
   },
   metricLabel: {
-    fontSize: 11,
-    color: '#94A3B8',
-    fontWeight: '500',
+    fontSize: 10,
+    color: '#64748B',
+    fontWeight: '600',
     marginBottom: 2,
-    textTransform: 'uppercase',
   },
   metricValue: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#F8FAFC',
   },
   metricDivider: {
     width: 1,
     height: 24,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
-  cardDescription: {
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#475569',
-    marginBottom: 12,
-  },
-  routeFooterRow: {
+
+  // Botones de acción
+  actionButtonsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 4,
+    gap: 10,
   },
-  badgeSurface: {
-    backgroundColor: '#F1F5F9',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  badgeSurfaceText: {
-    fontSize: 12,
-    color: '#475569',
-    fontWeight: '600',
-  },
-  centerRouteBtn: {
-    backgroundColor: '#EFF6FF',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  centerRouteBtnText: {
-    color: '#2563EB',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  poiBadgesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 12,
-  },
-  poiBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F1F5F9',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    gap: 4,
-  },
-  poiBadgeText: {
-    fontSize: 12,
-    color: '#334155',
-    fontWeight: '500',
-  },
-  googleMapsNavButton: {
+  focusRouteButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2563EB',
-    paddingVertical: 14,
-    borderRadius: 14,
-    gap: 8,
-    shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 4 },
+    backgroundColor: '#1E293B',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 230, 118, 0.3)',
+    gap: 6,
+  },
+  focusRouteButtonText: {
+    color: '#00E676',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  navigateButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#00E676',
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 6,
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  navigateButtonText: {
+    color: '#05080E',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+
+  // POI Card
+  poiDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  poiCategoryText: {
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  cardDescription: {
+    fontSize: 13,
+    color: '#CBD5E1',
+    lineHeight: 19,
+    marginBottom: 16,
+  },
+  navigateFullButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#00E676',
+    paddingVertical: 14,
+    borderRadius: 12,
+    gap: 8,
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
     elevation: 4,
   },
-  googleMapsNavButtonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
+  navigateFullButtonText: {
+    color: '#05080E',
+    fontSize: 14,
+    fontWeight: '800',
   },
 });

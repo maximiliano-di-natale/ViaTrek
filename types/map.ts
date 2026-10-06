@@ -1,46 +1,39 @@
-export type TransportMode = 'bike' | 'moto' | 'trekking';
-
-export type MapTypeOption = 'standard' | 'satellite' | 'terrain';
-
-export type DifficultyLevel = 'Fácil' | 'Moderado' | 'Difícil' | 'Experto';
-
-export type SurfaceType = 'Pavimento' | 'Ripio / Grava' | 'Tierra / Huella' | 'Sendero Técnico';
-
-export type PoiCategory = 'trailhead' | 'viewpoint' | 'water' | 'repair';
-
-export interface LatLng {
+export interface Coordinate {
   latitude: number;
   longitude: number;
 }
 
+// Alias compatible con react-native-maps y utilidades
+export type LatLng = Coordinate;
+
+export type RouteType = 'ciclovia' | 'sendero_mtb' | 'moto_trail';
+
 export interface RouteItem {
   id: string;
   name: string;
-  subtitle: string;
-  description: string;
-  modes: TransportMode[];
+  zone: string;
+  type: RouteType;
   distanceKm: number;
   elevationGainM: number;
-  estimatedTimeMin: number;
-  difficulty: DifficultyLevel;
-  surfaceType: SurfaceType;
-  color: string;
-  strokeWidth: number;
-  coordinates: LatLng[];
+  difficulty: 'Fácil' | 'Moderado' | 'Técnico';
+  surface: 'Asfalto' | 'Ripio/Tierra' | 'Mixto';
+  strokeColor: string;
+  coordinates: Coordinate[];
 }
 
-export interface PointOfInterest {
+export type POICategory = 'trailhead' | 'hidratacion' | 'mirador' | 'taller';
+
+export interface POIItem {
   id: string;
   name: string;
-  category: PoiCategory;
+  category: POICategory;
+  latitude: number;
+  longitude: number;
   description: string;
-  coordinate: LatLng;
-  modes: TransportMode[];
-  elevationM?: number;
-  parkingAvailable?: boolean;
-  waterAvailable?: boolean;
-  addressOrReference: string;
 }
+
+// Alias compatible
+export type PointOfInterest = POIItem;
 
 export interface MapRegion {
   latitude: number;
@@ -48,3 +41,5 @@ export interface MapRegion {
   latitudeDelta: number;
   longitudeDelta: number;
 }
+
+export type MapTypeOption = 'standard' | 'satellite' | 'terrain' | 'high_contrast';
