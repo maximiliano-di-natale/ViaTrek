@@ -1,4 +1,4 @@
-import { RouteItem, POIItem, MapRegion, TrailIncident } from '../types/map';
+import { RouteItem, POIItem, MapRegion, TrailIncident, MedicalProfile } from '../types/map';
 
 export const INITIAL_MENDOZA_REGION: MapRegion = {
   latitude: -32.8895,
@@ -237,3 +237,19 @@ export const INITIAL_INCIDENTS: TrailIncident[] = [
     author: 'Guille Enduro',
   },
 ];
+
+export const MENDOZA_EMERGENCY_NUMBERS = [
+  { name: '911 Emergencias Mendoza', number: '911', desc: 'Policía, Ambulancia y Bomberos' },
+  { name: 'Patrulla de Rescate de Alta Montaña (UPRAM)', number: '2614444444', desc: 'Policía de Mendoza - Rescate en Cerros y Cordillera' },
+  { name: 'Defensa Civil Mendoza', number: '103', desc: 'Emergencias climáticas, Zonda y aluviones' },
+  { name: 'Bomberos Mendoza', number: '100', desc: 'Rescate urbano y forestal' },
+];
+
+export const DEFAULT_MEDICAL_PROFILE: MedicalProfile = {
+  fullName: 'Maximiliano Di Natale',
+  bloodType: 'O+',
+  allergies: 'Ninguna conocida',
+  medicalNotes: 'Sin antecedentes cardíacos. Deportista habitual.',
+  emergencyContactPhone: '+5492615551234',
+  healthInsurance: 'OSDE / Particular',
+};

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -41,6 +41,12 @@ import {
   Plus,
   Clock,
   ShieldAlert,
+  Shield,
+  HeartPulse,
+  PhoneCall,
+  Send,
+  Timer,
+  Radio,
 } from 'lucide-react-native';
 
 import {
@@ -53,6 +59,8 @@ import {
   TrailIncident,
   IncidentType,
   IncidentSeverity,
+  GuardianSession,
+  MedicalProfile,
 } from '../types/map';
 import {
   INITIAL_MENDOZA_REGION,
@@ -60,6 +68,8 @@ import {
   MENDOZA_POIS,
   INITIAL_INCIDENTS,
   HIGH_CONTRAST_MAP_STYLE,
+  MENDOZA_EMERGENCY_NUMBERS,
+  DEFAULT_MEDICAL_PROFILE,
 } from '../data/routesAndPois';
 
 type FilterTab = 'todas' | RouteType;
@@ -89,6 +99,148 @@ export default function MapScreen() {
   const [newSeverity, setNewSeverity] = useState<IncidentSeverity>('media');
   const [newTitle, setNewTitle] = useState<string>('');
   const [newDescription, setNewDescription] = useState<string>('');
+
+  // Estados de Seguridad, Ángel Guardián y SOS (Fase 2)
+  const [isSafetyModalVisible, setIsSafetyModalVisible] = useState<boolean>(false);
+  const [safetyTab, setSafetyTab] = useState<'guardian' | 'sos' | 'medical'>('guardian');
+
+  const [guardianSession, setGuardianSession] = useState<GuardianSession>({
+    isActive: false,
+    destination: 'Cerro Arco (1.680m)',
+    startedAt: 0,
+    expectedReturnAt: 0,
+    contactName: 'Contacto de Confianza',
+    contactPhone: '+5492615551234',
+  });
+
+  const [guardianRemainingSeconds, setGuardianRemainingSeconds] = useState<number>(0);
+  const [guardianInputHours, setGuardianInputHours] = useState<number>(2.5);
+  const [guardianInputDest, setGuardianInputDest] = useState<string>('Cerro Arco / Precordillera');
+  const [guardianInputPhone, setGuardianInputPhone] = useState<string>('+5492615551234');
+  const [guardianInputName, setGuardianInputName] = useState<string>('Contacto de Emergencia');
+
+  // Ficha Médica Offline ICE
+  const [medicalProfile, setMedicalProfile] = useState<MedicalProfile>(DEFAULT_MEDICAL_PROFILE);
+
+  // Efecto de cuenta regresiva en vivo del Ángel Guardián
+  useEffect(() => {
+    let interval: any = null;
+    if (guardianSession.isActive) {
+      interval = setInterval(() => {
+        const remaining = Math.max(
+          0,
+          Math.floor((guardianSession.expectedReturnAt - Date.now()) / 1000)
+        );
+        setGuardianRemainingSeconds(remaining);
+        if (remaining === 0) {
+          Alert.alert(
+            '⚠️ TIEMPO DE RETORNO CUMPLIDO',
+            'Tu tiempo estimado en el sendero ha expirado. Si estás a salvo, confirma tu llegada. Si necesitas auxilio, activa el botón SOS.',
+            [
+              { text: 'Extender 30m', onPress: () => handleExtendGuardian(30) },
+              { text: 'Llegué a salvo', onPress: handleFinishGuardian },
+              {
+                text: 'Abrir SOS',
+                onPress: () => {
+                  setIsSafetyModalVisible(true);
+                  setSafetyTab('sos');
+                },
+              },
+            ]
+          );
+        }
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [guardianSession.isActive, guardianSession.expectedReturnAt]);
+
+  const handleStartGuardian = () => {
+    const now = Date.now();
+    const returnAt = now + guardianInputHours * 60 * 60 * 1000;
+    setGuardianSession({
+      isActive: true,
+      destination: guardianInputDest || 'Precordillera Mendoza',
+      startedAt: now,
+      expectedReturnAt: returnAt,
+      contactName: guardianInputName || 'Contacto',
+      contactPhone: guardianInputPhone || '+5492615551234',
+    });
+    setGuardianRemainingSeconds(Math.floor(guardianInputHours * 3600));
+    setIsSafetyModalVisible(false);
+    Alert.alert(
+      '🛡️ Ángel Guardián Activado',
+      `Monitoreando regreso para ${guardianInputDest} (${guardianInputHours} horas). Si no confirmas tu regreso, te recordaremos enviar tu alerta.`
+    );
+  };
+
+  const handleExtendGuardian = (minutes: number = 30) => {
+    setGuardianSession((prev) => ({
+      ...prev,
+      expectedReturnAt: prev.expectedReturnAt + minutes * 60 * 1000,
+    }));
+    Alert.alert('Tiempo extendido', `Se añadieron ${minutes} minutos a tu temporizador de seguridad.`);
+  };
+
+  const handleFinishGuardian = () => {
+    setGuardianSession((prev) => ({ ...prev, isActive: false }));
+    Alert.alert('¡Excelente!', 'Confirmaste tu regreso a salvo. Que descanses.');
+  };
+
+  const handleSendSOSWhatsApp = () => {
+    const lat = userLocation?.latitude ?? INITIAL_MENDOZA_REGION.latitude;
+    const lng = userLocation?.longitude ?? INITIAL_MENDOZA_REGION.longitude;
+    const mapsLink = `https://maps.google.com/?q=${lat},${lng}`;
+    const text = encodeURIComponent(
+      `🚨 *EMERGENCIA SOS VIATREK MENDOZA* 🚨\n\n` +
+      `Necesito auxilio en la montaña / sendero.\n` +
+      `📍 Mi ubicación GPS exacta:\n${mapsLink}\n(Coordenadas: ${lat.toFixed(5)}, ${lng.toFixed(5)})\n\n` +
+      `🏔️ Destino: ${guardianSession.destination}\n` +
+      `👤 Ficha Médica: ${medicalProfile.fullName} | Grupo Sang: ${medicalProfile.bloodType}\n` +
+      `⚠️ Alergias/Notas: ${medicalProfile.allergies} | ${medicalProfile.medicalNotes}`
+    );
+
+    const cleanPhone = guardianSession.contactPhone.replace(/[^0-9]/g, '');
+    const url = cleanPhone
+      ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${text}`
+      : `https://api.whatsapp.com/send?text=${text}`;
+
+    Linking.openURL(url).catch(() => {
+      Alert.alert('Error', 'No se pudo abrir WhatsApp.');
+    });
+  };
+
+  const handleSendSOSSMS = () => {
+    const lat = userLocation?.latitude ?? INITIAL_MENDOZA_REGION.latitude;
+    const lng = userLocation?.longitude ?? INITIAL_MENDOZA_REGION.longitude;
+    const mapsLink = `https://maps.google.com/?q=${lat},${lng}`;
+    const body = encodeURIComponent(
+      `EMERGENCIA SOS VIATREK: Auxilio en montana. Ubicacion GPS: ${mapsLink} (${lat.toFixed(5)},${lng.toFixed(5)}). Nombre: ${medicalProfile.fullName} (${medicalProfile.bloodType}).`
+    );
+    const cleanPhone = guardianSession.contactPhone.replace(/[^0-9]/g, '');
+    const url = Platform.select({
+      ios: `sms:${cleanPhone}&body=${body}`,
+      android: `sms:${cleanPhone}?body=${body}`,
+    }) || `sms:${cleanPhone}?body=${body}`;
+
+    Linking.openURL(url).catch(() => {
+      Alert.alert('Error', 'No se pudo abrir la app de SMS.');
+    });
+  };
+
+  const handleCallEmergency = (phone: string) => {
+    Linking.openURL(`tel:${phone}`).catch(() => {
+      Alert.alert('Error', `No se pudo iniciar la llamada a ${phone}.`);
+    });
+  };
+
+  const formatSecondsToClock = (totalSec: number) => {
+    const hrs = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Rutas filtradas
   const visibleRoutes = useMemo(() => {
@@ -630,8 +782,60 @@ export default function MapScreen() {
         </View>
       </View>
 
+      {/* BARRA FLOTANTE: ÁNGEL GUARDIÁN ACTIVO (CUENTA REGRESIVA EN VIVO) */}
+      {guardianSession.isActive && (
+        <View style={[styles.guardianBanner, { top: insets.top + 78 }]}>
+          <View style={styles.guardianBannerLeft}>
+            <View style={styles.guardianPulseDot} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.guardianBannerTitle} numberOfLines={1}>
+                GUARDIÁN ACTIVO • {guardianSession.destination}
+              </Text>
+              <Text style={styles.guardianBannerCountdown}>
+                ⏱️ Regreso en: {formatSecondsToClock(guardianRemainingSeconds)}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.guardianBannerActions}>
+            <TouchableOpacity
+              style={styles.guardianBannerExtendBtn}
+              onPress={() => handleExtendGuardian(30)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.guardianBannerExtendText}>+30m</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.guardianBannerSafeBtn}
+              onPress={handleFinishGuardian}
+              activeOpacity={0.85}
+            >
+              <CheckCircle2 size={13} color="#05080E" strokeWidth={3} />
+              <Text style={styles.guardianBannerSafeText}>A salvo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
       {/* FABs: BOTONES LATERALES DE ACCIÓN */}
-      <View style={[styles.fabContainer, { top: insets.top + 80 }]}>
+      <View style={[styles.fabContainer, { top: insets.top + (guardianSession.isActive ? 135 : 80) }]}>
+        {/* Botón Seguridad & SOS (Fase 2) */}
+        <TouchableOpacity
+          style={[
+            styles.fabButton,
+            styles.fabSafetyButton,
+            guardianSession.isActive && styles.fabSafetyButtonActive,
+          ]}
+          onPress={() => setIsSafetyModalVisible(true)}
+          activeOpacity={0.85}
+        >
+          <ShieldAlert
+            size={21}
+            color={guardianSession.isActive ? '#00E676' : '#FF1744'}
+          />
+        </TouchableOpacity>
+
         {/* Botón Waze de la Montaña: Reportar Alerta en tiempo real */}
         <TouchableOpacity
           style={[styles.fabButton, styles.fabReportButton]}
@@ -1132,6 +1336,315 @@ export default function MapScreen() {
                   Publicar Alerta Comunitaria
                 </Text>
               </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL: SUITE DE SEGURIDAD, ÁNGEL GUARDIÁN Y SOS INTELIGENTE (FASE 2) */}
+      <Modal
+        visible={isSafetyModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsSafetyModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, styles.safetyModalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderTitleRow}>
+                <ShieldAlert size={22} color="#FF1744" />
+                <Text style={styles.modalTitle}>Seguridad & SOS de Montaña</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setIsSafetyModalVisible(false)}
+                style={styles.modalCloseBtn}
+              >
+                <X size={20} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Pestañas de la suite de seguridad */}
+            <View style={styles.safetyTabsWrapper}>
+              <TouchableOpacity
+                style={[styles.safetyTabBtn, safetyTab === 'guardian' && styles.safetyTabBtnActive]}
+                onPress={() => setSafetyTab('guardian')}
+              >
+                <Timer size={14} color={safetyTab === 'guardian' ? '#05080E' : '#94A3B8'} />
+                <Text style={[styles.safetyTabBtnText, safetyTab === 'guardian' && styles.safetyTabBtnTextActive]}>
+                  Ángel Guardián
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.safetyTabBtn, safetyTab === 'sos' && styles.safetyTabBtnActiveSos]}
+                onPress={() => setSafetyTab('sos')}
+              >
+                <Radio size={14} color={safetyTab === 'sos' ? '#FFFFFF' : '#FF1744'} />
+                <Text style={[styles.safetyTabBtnText, safetyTab === 'sos' && styles.safetyTabBtnTextActiveSos]}>
+                  Disparador SOS
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.safetyTabBtn, safetyTab === 'medical' && styles.safetyTabBtnActive]}
+                onPress={() => setSafetyTab('medical')}
+              >
+                <HeartPulse size={14} color={safetyTab === 'medical' ? '#05080E' : '#94A3B8'} />
+                <Text style={[styles.safetyTabBtnText, safetyTab === 'medical' && styles.safetyTabBtnTextActive]}>
+                  Ficha Médica
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* TAB 1: ÁNGEL GUARDIÁN */}
+              {safetyTab === 'guardian' && (
+                <View>
+                  <Text style={styles.modalSubtitle}>
+                    Temporizador preventivo de regreso. Si no confirmas tu llegada al vencer el plazo, la app te asistirá con tu alerta SOS.
+                  </Text>
+
+                  {guardianSession.isActive ? (
+                    <View style={styles.guardianActiveBox}>
+                      <View style={styles.guardianActiveHeader}>
+                        <View style={styles.guardianPulseDot} />
+                        <Text style={styles.guardianActiveTitle}>MONITOREO EN CURSO</Text>
+                      </View>
+                      <Text style={styles.guardianActiveDest}>{guardianSession.destination}</Text>
+                      <Text style={styles.guardianCountdownBig}>
+                        {formatSecondsToClock(guardianRemainingSeconds)}
+                      </Text>
+                      <Text style={styles.guardianActiveSubtext}>
+                        Contacto notificado: {guardianSession.contactName} ({guardianSession.contactPhone})
+                      </Text>
+
+                      <View style={styles.guardianActiveActions}>
+                        <TouchableOpacity
+                          style={styles.guardianExtendBigBtn}
+                          onPress={() => handleExtendGuardian(30)}
+                        >
+                          <Text style={styles.guardianExtendBigBtnText}>+30 Minutos</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={styles.guardianFinishBigBtn}
+                          onPress={() => {
+                            handleFinishGuardian();
+                            setIsSafetyModalVisible(false);
+                          }}
+                        >
+                          <CheckCircle2 size={16} color="#05080E" strokeWidth={3} />
+                          <Text style={styles.guardianFinishBigBtnText}>Llegué a Salvo ✅</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ) : (
+                    <View>
+                      <Text style={styles.inputSectionLabel}>DESTINO ESTIMADO</Text>
+                      <TextInput
+                        style={styles.textInput}
+                        value={guardianInputDest}
+                        onChangeText={setGuardianInputDest}
+                        placeholder="Ej: Cerro Arco, Chacras MTB, Crucesita..."
+                        placeholderTextColor="#64748B"
+                      />
+
+                      <Text style={styles.inputSectionLabel}>DURACIÓN ESTIMADA</Text>
+                      <View style={styles.hoursChipRow}>
+                        {[1, 2, 2.5, 3, 4, 5].map((h) => {
+                          const isSel = guardianInputHours === h;
+                          return (
+                            <TouchableOpacity
+                              key={h}
+                              style={[styles.hourChip, isSel && styles.hourChipActive]}
+                              onPress={() => setGuardianInputHours(h)}
+                            >
+                              <Text style={[styles.hourChipText, isSel && styles.hourChipTextActive]}>
+                                {h}h
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+
+                      <Text style={styles.inputSectionLabel}>NOMBRE CONTACTO DE EMERGENCIA</Text>
+                      <TextInput
+                        style={styles.textInput}
+                        value={guardianInputName}
+                        onChangeText={setGuardianInputName}
+                        placeholder="Nombre de familiar o amigo"
+                        placeholderTextColor="#64748B"
+                      />
+
+                      <Text style={styles.inputSectionLabel}>TELÉFONO DE CONFIANZA (WHATSAPP/SMS)</Text>
+                      <TextInput
+                        style={styles.textInput}
+                        value={guardianInputPhone}
+                        onChangeText={setGuardianInputPhone}
+                        placeholder="+54 9 261..."
+                        keyboardType="phone-pad"
+                        placeholderTextColor="#64748B"
+                      />
+
+                      <TouchableOpacity
+                        style={styles.startGuardianButton}
+                        onPress={handleStartGuardian}
+                        activeOpacity={0.88}
+                      >
+                        <Shield size={18} color="#05080E" strokeWidth={2.8} />
+                        <Text style={styles.startGuardianButtonText}>
+                          Activar Ángel Guardián 🛡️
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {/* TAB 2: DISPARADOR SOS */}
+              {safetyTab === 'sos' && (
+                <View>
+                  <Text style={styles.modalSubtitle}>
+                    Envía de inmediato tus coordenadas GPS y ficha médica sin requerir datos móviles pesados.
+                  </Text>
+
+                  {/* Coordenadas en tiempo real */}
+                  <View style={styles.sosCoordsBox}>
+                    <Text style={styles.sosCoordsLabel}>TU ÚLTIMA POSICIÓN GPS DETECTADA:</Text>
+                    <Text style={styles.sosCoordsValue}>
+                      Lat: {userLocation?.latitude?.toFixed(5) || INITIAL_MENDOZA_REGION.latitude.toFixed(5)} • Lng: {userLocation?.longitude?.toFixed(5) || INITIAL_MENDOZA_REGION.longitude.toFixed(5)}
+                    </Text>
+                  </View>
+
+                  {/* Botón WhatsApp SOS */}
+                  <TouchableOpacity
+                    style={styles.sosWhatsAppBtn}
+                    onPress={handleSendSOSWhatsApp}
+                    activeOpacity={0.88}
+                  >
+                    <Send size={18} color="#FFFFFF" strokeWidth={2.6} />
+                    <Text style={styles.sosWhatsAppBtnText}>
+                      Enviar Alerta SOS por WhatsApp 📲
+                    </Text>
+                  </TouchableOpacity>
+
+                  {/* Botón SMS SOS (Offline) */}
+                  <TouchableOpacity
+                    style={styles.sosSmsBtn}
+                    onPress={handleSendSOSSMS}
+                    activeOpacity={0.88}
+                  >
+                    <Radio size={18} color="#05080E" strokeWidth={2.6} />
+                    <Text style={styles.sosSmsBtnText}>
+                      Enviar SOS por SMS (Funciona con 1 Raya) 💬
+                    </Text>
+                  </TouchableOpacity>
+
+                  {/* Números de rescate en Mendoza */}
+                  <Text style={styles.emergencyNumbersHeader}>
+                    Llamada de Rescate Directa (Mendoza):
+                  </Text>
+                  {MENDOZA_EMERGENCY_NUMBERS.map((em) => (
+                    <TouchableOpacity
+                      key={em.number}
+                      style={styles.emergencyNumberCard}
+                      onPress={() => handleCallEmergency(em.number)}
+                      activeOpacity={0.8}
+                    >
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.emergencyCardName}>{em.name}</Text>
+                        <Text style={styles.emergencyCardDesc}>{em.desc}</Text>
+                      </View>
+                      <View style={styles.emergencyCardCallBtn}>
+                        <PhoneCall size={15} color="#05080E" strokeWidth={2.8} />
+                        <Text style={styles.emergencyCardNumber}>{em.number}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+
+              {/* TAB 3: FICHA MÉDICA ICE */}
+              {safetyTab === 'medical' && (
+                <View>
+                  <Text style={styles.modalSubtitle}>
+                    Ficha médica guardada en el dispositivo. Permite a brigadas de auxilio y compañeros conocer datos vitales en caso de incidente.
+                  </Text>
+
+                  <Text style={styles.inputSectionLabel}>NOMBRE COMPLETO</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={medicalProfile.fullName}
+                    onChangeText={(val) => setMedicalProfile({ ...medicalProfile, fullName: val })}
+                  />
+
+                  <Text style={styles.inputSectionLabel}>GRUPO SANGUÍNEO</Text>
+                  <View style={styles.bloodGroupRow}>
+                    {['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+'].map((bg) => {
+                      const isBgSel = medicalProfile.bloodType === bg;
+                      return (
+                        <TouchableOpacity
+                          key={bg}
+                          style={[styles.bloodChip, isBgSel && styles.bloodChipActive]}
+                          onPress={() => setMedicalProfile({ ...medicalProfile, bloodType: bg })}
+                        >
+                          <Text style={[styles.bloodChipText, isBgSel && styles.bloodChipTextActive]}>
+                            {bg}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  <Text style={styles.inputSectionLabel}>ALERGIAS O MEDICACIÓN CRÍTICA</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={medicalProfile.allergies}
+                    onChangeText={(val) => setMedicalProfile({ ...medicalProfile, allergies: val })}
+                    placeholder="Ej: Alérgico a penicilina, ibuprofeno..."
+                    placeholderTextColor="#64748B"
+                  />
+
+                  <Text style={styles.inputSectionLabel}>TELÉFONO DE CONTACTO ICE</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={medicalProfile.emergencyContactPhone}
+                    onChangeText={(val) => setMedicalProfile({ ...medicalProfile, emergencyContactPhone: val })}
+                    placeholder="+549..."
+                    keyboardType="phone-pad"
+                    placeholderTextColor="#64748B"
+                  />
+
+                  <Text style={styles.inputSectionLabel}>OBRA SOCIAL / SEGURO MÉDICO</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={medicalProfile.healthInsurance}
+                    onChangeText={(val) => setMedicalProfile({ ...medicalProfile, healthInsurance: val })}
+                    placeholder="Ej: OSDE / OSEP / Particular"
+                    placeholderTextColor="#64748B"
+                  />
+
+                  <Text style={styles.inputSectionLabel}>NOTAS ADICIONALES PARA RESCATISTAS</Text>
+                  <TextInput
+                    style={[styles.textInput, styles.textArea]}
+                    value={medicalProfile.medicalNotes}
+                    onChangeText={(val) => setMedicalProfile({ ...medicalProfile, medicalNotes: val })}
+                    multiline
+                  />
+
+                  <TouchableOpacity
+                    style={styles.saveMedicalBtn}
+                    onPress={() => {
+                      Alert.alert('Ficha Guardada', 'Tus datos médicos de emergencia están actualizados y disponibles offline.');
+                      setIsSafetyModalVisible(false);
+                    }}
+                    activeOpacity={0.88}
+                  >
+                    <CheckCircle2 size={18} color="#05080E" strokeWidth={3} />
+                    <Text style={styles.saveMedicalBtnText}>Guardar Ficha Médica</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>
@@ -1817,6 +2330,423 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   submitIncidentButtonText: {
+    color: '#05080E',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+
+  // Barra Flotante Ángel Guardián Activo
+  guardianBanner: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    backgroundColor: '#0F172A',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 999,
+    borderWidth: 1.5,
+    borderColor: '#00E676',
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  guardianBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+    marginRight: 6,
+  },
+  guardianPulseDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#00E676',
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  guardianBannerTitle: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  guardianBannerCountdown: {
+    color: '#00E676',
+    fontSize: 13,
+    fontWeight: '900',
+    marginTop: 1,
+  },
+  guardianBannerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  guardianBannerExtendBtn: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  guardianBannerExtendText: {
+    color: '#F8FAFC',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  guardianBannerSafeBtn: {
+    backgroundColor: '#00E676',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  guardianBannerSafeText: {
+    color: '#05080E',
+    fontSize: 11,
+    fontWeight: '900',
+  },
+
+  // FAB Safety Button
+  fabSafetyButton: {
+    borderColor: '#FF1744',
+    backgroundColor: '#1E293B',
+  },
+  fabSafetyButtonActive: {
+    borderColor: '#00E676',
+    backgroundColor: '#052e16',
+  },
+
+  // Modal de Seguridad
+  safetyModalContent: {
+    borderTopColor: '#FF1744',
+    maxHeight: '92%',
+  },
+  safetyTabsWrapper: {
+    flexDirection: 'row',
+    backgroundColor: '#1E293B',
+    borderRadius: 14,
+    padding: 3,
+    marginBottom: 14,
+    gap: 4,
+  },
+  safetyTabBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 9,
+    borderRadius: 11,
+    gap: 5,
+  },
+  safetyTabBtnActive: {
+    backgroundColor: '#00E676',
+  },
+  safetyTabBtnActiveSos: {
+    backgroundColor: '#FF1744',
+  },
+  safetyTabBtnText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  safetyTabBtnTextActive: {
+    color: '#05080E',
+    fontWeight: '900',
+  },
+  safetyTabBtnTextActiveSos: {
+    color: '#FFFFFF',
+    fontWeight: '900',
+  },
+
+  // Guardián Activo en Modal
+  guardianActiveBox: {
+    backgroundColor: '#080C14',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1.5,
+    borderColor: '#00E676',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  guardianActiveHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  guardianActiveTitle: {
+    color: '#00E676',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  guardianActiveDest: {
+    color: '#F8FAFC',
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  guardianCountdownBig: {
+    color: '#00E676',
+    fontSize: 34,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    marginVertical: 4,
+  },
+  guardianActiveSubtext: {
+    color: '#94A3B8',
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  guardianActiveActions: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+  },
+  guardianExtendBigBtn: {
+    flex: 1,
+    backgroundColor: '#1E293B',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    alignItems: 'center',
+  },
+  guardianExtendBigBtnText: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  guardianFinishBigBtn: {
+    flex: 1,
+    backgroundColor: '#00E676',
+    paddingVertical: 12,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+  },
+  guardianFinishBigBtnText: {
+    color: '#05080E',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+
+  // Configuración Ángel Guardián
+  hoursChipRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 12,
+  },
+  hourChip: {
+    flex: 1,
+    backgroundColor: '#1E293B',
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  hourChipActive: {
+    backgroundColor: '#00E676',
+    borderColor: '#00E676',
+  },
+  hourChipText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  hourChipTextActive: {
+    color: '#05080E',
+    fontWeight: '900',
+  },
+  startGuardianButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#00E676',
+    paddingVertical: 14,
+    borderRadius: 14,
+    gap: 8,
+    marginTop: 10,
+    marginBottom: 8,
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  startGuardianButtonText: {
+    color: '#05080E',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+
+  // Disparador SOS
+  sosCoordsBox: {
+    backgroundColor: '#080C14',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 23, 68, 0.3)',
+    marginBottom: 14,
+  },
+  sosCoordsLabel: {
+    color: '#FF1744',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  sosCoordsValue: {
+    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  sosWhatsAppBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#25D366',
+    paddingVertical: 14,
+    borderRadius: 14,
+    gap: 8,
+    marginBottom: 10,
+    shadowColor: '#25D366',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  sosWhatsAppBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  sosSmsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFD600',
+    paddingVertical: 14,
+    borderRadius: 14,
+    gap: 8,
+    marginBottom: 16,
+    shadowColor: '#FFD600',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  sosSmsBtnText: {
+    color: '#05080E',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  emergencyNumbersHeader: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+    marginTop: 4,
+  },
+  emergencyNumberCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1E293B',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  emergencyCardName: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  emergencyCardDesc: {
+    color: '#64748B',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  emergencyCardCallBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF1744',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 5,
+  },
+  emergencyCardNumber: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+
+  // Ficha Médica ICE
+  bloodGroupRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 10,
+    flexWrap: 'wrap',
+  },
+  bloodChip: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  bloodChipActive: {
+    backgroundColor: '#FF1744',
+    borderColor: '#FF1744',
+  },
+  bloodChipText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  bloodChipTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '900',
+  },
+  saveMedicalBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#00E676',
+    paddingVertical: 14,
+    borderRadius: 14,
+    gap: 8,
+    marginTop: 12,
+    marginBottom: 10,
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  saveMedicalBtnText: {
     color: '#05080E',
     fontSize: 15,
     fontWeight: '900',

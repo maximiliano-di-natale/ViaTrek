@@ -68,3 +68,27 @@ export interface TrailIncident {
   resolvedVotes: number;
   author: string;
 }
+
+export interface SafetyContact {
+  name: string;
+  phone: string;
+  relationship: string;
+}
+
+export interface MedicalProfile {
+  fullName: string;
+  bloodType: string;
+  allergies: string;
+  medicalNotes: string;
+  emergencyContactPhone: string;
+  healthInsurance: string;
+}
+
+export interface GuardianSession {
+  isActive: boolean;
+  destination: string;
+  startedAt: number; // timestamp
+  expectedReturnAt: number; // timestamp
+  contactName: string;
+  contactPhone: string;
+}

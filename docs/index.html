@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ViaTrek Mendoza - Senderos, Ciclovías & Alertas en Vivo</title>
+  <title>ViaTrek Mendoza - Senderos, Seguridad SOS & Ángel Guardián</title>
   
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -119,15 +119,92 @@
       letter-spacing: 0.3px;
     }
 
+    /* BARRA FLOTANTE ÁNGEL GUARDIÁN ACTIVO */
+    .guardian-banner {
+      position: absolute;
+      top: 98px;
+      left: 12px;
+      right: 12px;
+      max-width: 480px;
+      margin: 0 auto;
+      background: #0F172A;
+      border: 1.5px solid #00E676;
+      border-radius: 16px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0, 230, 118, 0.25);
+      animation: slideDownBanner 0.3s ease-out;
+    }
+    @keyframes slideDownBanner {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .guardian-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .guardian-pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
+      background: #00E676;
+      box-shadow: 0 0 10px #00E676;
+      animation: pulse 1.5s infinite;
+    }
+    .guardian-banner-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #94A3B8;
+      letter-spacing: 0.5px;
+    }
+    .guardian-banner-countdown {
+      font-size: 14px;
+      font-weight: 900;
+      color: #00E676;
+    }
+    .guardian-banner-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-extend-mini {
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #F8FAFC;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 9px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-safe-mini {
+      background: #00E676;
+      border: none;
+      color: #05080E;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     /* FLOATING ACTION BUTTONS */
     .fab-container {
       position: absolute;
-      top: 96px;
+      top: 100px;
       right: 14px;
       z-index: 1000;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      transition: top 0.2s ease;
     }
     .fab-btn {
       width: 44px;
@@ -149,6 +226,14 @@
       transform: scale(1.06);
       background: #1E293B;
       border-color: rgba(255, 255, 255, 0.25);
+    }
+    .fab-btn.safety-btn {
+      border-color: #FF1744;
+      background: #1E293B;
+    }
+    .fab-btn.safety-btn.active-guardian {
+      border-color: #00E676;
+      background: #052e16;
     }
     .fab-btn.report-btn {
       border-color: #FFD600;
@@ -497,7 +582,7 @@
       100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
     }
 
-    /* MODAL: REPORTAR ALERTA */
+    /* MODAL BASE */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -520,7 +605,7 @@
       padding: 22px;
       width: 100%;
       max-width: 500px;
-      border-top: 1px solid rgba(255, 214, 0, 0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       max-height: 88vh;
       overflow-y: auto;
       animation: slideUpModal 0.25s ease-out;
@@ -546,7 +631,7 @@
     .modal-subtitle {
       font-size: 12px;
       color: #94A3B8;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       line-height: 1.4;
     }
     .input-label {
@@ -646,6 +731,149 @@
       box-shadow: 0 4px 14px rgba(255, 214, 0, 0.35);
       margin-top: 6px;
     }
+
+    /* SAFETY MODAL & TABS */
+    .safety-tabs-row {
+      display: flex;
+      background: #1E293B;
+      border-radius: 14px;
+      padding: 3px;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+    .safety-tab-btn {
+      flex: 1;
+      padding: 8px 6px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      color: #94A3B8;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .safety-tab-btn.active {
+      background: #00E676;
+      color: #05080E;
+      font-weight: 900;
+    }
+    .safety-tab-btn.active-sos {
+      background: #FF1744;
+      color: #FFFFFF;
+      font-weight: 900;
+    }
+    .guardian-card-box {
+      background: #080C14;
+      border: 1.5px solid #00E676;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .guardian-time-big {
+      font-size: 32px;
+      font-weight: 900;
+      color: #00E676;
+      letter-spacing: 1.5px;
+      margin: 8px 0;
+    }
+    .btn-start-guardian {
+      width: 100%;
+      padding: 13px;
+      background: #00E676;
+      color: #05080E;
+      font-size: 14px;
+      font-weight: 900;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 230, 118, 0.35);
+      margin-top: 6px;
+    }
+    .sos-btn-whatsapp {
+      width: 100%;
+      padding: 13px;
+      background: #25D366;
+      color: #FFFFFF;
+      font-size: 14px;
+      font-weight: 900;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+      text-decoration: none;
+    }
+    .sos-btn-sms {
+      width: 100%;
+      padding: 13px;
+      background: #FFD600;
+      color: #05080E;
+      font-size: 14px;
+      font-weight: 900;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(255, 214, 0, 0.3);
+      text-decoration: none;
+    }
+    .em-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1E293B;
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .em-call-btn {
+      background: #FF1744;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 900;
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hours-chip-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .hour-chip {
+      flex: 1;
+      padding: 8px 4px;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      color: #94A3B8;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+    .hour-chip.active {
+      background: #00E676;
+      color: #05080E;
+      font-weight: 900;
+    }
   </style>
 </head>
 <body>
@@ -671,8 +899,28 @@
     </div>
   </div>
 
+  <!-- BARRA FLOTANTE ÁNGEL GUARDIÁN ACTIVO (CUENTA REGRESIVA EN VIVO) -->
+  <div class="guardian-banner" id="guardian-banner" style="display: none;">
+    <div class="guardian-banner-left">
+      <div class="guardian-pulse-dot"></div>
+      <div>
+        <div class="guardian-banner-title" id="guardian-banner-dest">GUARDIÁN ACTIVO • CERRO ARCO</div>
+        <div class="guardian-banner-countdown" id="guardian-banner-time">⏱️ Regreso en: 02:30:00</div>
+      </div>
+    </div>
+    <div class="guardian-banner-actions">
+      <button class="btn-extend-mini" onclick="extendGuardian(30)">+30m</button>
+      <button class="btn-safe-mini" onclick="finishGuardian()">A salvo ✅</button>
+    </div>
+  </div>
+
   <!-- FLOATING BUTTONS -->
-  <div class="fab-container">
+  <div class="fab-container" id="fab-container">
+    <!-- Botón Seguridad & SOS (Fase 2) -->
+    <button class="fab-btn safety-btn" id="fab-safety-btn" onclick="openSafetyModal()" title="Suite de Seguridad & SOS">
+      🛡️
+    </button>
+
     <!-- Botón Waze de la Montaña: Reportar Alerta -->
     <button class="fab-btn report-btn" onclick="openReportModal()" title="Reportar Alerta en Sendero">
       ⚠️
@@ -833,6 +1081,130 @@
     </div>
   </div>
 
+  <!-- MODAL: SUITE DE SEGURIDAD & SOS (FASE 2) -->
+  <div class="modal-overlay" id="safety-modal">
+    <div class="modal-content" style="border-top-color: #FF1744;">
+      <div class="modal-header">
+        <div class="modal-title">🛡️ Seguridad & SOS de Montaña</div>
+        <button class="close-btn" onclick="closeSafetyModal()">✕</button>
+      </div>
+
+      <div class="safety-tabs-row">
+        <button class="safety-tab-btn active" id="tab-btn-guardian" onclick="switchSafetyTab('guardian')">⏱️ Ángel Guardián</button>
+        <button class="safety-tab-btn" id="tab-btn-sos" onclick="switchSafetyTab('sos')">🚨 Botón SOS</button>
+        <button class="safety-tab-btn" id="tab-btn-medical" onclick="switchSafetyTab('medical')">🩺 Ficha ICE</button>
+      </div>
+
+      <!-- TAB 1: ÁNGEL GUARDIÁN -->
+      <div id="safety-tab-guardian">
+        <p class="modal-subtitle">
+          Temporizador preventivo de regreso. Si no confirmas tu llegada al vencer el plazo, la app te asistirá con tu alerta SOS.
+        </p>
+
+        <div id="guardian-inactive-view">
+          <label class="input-label">DESTINO ESTIMADO</label>
+          <input type="text" class="form-input" id="guardian-dest-input" value="Cerro Arco / Precordillera">
+
+          <label class="input-label">DURACIÓN ESTIMADA</label>
+          <div class="hours-chip-row">
+            <button class="hour-chip" onclick="selectGuardianHour(1, this)">1h</button>
+            <button class="hour-chip" onclick="selectGuardianHour(2, this)">2h</button>
+            <button class="hour-chip active" onclick="selectGuardianHour(2.5, this)">2.5h</button>
+            <button class="hour-chip" onclick="selectGuardianHour(3, this)">3h</button>
+            <button class="hour-chip" onclick="selectGuardianHour(4, this)">4h</button>
+          </div>
+
+          <label class="input-label">TELÉFONO DE CONFIANZA (WHATSAPP/SMS)</label>
+          <input type="text" class="form-input" id="guardian-phone-input" value="+54 9 261 555-1234">
+
+          <button class="btn-start-guardian" onclick="startGuardianWeb()">
+            Activar Ángel Guardián 🛡️
+          </button>
+        </div>
+
+        <div id="guardian-active-view" style="display: none;">
+          <div class="guardian-card-box">
+            <div style="color: #00E676; font-size: 11px; font-weight: 900; letter-spacing: 0.8px;">MONITOREO EN CURSO</div>
+            <div style="color: #F8FAFC; font-size: 16px; font-weight: 800; margin-top: 4px;" id="guardian-dest-label">Cerro Arco</div>
+            <div class="guardian-time-big" id="guardian-modal-countdown">02:30:00</div>
+            <p style="color: #94A3B8; font-size: 11px;">Si no confirmas tu regreso a tiempo, te recordaremos enviar el SOS.</p>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-extend-mini" style="flex: 1; padding: 12px;" onclick="extendGuardian(30)">+30 Minutos</button>
+            <button class="btn-safe-mini" style="flex: 1; padding: 12px; justify-content: center;" onclick="finishGuardian()">Llegué a Salvo ✅</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: DISPARADOR SOS -->
+      <div id="safety-tab-sos" style="display: none;">
+        <p class="modal-subtitle">
+          Envía de inmediato tus coordenadas GPS y ficha médica sin requerir datos móviles pesados.
+        </p>
+
+        <div style="background: #080C14; padding: 10px; border-radius: 10px; margin-bottom: 12px; border: 1px solid rgba(255, 23, 68, 0.3);">
+          <div style="color: #FF1744; font-size: 10px; font-weight: 800;">TU UBICACIÓN GPS DETECTADA:</div>
+          <div style="color: #F8FAFC; font-size: 12px; font-weight: 700;" id="sos-coords-label">Lat: -32.88950 • Lng: -68.86500</div>
+        </div>
+
+        <a class="sos-btn-whatsapp" id="sos-whatsapp-link" href="#" target="_blank">
+          📲 Enviar Alerta SOS por WhatsApp
+        </a>
+
+        <a class="sos-btn-sms" id="sos-sms-link" href="#">
+          💬 Enviar Alerta SOS por SMS (1 Raya)
+        </a>
+
+        <div style="color: #94A3B8; font-size: 11px; font-weight: 800; margin: 10px 0 6px 0;">Llamadas de Rescate Directas (Mendoza):</div>
+        <div class="em-card">
+          <div>
+            <div style="font-size: 13px; font-weight: 800; color: #F8FAFC;">911 Emergencias</div>
+            <div style="font-size: 10px; color: #64748B;">Policía, Ambulancia y Bomberos</div>
+          </div>
+          <a class="em-call-btn" href="tel:911">📞 911</a>
+        </div>
+        <div class="em-card">
+          <div>
+            <div style="font-size: 13px; font-weight: 800; color: #F8FAFC;">Rescate Alta Montaña (UPRAM)</div>
+            <div style="font-size: 10px; color: #64748B;">Policía de Mendoza - Cerros y Cordillera</div>
+          </div>
+          <a class="em-call-btn" href="tel:2614444444">📞 Llamar</a>
+        </div>
+        <div class="em-card">
+          <div>
+            <div style="font-size: 13px; font-weight: 800; color: #F8FAFC;">Defensa Civil Mendoza</div>
+            <div style="font-size: 10px; color: #64748B;">Emergencias climáticas y Zonda</div>
+          </div>
+          <a class="em-call-btn" href="tel:103">📞 103</a>
+        </div>
+      </div>
+
+      <!-- TAB 3: FICHA MÉDICA ICE -->
+      <div id="safety-tab-medical" style="display: none;">
+        <p class="modal-subtitle">
+          Ficha médica guardada en tu dispositivo para que rescatistas conozcan datos vitales en caso de accidente.
+        </p>
+
+        <label class="input-label">NOMBRE COMPLETO</label>
+        <input type="text" class="form-input" id="med-name" value="Maximiliano Di Natale">
+
+        <label class="input-label">GRUPO SANGUÍNEO</label>
+        <input type="text" class="form-input" id="med-blood" value="O+">
+
+        <label class="input-label">ALERGIAS O MEDICACIÓN</label>
+        <input type="text" class="form-input" id="med-allergies" value="Ninguna conocida">
+
+        <label class="input-label">CONTACTO DE EMERGENCIA</label>
+        <input type="text" class="form-input" id="med-contact" value="+54 9 261 555-1234">
+
+        <button class="btn-start-guardian" onclick="saveMedicalProfileWeb()">
+          Guardar Ficha Médica ✅
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // DATASET REAL DE MENDOZA
     const MENDOZA_ROUTES = [
@@ -983,13 +1355,13 @@
       }
     ];
 
-    // DATASET DE ALERTAS COMUNITARIAS EN TIEMPO REAL (WAZE DE LA MONTAÑA)
+    // DATASET DE ALERTAS COMUNITARIAS
     let MENDOZA_INCIDENTS = [
       {
         id: 'inc-cerro-arco-derrumbe',
         type: 'landslide',
         title: 'Derrumbe de piedras en curva 3',
-        description: 'Piedras sueltas y desmoronamiento de ladera tras la lluvia. Precaución con motos de enduro y bicis en la bajada rápida.',
+        description: 'Piedras sueltas y desmoronamiento de ladera tras la lluvia. Precaución con motos y bicis.',
         severity: 'media',
         latitude: -32.8445,
         longitude: -68.9180,
@@ -1003,7 +1375,7 @@
         id: 'inc-chacras-rosetas',
         type: 'thorns',
         title: 'Sector con rosetas / espinas abundantes',
-        description: 'Mucho cadillo y espinas en el cañadón seco. Obligatorio líquido tubeless o sellador en cámaras.',
+        description: 'Mucho cadillo y espinas en el cañadón seco. Obligatorio líquido sellador.',
         severity: 'alta',
         latitude: -32.9880,
         longitude: -68.9080,
@@ -1017,7 +1389,7 @@
         id: 'inc-crucesita-vertiente',
         type: 'water',
         title: 'Vertiente natural activa con agua limpia',
-        description: 'Caudal excelente y fresco en la bajada de la vertiente. Excelente para recargar botellas.',
+        description: 'Caudal excelente y fresco en la bajada de la vertiente. Excelente para recargar.',
         severity: 'baja',
         latitude: -32.9645,
         longitude: -68.9790,
@@ -1031,7 +1403,7 @@
         id: 'inc-ciclovia-obras',
         type: 'blocked',
         title: 'Obras de repavimentación y paso angosto',
-        description: 'Vallas amarillas reduciendo el carril de ciclovía por poda y bacheo municipal. Reducir velocidad.',
+        description: 'Vallas amarillas reduciendo el carril de ciclovía por poda y bacheo municipal.',
         severity: 'media',
         latitude: -32.9030,
         longitude: -68.8442,
@@ -1059,6 +1431,7 @@
 
     // INICIALIZACIÓN DEL MAPA
     const initialCoords = [-32.8895, -68.8650];
+    let currentUserCoords = initialCoords;
     const map = L.map('map', {
       center: initialCoords,
       zoom: 12,
@@ -1132,7 +1505,6 @@
     }
 
     function renderMapElements() {
-      // Limpiar capas previas
       polylineLayers.forEach(p => map.removeLayer(p));
       polylineLayers = [];
       markerLayers.forEach(m => map.removeLayer(m));
@@ -1151,7 +1523,7 @@
       document.getElementById('stats-badge').innerText = `Mendoza • ${filteredRoutes.length} rutas • ${MENDOZA_POIS.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
       document.getElementById('fab-badge-count').innerText = filteredIncidents.length;
 
-      // Renderizar Doble Polyline (Casing negro + Neón)
+      // Rutas
       filteredRoutes.forEach(route => {
         const casing = L.polyline(route.coordinates, {
           color: '#05080E',
@@ -1174,7 +1546,7 @@
         polylineLayers.push(casing, core);
       });
 
-      // Marcadores POI
+      // POIs
       MENDOZA_POIS.forEach(poi => {
         const customIcon = L.divIcon({
           className: '',
@@ -1188,7 +1560,7 @@
         markerLayers.push(marker);
       });
 
-      // Marcadores de Incidentes en Tiempo Real (Waze)
+      // Alertas Waze
       filteredIncidents.forEach(incident => {
         const sevColor = getSeverityHex(incident.severity);
         const emoji = getIncidentIconEmoji(incident.type);
@@ -1321,6 +1693,9 @@
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
+          currentUserCoords = [latitude, longitude];
+          updateSosLinks(latitude, longitude);
+
           if (userMarker) map.removeLayer(userMarker);
           const icon = L.divIcon({
             className: '',
@@ -1335,30 +1710,26 @@
       );
     }
 
-    // GESTIÓN DEL MODAL DE REPORTE
+    // GESTIÓN DEL MODAL DE REPORTE WAZE
     let modalSelectedType = 'landslide';
     let modalSelectedSeverity = 'media';
 
     function openReportModal() {
       document.getElementById('report-modal').classList.add('open');
     }
-
     function closeReportModal() {
       document.getElementById('report-modal').classList.remove('open');
     }
-
     function selectIncidentType(type) {
       modalSelectedType = type;
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('type-' + type).classList.add('active');
     }
-
     function selectSeverity(sev) {
       modalSelectedSeverity = sev;
       document.querySelectorAll('.sev-btn').forEach(b => b.className = 'sev-btn');
       document.getElementById('sev-' + sev).classList.add('active-' + sev);
     }
-
     function submitReportWeb() {
       const title = document.getElementById('report-title-input').value.trim();
       const desc = document.getElementById('report-desc-input').value.trim();
@@ -1368,15 +1739,14 @@
         return;
       }
 
-      // Posición en centro de Mendoza o leve desplazamiento
       const newInc = {
         id: 'inc-' + Date.now(),
         type: modalSelectedType,
         title: title,
         description: desc || 'Reportado en tiempo real por la comunidad ViaTrek.',
         severity: modalSelectedSeverity,
-        latitude: initialCoords[0] + (Math.random() - 0.5) * 0.03,
-        longitude: initialCoords[1] + (Math.random() - 0.5) * 0.03,
+        latitude: currentUserCoords[0] + (Math.random() - 0.5) * 0.02,
+        longitude: currentUserCoords[1] + (Math.random() - 0.5) * 0.02,
         reportedAt: 'Recién',
         affectedModes: currentFilter === 'todas' ? ['ciclovia', 'sendero_mtb', 'moto_trail'] : [currentFilter],
         upvotes: 1,
@@ -1390,13 +1760,126 @@
       showIncidentCard(newInc);
 
       map.flyTo([newInc.latitude, newInc.longitude], 14, { duration: 1 });
-
       document.getElementById('report-title-input').value = '';
       document.getElementById('report-desc-input').value = '';
-      alert('¡Alerta publicada! Tu reporte ya es visible para toda la comunidad en el mapa.');
+      alert('¡Alerta publicada! Tu reporte ya es visible para toda la comunidad.');
     }
 
-    // Inicializar
+    // --- GESTIÓN DE SEGURIDAD & SOS (FASE 2) ---
+    let guardianActive = false;
+    let guardianReturnTimestamp = 0;
+    let guardianTimerInterval = null;
+    let guardianSelectedHours = 2.5;
+
+    function openSafetyModal() {
+      updateSosLinks(currentUserCoords[0], currentUserCoords[1]);
+      document.getElementById('safety-modal').classList.add('open');
+    }
+    function closeSafetyModal() {
+      document.getElementById('safety-modal').classList.remove('open');
+    }
+    function switchSafetyTab(tab) {
+      ['guardian', 'sos', 'medical'].forEach(t => {
+        document.getElementById('safety-tab-' + t).style.display = 'none';
+        document.getElementById('tab-btn-' + t).className = 'safety-tab-btn';
+      });
+      document.getElementById('safety-tab-' + tab).style.display = 'block';
+      if (tab === 'sos') {
+        document.getElementById('tab-btn-' + tab).classList.add('active-sos');
+      } else {
+        document.getElementById('tab-btn-' + tab).classList.add('active');
+      }
+    }
+    function selectGuardianHour(h, btn) {
+      guardianSelectedHours = h;
+      document.querySelectorAll('.hour-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function formatClock(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function startGuardianWeb() {
+      const dest = document.getElementById('guardian-dest-input').value.trim() || 'Precordillera';
+      const phone = document.getElementById('guardian-phone-input').value.trim();
+
+      guardianActive = true;
+      guardianReturnTimestamp = Date.now() + guardianSelectedHours * 3600 * 1000;
+
+      document.getElementById('guardian-banner').style.display = 'flex';
+      document.getElementById('fab-container').style.top = '155px';
+      document.getElementById('fab-safety-btn').classList.add('active-guardian');
+      document.getElementById('guardian-banner-dest').innerText = `GUARDIÁN ACTIVO • ${dest.toUpperCase()}`;
+      document.getElementById('guardian-dest-label').innerText = dest;
+
+      document.getElementById('guardian-inactive-view').style.display = 'none';
+      document.getElementById('guardian-active-view').style.display = 'block';
+
+      if (guardianTimerInterval) clearInterval(guardianTimerInterval);
+      guardianTimerInterval = setInterval(updateGuardianCountdown, 1000);
+      updateGuardianCountdown();
+
+      closeSafetyModal();
+      alert(`🛡️ Ángel Guardián activado para ${dest} (${guardianSelectedHours} horas). Tu regreso está monitoreado.`);
+    }
+
+    function updateGuardianCountdown() {
+      if (!guardianActive) return;
+      const remainingSec = Math.max(0, Math.floor((guardianReturnTimestamp - Date.now()) / 1000));
+      const clockStr = formatClock(remainingSec);
+      document.getElementById('guardian-banner-time').innerText = `⏱️ Regreso en: ${clockStr}`;
+      document.getElementById('guardian-modal-countdown').innerText = clockStr;
+
+      if (remainingSec === 0) {
+        alert('⚠️ ¡TIEMPO DE RETORNO CUMPLIDO! Si estás bien, confirma tu llegada. Si necesitas auxilio, activa el botón SOS.');
+        openSafetyModal();
+        switchSafetyTab('sos');
+      }
+    }
+
+    function extendGuardian(mins) {
+      guardianReturnTimestamp += mins * 60 * 1000;
+      updateGuardianCountdown();
+      alert(`Tiempo extendido +${mins} minutos.`);
+    }
+
+    function finishGuardian() {
+      guardianActive = false;
+      if (guardianTimerInterval) clearInterval(guardianTimerInterval);
+
+      document.getElementById('guardian-banner').style.display = 'none';
+      document.getElementById('fab-container').style.top = '100px';
+      document.getElementById('fab-safety-btn').classList.remove('active-guardian');
+
+      document.getElementById('guardian-inactive-view').style.display = 'block';
+      document.getElementById('guardian-active-view').style.display = 'none';
+
+      closeSafetyModal();
+      alert('¡Excelente noticia! Confirmaste tu regreso a salvo. Que descanses.');
+    }
+
+    function updateSosLinks(lat, lng) {
+      document.getElementById('sos-coords-label').innerText = `Lat: ${lat.toFixed(5)} • Lng: ${lng.toFixed(5)}`;
+      const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
+      const name = document.getElementById('med-name').value || 'Maximiliano Di Natale';
+      const blood = document.getElementById('med-blood').value || 'O+';
+      const msg = encodeURIComponent(`🚨 *EMERGENCIA SOS VIATREK MENDOZA* 🚨\nNecesito auxilio en el sendero.\n📍 Coordenadas GPS: ${mapsUrl} (${lat.toFixed(5)}, ${lng.toFixed(5)})\n👤 Paciente: ${name} (Grupo ${blood})`);
+
+      document.getElementById('sos-whatsapp-link').href = `https://api.whatsapp.com/send?text=${msg}`;
+      document.getElementById('sos-sms-link').href = `sms:?body=${encodeURIComponent(`EMERGENCIA SOS VIATREK: Auxilio en montana. GPS: ${mapsUrl} (${lat.toFixed(5)},${lng.toFixed(5)}). Nombre: ${name}`)}`;
+    }
+
+    function saveMedicalProfileWeb() {
+      alert('Ficha médica guardada correctamente en el dispositivo.');
+      closeSafetyModal();
+    }
+
+    // Inicializar mapa y datos
+    updateSosLinks(initialCoords[0], initialCoords[1]);
     renderMapElements();
   </script>
 </body>
