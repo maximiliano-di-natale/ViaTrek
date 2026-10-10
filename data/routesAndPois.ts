@@ -1,4 +1,12 @@
-import { RouteItem, POIItem, MapRegion, TrailIncident, MedicalProfile } from '../types/map';
+import {
+  RouteItem,
+  POIItem,
+  MapRegion,
+  TrailIncident,
+  MedicalProfile,
+  ProtectedArea,
+  ConvivenciaRuleItem,
+} from '../types/map';
 
 export const INITIAL_MENDOZA_REGION: MapRegion = {
   latitude: -32.8895,
@@ -26,6 +34,15 @@ export const MENDOZA_ROUTES: RouteItem[] = [
       { latitude: -32.8955, longitude: -68.8430 }, // Parque Central / Estación Belgrano
       { latitude: -32.8830, longitude: -68.8385 }, // Nave Cultural
     ],
+    legality: {
+      status: 'libre',
+      badgeText: '🟢 Libre Multimodal',
+      tagColor: '#00E676',
+      allowedModes: { trekking: true, bicycle: true, moto: false },
+      priorityRule: 'Peatones tienen paso prioritario en cruces señalizados. Bicis máx 25 km/h.',
+      legalWarning: 'Prohibida la circulación de motos a combustión en carriles de ciclovía (Ley 9024).',
+      authority: 'Municipios de Godoy Cruz y Ciudad de Mendoza',
+    },
   },
   {
     id: 'ciclovia-parque-general-san-martin',
@@ -44,6 +61,14 @@ export const MENDOZA_ROUTES: RouteItem[] = [
       { latitude: -32.8810, longitude: -68.8825 }, // Estadio Malvinas Argentinas
       { latitude: -32.8860, longitude: -68.8912 }, // Subida Base Cerro de la Gloria
     ],
+    legality: {
+      status: 'libre',
+      badgeText: '🟢 Parque Recreativo',
+      tagColor: '#00E676',
+      allowedModes: { trekking: true, bicycle: true, moto: false },
+      priorityRule: 'Zona de paseo familiar: prioridad absoluta al peatón y deportistas a pie en Rosedal y Lago.',
+      authority: 'Dirección de Parques y Paseos Públicos de Mendoza',
+    },
   },
   {
     id: 'sendero-chacras-dique-frias',
@@ -63,6 +88,15 @@ export const MENDOZA_ROUTES: RouteItem[] = [
       { latitude: -32.9210, longitude: -68.8890 }, // Quebrada del Dique Frías
       { latitude: -32.9080, longitude: -68.8820 }, // Mirador Dique Frías
     ],
+    legality: {
+      status: 'compartido_precaucion',
+      badgeText: '🟡 Mixto: Peatón Prioritario',
+      tagColor: '#FFD600',
+      allowedModes: { trekking: true, bicycle: true, moto: false },
+      priorityRule: 'Senderos angostos: la bicicleta debe descender velocidad a paso de hombre al toparse con caminantes.',
+      legalWarning: 'Prohibido ingreso de motos de enduro para evitar la erosión hídrica de cañadones aluvionales.',
+      authority: 'Municipio de Luján de Cuyo & Comunidad de Senderistas',
+    },
   },
   {
     id: 'sendero-cerro-arco-cumbre',
@@ -81,6 +115,70 @@ export const MENDOZA_ROUTES: RouteItem[] = [
       { latitude: -32.8482, longitude: -68.9440 }, // Filo oeste
       { latitude: -32.8498, longitude: -68.9485 }, // Antenas Cumbre Cerro Arco
     ],
+    legality: {
+      status: 'compartido_precaucion',
+      badgeText: '🟡 Camino de Servicio Mixto',
+      tagColor: '#FFD600',
+      allowedModes: { trekking: true, bicycle: true, moto: true },
+      priorityRule: 'Camino de mantenimiento: velocidad máx 20 km/h para motos/4x4. Prohibido salirse de la huella hacia las laderas.',
+      legalWarning: 'Prohibido acelerar o derrapar en curvas; prioridad constante al senderista que sube a pie.',
+      authority: 'Municipalidad de Las Heras',
+    },
+  },
+  {
+    id: 'sendero-divisadero-largo',
+    name: 'Quebrada de Divisadero Largo (Reserva Protegida)',
+    zone: 'Las Heras / Ciudad',
+    type: 'sendero_mtb',
+    distanceKm: 5.6,
+    elevationGainM: 260,
+    difficulty: 'Moderado',
+    surface: 'Ripio/Tierra',
+    strokeColor: '#FF1744', // Rojo alerta ecológica
+    coordinates: [
+      { latitude: -32.8760, longitude: -68.9020 }, // Centro de Informes Guardaparques
+      { latitude: -32.8730, longitude: -68.9110 }, // Falla geológica Divisadero
+      { latitude: -32.8705, longitude: -68.9190 }, // Mirador Cascada Seca
+      { latitude: -32.8680, longitude: -68.9270 }, // Quebrada de los fósiles
+      { latitude: -32.8650, longitude: -68.9340 }, // Límite oeste reserva
+    ],
+    legality: {
+      status: 'prohibido_motor',
+      badgeText: '🔴 Reserva Ecológica - Prohibido Motor',
+      tagColor: '#FF1744',
+      allowedModes: { trekking: true, bicycle: true, moto: false },
+      priorityRule: 'Área Natural Protegida. Registro obligatorio en Centro de Guardaparques. Prohibido salirse del sendero.',
+      legalWarning: 'Ley Provincial 6045: Totalmente prohibido el ingreso de motos, cuatriciclos y vehículos a combustión. Multas severas y secuestro vehicular.',
+      authority: 'Cuerpo de Guardaparques de Mendoza (DRNR)',
+    },
+  },
+  {
+    id: 'circuito-enduro-el-challao',
+    name: 'Circuito Enduro & Huellas El Challao / Puesto El Chulengo',
+    zone: 'Las Heras Precordillera',
+    type: 'moto_trail',
+    distanceKm: 14.5,
+    elevationGainM: 410,
+    difficulty: 'Técnico',
+    surface: 'Ripio/Tierra',
+    strokeColor: '#2979FF',
+    coordinates: [
+      { latitude: -32.8360, longitude: -68.9260 }, // Entrada El Challao Puesto
+      { latitude: -32.8290, longitude: -68.9340 }, // Cañadón de ripio
+      { latitude: -32.8210, longitude: -68.9400 }, // Subida de piedras El Chulengo
+      { latitude: -32.8140, longitude: -68.9460 }, // Filo precordillerano norte
+      { latitude: -32.8080, longitude: -68.9540 }, // Bajada técnica
+      { latitude: -32.8010, longitude: -68.9610 }, // Huella vehicular abierta
+    ],
+    legality: {
+      status: 'circuito_enduro',
+      badgeText: '🔵 Circuito Enduro Habilitado',
+      tagColor: '#2979FF',
+      allowedModes: { trekking: false, bicycle: true, moto: true },
+      priorityRule: 'Circuito tradicional para entrenamiento de motociclismo. Bicis y peatones circular con extrema precaución.',
+      legalWarning: 'Obligatorio uso de casco integral homologado y escape reglamentario. Respetar alambrados de puestos.',
+      authority: 'Comunidad Enduro Mendoza / Las Heras',
+    },
   },
   {
     id: 'ruta-moto-villavicencio-caracoles',
@@ -99,6 +197,15 @@ export const MENDOZA_ROUTES: RouteItem[] = [
       { latitude: -32.4980, longitude: -69.0730 }, // Curvas de herradura
       { latitude: -32.4820, longitude: -69.0980 }, // Cruz de Paramillos (Punto más alto)
     ],
+    legality: {
+      status: 'circuito_enduro',
+      badgeText: '🔵 Ruta Vehicular RP 52',
+      tagColor: '#2979FF',
+      allowedModes: { trekking: true, bicycle: true, moto: true },
+      priorityRule: 'Ruta provincial de ripio. Vehículos en ascenso tienen prioridad de paso en las 365 curvas.',
+      legalWarning: 'Reserva Natural Villavicencio: velocidad máx 40 km/h. Prohibido salir del camino hacia la flora protegida.',
+      authority: 'Dirección Provincial de Vialidad & Reserva Villavicencio',
+    },
   },
 ];
 
@@ -253,3 +360,151 @@ export const DEFAULT_MEDICAL_PROFILE: MedicalProfile = {
   emergencyContactPhone: '+5492615551234',
   healthInsurance: 'OSDE / Particular',
 };
+
+export const MENDOZA_PROTECTED_AREAS: ProtectedArea[] = [
+  {
+    id: 'reserva-divisadero-largo',
+    name: 'Reserva Natural Divisadero Largo',
+    shortName: 'Reserva Divisadero',
+    category: 'reserva_natural',
+    status: 'prohibido_motor',
+    authority: 'Cuerpo de Guardaparques de Mendoza (DRNR)',
+    contactRanger: '2614257065',
+    description: 'Área natural protegida de alto valor geológico, paleontológico y botánico. Alberga fósiles de más de 200 millones de años.',
+    rules: [
+      '🚫 Terminantemente prohibido el ingreso de motos de enduro, cuatriciclos y vehículos a combustión (Ley 6045).',
+      '🥾 Registro obligatorio en seccional de Guardaparques antes de iniciar el sendero.',
+      '🗑️ Prohibido arrojar residuos o restos orgánicos.',
+      '🔥 Prohibido encender fuego en toda la reserva.',
+      '🐕 No se permite el ingreso con animales domésticos.',
+    ],
+    allowedModes: {
+      trekking: true,
+      bicycle: true,
+      moto: false,
+    },
+    fillColor: 'rgba(255, 23, 68, 0.16)',
+    strokeColor: '#FF1744',
+    coordinates: [
+      { latitude: -32.8620, longitude: -68.9480 },
+      { latitude: -32.8610, longitude: -68.8980 },
+      { latitude: -32.8800, longitude: -68.8940 },
+      { latitude: -32.8840, longitude: -68.9450 },
+    ],
+  },
+  {
+    id: 'parque-san-martin',
+    name: 'Parque General San Martín (Zona Recreativa)',
+    shortName: 'Parque San Martín',
+    category: 'parque_provincial',
+    status: 'libre',
+    authority: 'Dirección de Parques y Paseos Públicos de Mendoza',
+    contactRanger: '2614495555',
+    description: 'Principal pulmón verde urbano del Gran Mendoza con más de 17 km de ciclovías y paseos peatonales.',
+    rules: [
+      '🚴 Ciclovías exclusivas para bicicletas y monopatines no motorizados.',
+      '🥾 Prioridad de paso peatonal en todos los cruces y rotondas.',
+      '🚫 Motos a combustión prohibidas en senderos internos y ciclovías (solo calzadas vehiculares).',
+      '🗑️ Utilizar los puntos limpios y cestos clasificadores.',
+    ],
+    allowedModes: {
+      trekking: true,
+      bicycle: true,
+      moto: false,
+    },
+    fillColor: 'rgba(0, 230, 118, 0.12)',
+    strokeColor: '#00E676',
+    coordinates: [
+      { latitude: -32.8780, longitude: -68.8600 },
+      { latitude: -32.8790, longitude: -68.8950 },
+      { latitude: -32.8940, longitude: -68.8950 },
+      { latitude: -32.8930, longitude: -68.8600 },
+    ],
+  },
+  {
+    id: 'circuito-enduro-challao',
+    name: 'Sector de Huellas y Enduro El Challao / Puesto El Chulengo',
+    shortName: 'Enduro El Challao',
+    category: 'circuito_enduro',
+    status: 'circuito_enduro',
+    authority: 'Comunidad Enduro Mendoza / Las Heras',
+    contactRanger: '2614815460',
+    description: 'Circuito tradicional sobre lechos secos y huellas precordilleranas autorizadas para entrenamiento deportivo de motos.',
+    rules: [
+      '🏍️ Tránsito motorizado autorizado únicamente sobre huellas abiertas y lechos secos.',
+      '🚫 No abrir huellas nuevas que generen erosión sobre laderas vírgenes.',
+      '🛡️ Uso obligatorio de casco homologado, pechera y botas de protección.',
+      '🔇 Prohibido escape libre no reglamentario.',
+      '🥾 Reducir la velocidad al cruzarse con senderistas o ciclistas.',
+    ],
+    allowedModes: {
+      trekking: false,
+      bicycle: true,
+      moto: true,
+    },
+    fillColor: 'rgba(41, 121, 255, 0.14)',
+    strokeColor: '#2979FF',
+    coordinates: [
+      { latitude: -32.7980, longitude: -68.9680 },
+      { latitude: -32.8020, longitude: -68.9200 },
+      { latitude: -32.8380, longitude: -68.9180 },
+      { latitude: -32.8360, longitude: -68.9680 },
+    ],
+  },
+];
+
+export const MENDOZA_CONVIVENCIA_RULES: ConvivenciaRuleItem[] = [
+  {
+    id: 'regla-peaton-primero',
+    icon: '🥾',
+    title: '1. El Peatón Siempre Tiene Paso Prioritario',
+    description: 'En senderos de montaña compartidos, la persona a pie o corriendo tiene derecho de paso sobre la bicicleta y la moto. En pasos ciegos o angostos, la bicicleta debe descender o bajar la velocidad a paso de hombre.',
+  },
+  {
+    id: 'regla-no-huellas-clandestinas',
+    icon: '🚫',
+    title: '2. Prohibido Abrir Atajos y Huellas Clandestinas',
+    description: 'Cortar las "zetas" de los cerros destruye la jarilla y el estrato vegetal. En tormentas de verano, esas líneas clandestinas se convierten en cárcavas aluvionales que arrasan la montaña.',
+    penaltyNote: 'Ley Provincial 6045: multas económicas y sanciones ambientales por degradación del suelo.',
+  },
+  {
+    id: 'regla-motos-circuitos-habilitados',
+    icon: '🏍️',
+    title: '3. Motos Solo en Circuitos y Huellas Autorizadas',
+    description: 'El motocross y enduro están estrictamente prohibidos en Reservas Naturales (Divisadero Largo, Villavicencio, Cordón del Plata) y senderos de trekking de Chacras. Utilizar exclusivamente circuitos habilitados como El Challao o rutas provinciales de ripio (RP 52).',
+    penaltyNote: 'Policía Rural y Guardaparques proceden al secuestro directo del rodado y multas severas.',
+  },
+  {
+    id: 'regla-no-dejes-rastro',
+    icon: '🎒',
+    title: '4. Filosofía "No Dejes Rastro" (Basura Cero)',
+    description: 'Todo lo que sube a la montaña, baja con vos. Envoltorios de geles energéticos, cámaras pinchadas, colillas y botellas deben regresar en tu mochila. No enterrar residuos.',
+  },
+  {
+    id: 'regla-mascotas-correa',
+    icon: '🐕',
+    title: '5. Mascotas Controladas con Correa',
+    description: 'En la precordillera mendocina habitan zorros grises, águilas moras y ofidios (yarará ñata). Llevar a los perros atados evita peleas con fauna autóctona y accidentes con otros deportistas.',
+  },
+];
+
+export const MENDOZA_RANGER_CONTACTS = [
+  {
+    title: 'Cuerpo de Guardaparques de Mendoza (DRNR)',
+    phone: '2614252090',
+    address: 'Parque General San Martín, Mendoza',
+    note: 'Consultas sobre permisos, estado de reservas y senderos habilitados',
+  },
+  {
+    title: 'Destacamento Guardaparques Divisadero Largo',
+    phone: '2614257065',
+    address: 'Ruta Papagallos s/n, Las Heras',
+    note: 'Registro de ingreso y emergencias en reserva Divisadero',
+  },
+  {
+    title: 'Policía Rural de Mendoza (Control de Motos y Furtivismo)',
+    phone: '2614815460',
+    address: 'Destacamento El Challao',
+    note: 'Denuncias de motos en áreas protegidas y caza furtiva',
+  },
+];

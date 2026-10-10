@@ -8,6 +8,22 @@ export type LatLng = Coordinate;
 
 export type RouteType = 'ciclovia' | 'sendero_mtb' | 'moto_trail';
 
+export type LegalityLevel = 'libre' | 'compartido_precaucion' | 'prohibido_motor' | 'circuito_enduro';
+
+export interface TrailLegality {
+  status: LegalityLevel;
+  badgeText: string;
+  tagColor: string;
+  allowedModes: {
+    trekking: boolean;
+    bicycle: boolean;
+    moto: boolean;
+  };
+  priorityRule: string;
+  legalWarning?: string;
+  authority: string;
+}
+
 export interface RouteItem {
   id: string;
   name: string;
@@ -19,6 +35,35 @@ export interface RouteItem {
   surface: 'Asfalto' | 'Ripio/Tierra' | 'Mixto';
   strokeColor: string;
   coordinates: Coordinate[];
+  legality: TrailLegality;
+}
+
+export interface ProtectedArea {
+  id: string;
+  name: string;
+  shortName: string;
+  category: 'reserva_natural' | 'parque_provincial' | 'circuito_enduro' | 'recreativo';
+  status: LegalityLevel;
+  authority: string;
+  contactRanger: string;
+  description: string;
+  rules: string[];
+  allowedModes: {
+    trekking: boolean;
+    bicycle: boolean;
+    moto: boolean;
+  };
+  coordinates: Coordinate[];
+  fillColor: string;
+  strokeColor: string;
+}
+
+export interface ConvivenciaRuleItem {
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+  penaltyNote?: string;
 }
 
 export type POICategory = 'trailhead' | 'hidratacion' | 'mirador' | 'taller';

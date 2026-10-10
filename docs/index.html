@@ -415,6 +415,133 @@
       background: rgba(255, 255, 255, 0.08);
     }
 
+    /* SEMÁFORO DE LEGALIDAD & CONVIVENCIA EN WEB */
+    .legality-box {
+      background: #080C14;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .legality-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .legality-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid;
+    }
+    .allowed-modes-pills {
+      display: flex;
+      gap: 4px;
+    }
+    .mode-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid;
+    }
+    .mode-pill.allowed {
+      background: rgba(0, 230, 118, 0.15);
+      border-color: #00E676;
+      color: #00E676;
+    }
+    .mode-pill.forbidden {
+      background: rgba(255, 23, 68, 0.15);
+      border-color: #FF1744;
+      color: #FF1744;
+    }
+    .priority-rule-text {
+      font-size: 11px;
+      color: #94A3B8;
+      line-height: 1.4;
+    }
+    .motor-warning-box {
+      margin-top: 8px;
+      padding: 8px;
+      background: rgba(255, 23, 68, 0.15);
+      border: 1px solid #FF1744;
+      border-radius: 8px;
+      color: #FF8A80;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    /* REGLAS DE ÁREA PROTEGIDA */
+    .protected-rules-box {
+      background: #080C14;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #CBD5E1;
+    }
+    .protected-rules-header {
+      font-weight: 800;
+      color: #F8FAFC;
+      margin-bottom: 6px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .protected-rule-item {
+      margin-bottom: 4px;
+      line-height: 1.35;
+      color: #94A3B8;
+    }
+
+    /* TARJETA CONVIVENCIA EN MODAL */
+    .convivencia-card {
+      background: #141C2B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .convivencia-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .convivencia-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #F8FAFC;
+    }
+    .convivencia-desc {
+      font-size: 12px;
+      color: #94A3B8;
+      line-height: 1.4;
+    }
+    .convivencia-penalty {
+      margin-top: 6px;
+      padding: 6px 8px;
+      background: rgba(255, 214, 0, 0.1);
+      border: 1px solid rgba(255, 214, 0, 0.3);
+      border-radius: 6px;
+      color: #FFD600;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .protected-area-item {
+      background: #141C2B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 4px solid #00E676;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
     .card-description {
       font-size: 13px;
       color: #CBD5E1;
@@ -933,6 +1060,12 @@
       <div class="fab-badge" id="fab-badge-count">5</div>
     </button>
 
+    <!-- Botón Semáforo de Convivencia & Reservas (Fase 3) -->
+    <button class="fab-btn" id="fab-convivencia-btn" onclick="openConvivenciaModal('manual')" title="Semáforo de Legalidad & Convivencia" style="border-color: #00E676;">
+      ⚖️
+      <div class="fab-badge" style="background: #00E676; color: #05080E; font-weight: 900;">3</div>
+    </button>
+
     <button class="fab-btn" onclick="toggleMapTypeMenu()" title="Tipo de mapa">
       🗺️
     </button>
@@ -994,9 +1127,51 @@
       </div>
     </div>
 
+    <!-- SEMÁFORO DE LEGALIDAD Y CONVIVENCIA (FASE 3) -->
+    <div class="legality-box" id="route-legality-box">
+      <div class="legality-header">
+        <span class="legality-badge" id="route-legality-badge">🟢 Libre Multimodal</span>
+        <div class="allowed-modes-pills" id="route-allowed-pills">
+          <span class="mode-pill allowed" id="route-pill-trek">🥾 ✓</span>
+          <span class="mode-pill allowed" id="route-pill-bike">🚴 ✓</span>
+          <span class="mode-pill forbidden" id="route-pill-moto">🏍️ ✕</span>
+        </div>
+      </div>
+      <div class="priority-rule-text" id="route-priority-text">📌 Prioridad: Peatón > Bici > Moto</div>
+      <div class="motor-warning-box" id="route-motor-warning" style="display: none;">
+        ⚠️ Zona protegida por Guardaparques. Prohibido circular en moto.
+      </div>
+    </div>
+
     <div class="action-row">
       <button class="btn-focus" onclick="focusActiveRoute()">Enfocar Trazado</button>
       <a class="btn-nav" id="route-nav-link" href="#" target="_blank">Ir al Inicio</a>
+    </div>
+  </div>
+
+  <!-- BOTTOM CARD: DETALLE DE ÁREA PROTEGIDA (FASE 3) -->
+  <div class="bottom-card" id="protected-area-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title-row">
+          <span class="legality-badge" id="area-badge" style="border-color: #FF1744; color: #FF1744;">🛡️ RESERVA PROTEGIDA</span>
+          <span class="zone-badge" id="area-auth">Guardaparques Mendoza</span>
+        </div>
+        <div class="card-title" id="area-title">Nombre del Área</div>
+      </div>
+      <button class="close-btn" onclick="closeCards()">✕</button>
+    </div>
+
+    <p class="card-description" id="area-desc"></p>
+
+    <div class="protected-rules-box">
+      <div class="protected-rules-header">Reglamento de Convivencia y Acceso:</div>
+      <div id="area-rules-list"></div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-focus" onclick="openConvivenciaModal('reservas')">Guía Completa</button>
+      <a class="btn-nav" id="area-ranger-link" href="tel:2614257065">Llamar Guardaparques</a>
     </div>
   </div>
 
@@ -1214,6 +1389,70 @@
     </div>
   </div>
 
+  <!-- MODAL: MANUAL DE CONVIVENCIA & ÁREAS PROTEGIDAS (FASE 3) -->
+  <div class="modal-overlay" id="convivencia-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">⚖️ Convivencia & Áreas Protegidas</div>
+        <button class="close-btn" onclick="closeConvivenciaModal()">✕</button>
+      </div>
+
+      <div class="safety-tabs">
+        <button class="safety-tab-btn active" id="conv-tab-btn-manual" onclick="switchConvTab('manual')">
+          📖 Manual
+        </button>
+        <button class="safety-tab-btn" id="conv-tab-btn-reservas" onclick="switchConvTab('reservas')">
+          🛡️ Reservas
+        </button>
+        <button class="safety-tab-btn" id="conv-tab-btn-denuncia" onclick="switchConvTab('denuncia')">
+          📢 Denunciar
+        </button>
+      </div>
+
+      <!-- TAB 1: MANUAL -->
+      <div class="safety-tab-pane active" id="conv-pane-manual">
+        <p class="modal-subtitle">
+          Los 5 mandamientos de la montaña mendocina para garantizar el disfrute compartido, la seguridad y la conservación ambiental.
+        </p>
+        <div id="convivencia-rules-list"></div>
+      </div>
+
+      <!-- TAB 2: RESERVAS -->
+      <div class="safety-tab-pane" id="conv-pane-reservas" style="display: none;">
+        <p class="modal-subtitle">
+          Zonificación oficial de Mendoza. Pulsa para contactar destacamentos o ver normativas específicas.
+        </p>
+        <div id="protected-areas-list"></div>
+        <div style="color: #94A3B8; font-size: 11px; font-weight: 800; margin: 12px 0 6px 0;">AUTORIDADES DE CONTROL MENDOZA</div>
+        <div id="ranger-contacts-list"></div>
+      </div>
+
+      <!-- TAB 3: DENUNCIA -->
+      <div class="safety-tab-pane" id="conv-pane-denuncia" style="display: none;">
+        <p class="modal-subtitle">
+          Reporta huellas clandestinas abiertas sin autorización, motos en reservas protegidas o vandalismo ambiental con GPS.
+        </p>
+        <label class="input-label">TIPO DE INFRACCIÓN</label>
+        <select class="form-input" id="denuncia-type">
+          <option value="motos">🏍️ Motos / Quads en Reserva Protegida</option>
+          <option value="huella">⛏️ Apertura de Huella Clandestina / Atajo</option>
+          <option value="basura">🗑️ Basural clandestino / Residuos</option>
+          <option value="fuego">🔥 Fuego fuera de camping</option>
+        </select>
+
+        <label class="input-label">ZONA AFECTADA</label>
+        <input type="text" class="form-input" id="denuncia-zone" value="Reserva Natural Divisadero Largo">
+
+        <label class="input-label">DESCRIPCIÓN DEL HECHO</label>
+        <textarea class="form-textarea" id="denuncia-desc" placeholder="Describe qué observaste (ej: 3 motos de enduro cruzando el sendero peatonal de la reserva...)"></textarea>
+
+        <button class="btn-start-guardian" style="background: #FF1744; color: #FFFFFF;" onclick="sendCitizenDenunciaWeb()">
+          📢 Registrar Denuncia Ambiental con GPS
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // DATASET REAL DE MENDOZA
     const MENDOZA_ROUTES = [
@@ -1234,7 +1473,16 @@
           [-32.9032, -68.8441],
           [-32.8955, -68.8430],
           [-32.8830, -68.8385]
-        ]
+        ],
+        legality: {
+          status: 'libre',
+          badgeText: '🟢 Libre Multimodal',
+          tagColor: '#00E676',
+          allowedModes: { trekking: true, bicycle: true, moto: false },
+          priorityRule: 'Peatones tienen paso prioritario en cruces señalizados. Bicis máx 25 km/h.',
+          legalWarning: 'Prohibida la circulación de motos a combustión en carriles de ciclovía (Ley 9024).',
+          authority: 'Municipios de Godoy Cruz y Ciudad de Mendoza'
+        }
       },
       {
         id: 'ciclovia-parque-general-san-martin',
@@ -1252,7 +1500,15 @@
           [-32.8851, -68.8790],
           [-32.8810, -68.8825],
           [-32.8860, -68.8912]
-        ]
+        ],
+        legality: {
+          status: 'libre',
+          badgeText: '🟢 Parque Recreativo',
+          tagColor: '#00E676',
+          allowedModes: { trekking: true, bicycle: true, moto: false },
+          priorityRule: 'Zona de paseo familiar: prioridad absoluta al peatón y deportistas a pie.',
+          authority: 'Dirección de Parques y Paseos Públicos de Mendoza'
+        }
       },
       {
         id: 'sendero-chacras-dique-frias',
@@ -1271,7 +1527,16 @@
           [-32.9730, -68.9240],
           [-32.9610, -68.9120],
           [-32.9520, -68.8990]
-        ]
+        ],
+        legality: {
+          status: 'compartido_precaucion',
+          badgeText: '🟡 Mixto: Peatón Prioritario',
+          tagColor: '#FFD600',
+          allowedModes: { trekking: true, bicycle: true, moto: false },
+          priorityRule: 'Senderos angostos: la bicicleta debe descender velocidad a paso de hombre.',
+          legalWarning: 'Prohibido ingreso de motos de enduro para evitar la erosión de cañadones secos.',
+          authority: 'Municipio de Luján de Cuyo & Comunidad de Senderistas'
+        }
       },
       {
         id: 'sendero-cerro-arco-antenas',
@@ -1289,7 +1554,71 @@
           [-32.8360, -68.9410],
           [-32.8340, -68.9485],
           [-32.8280, -68.9560]
-        ]
+        ],
+        legality: {
+          status: 'compartido_precaucion',
+          badgeText: '🟡 Camino de Servicio Mixto',
+          tagColor: '#FFD600',
+          allowedModes: { trekking: true, bicycle: true, moto: true },
+          priorityRule: 'Camino de mantenimiento: velocidad máx 20 km/h para vehículos. Prohibido salir de la huella.',
+          legalWarning: 'Prioridad constante al senderista que sube a pie.',
+          authority: 'Municipalidad de Las Heras'
+        }
+      },
+      {
+        id: 'sendero-divisadero-largo',
+        name: 'Quebrada de Divisadero Largo (Reserva Protegida)',
+        zone: 'Las Heras / Ciudad',
+        type: 'sendero_mtb',
+        distanceKm: 5.6,
+        elevationGainM: 260,
+        difficulty: 'Moderado',
+        surface: 'Ripio/Tierra',
+        strokeColor: '#FF1744',
+        coordinates: [
+          [-32.8760, -68.9020],
+          [-32.8730, -68.9110],
+          [-32.8705, -68.9190],
+          [-32.8680, -68.9270],
+          [-32.8650, -68.9340]
+        ],
+        legality: {
+          status: 'prohibido_motor',
+          badgeText: '🔴 Reserva Ecológica - Prohibido Motor',
+          tagColor: '#FF1744',
+          allowedModes: { trekking: true, bicycle: true, moto: false },
+          priorityRule: 'Área Natural Protegida. Registro obligatorio en puesto de Guardaparques. Prohibido salir del sendero.',
+          legalWarning: 'Ley Provincial 6045: Totalmente prohibido el acceso a motos, cuatriciclos y vehículos a combustión. Multas severas y secuestro vehicular.',
+          authority: 'Cuerpo de Guardaparques de Mendoza (DRNR)'
+        }
+      },
+      {
+        id: 'circuito-enduro-el-challao',
+        name: 'Circuito Enduro & Huellas El Challao / Puesto El Chulengo',
+        zone: 'Las Heras Precordillera',
+        type: 'moto_trail',
+        distanceKm: 14.5,
+        elevationGainM: 410,
+        difficulty: 'Técnico',
+        surface: 'Ripio/Tierra',
+        strokeColor: '#2979FF',
+        coordinates: [
+          [-32.8360, -68.9260],
+          [-32.8290, -68.9340],
+          [-32.8210, -68.9400],
+          [-32.8140, -68.9460],
+          [-32.8080, -68.9540],
+          [-32.8010, -68.9610]
+        ],
+        legality: {
+          status: 'circuito_enduro',
+          badgeText: '🔵 Circuito Enduro Habilitado',
+          tagColor: '#2979FF',
+          allowedModes: { trekking: false, bicycle: true, moto: true },
+          priorityRule: 'Circuito tradicional para entrenamiento de motociclismo. Bicis y peatones circular con extrema precaución.',
+          legalWarning: 'Obligatorio uso de casco integral homologado y escape reglamentario.',
+          authority: 'Comunidad Enduro Mendoza / Las Heras'
+        }
       },
       {
         id: 'sendero-quebrada-san-isidro',
@@ -1307,7 +1636,128 @@
           [-32.8850, -68.9610],
           [-32.9120, -68.9720],
           [-32.9645, -68.9790]
+        ],
+        legality: {
+          status: 'circuito_enduro',
+          badgeText: '🔵 Ruta Vehicular de Ripio',
+          tagColor: '#2979FF',
+          allowedModes: { trekking: true, bicycle: true, moto: true },
+          priorityRule: 'Ripio precordillerano. Prioridad a peatones en cruces de vertientes.',
+          authority: 'Vialidad Provincial & Comunidad de Puestos'
+        }
+      }
+    ];
+
+    const MENDOZA_PROTECTED_AREAS = [
+      {
+        id: 'reserva-divisadero-largo',
+        name: 'Reserva Natural Divisadero Largo',
+        shortName: 'Reserva Divisadero',
+        category: 'reserva_natural',
+        status: 'prohibido_motor',
+        authority: 'Cuerpo de Guardaparques de Mendoza (DRNR)',
+        contactRanger: '2614257065',
+        description: 'Área natural protegida de alto valor geológico y botánico. Fósiles de más de 200 millones de años.',
+        rules: [
+          '🚫 Terminantemente prohibido el ingreso de motos de enduro y quads (Ley 6045).',
+          '🥾 Registro obligatorio en seccional de Guardaparques antes de iniciar el sendero.',
+          '🗑️ Prohibido arrojar residuos o restos orgánicos.',
+          '🔥 Prohibido encender fuego en toda la reserva.'
+        ],
+        allowedModes: { trekking: true, bicycle: true, moto: false },
+        fillColor: '#FF1744',
+        strokeColor: '#FF1744',
+        coordinates: [
+          [-32.8620, -68.9480],
+          [-32.8610, -68.8980],
+          [-32.8800, -68.8940],
+          [-32.8840, -68.9450]
         ]
+      },
+      {
+        id: 'parque-san-martin',
+        name: 'Parque General San Martín (Zona Recreativa)',
+        shortName: 'Parque San Martín',
+        category: 'parque_provincial',
+        status: 'libre',
+        authority: 'Dirección de Parques y Paseos Públicos de Mendoza',
+        contactRanger: '2614495555',
+        description: 'Principal pulmón verde urbano del Gran Mendoza con más de 17 km de ciclovías y paseos peatonales.',
+        rules: [
+          '🚴 Ciclovías exclusivas para bicicletas y monopatines no motorizados.',
+          '🥾 Prioridad de paso peatonal en todos los cruces.',
+          '🚫 Motos prohibidas en senderos internos y ciclovías.',
+          '🗑️ Utilizar los puntos limpios y clasificadores.'
+        ],
+        allowedModes: { trekking: true, bicycle: true, moto: false },
+        fillColor: '#00E676',
+        strokeColor: '#00E676',
+        coordinates: [
+          [-32.8780, -68.8600],
+          [-32.8790, -68.8950],
+          [-32.8940, -68.8950],
+          [-32.8930, -68.8600]
+        ]
+      },
+      {
+        id: 'circuito-enduro-challao',
+        name: 'Sector de Huellas y Enduro El Challao / Puesto El Chulengo',
+        shortName: 'Enduro El Challao',
+        category: 'circuito_enduro',
+        status: 'circuito_enduro',
+        authority: 'Comunidad Enduro Mendoza / Las Heras',
+        contactRanger: '2614815460',
+        description: 'Circuito tradicional sobre lechos secos y huellas precordilleranas autorizadas para motociclismo.',
+        rules: [
+          '🏍️ Tránsito motorizado autorizado únicamente sobre huellas abiertas.',
+          '🚫 No abrir huellas nuevas que erosionen laderas vírgenes.',
+          '🛡️ Uso obligatorio de casco homologado y botas de protección.',
+          '🥾 Reducir la velocidad al cruzarse con senderistas.'
+        ],
+        allowedModes: { trekking: false, bicycle: true, moto: true },
+        fillColor: '#2979FF',
+        strokeColor: '#2979FF',
+        coordinates: [
+          [-32.7980, -68.9680],
+          [-32.8020, -68.9200],
+          [-32.8380, -68.9180],
+          [-32.8360, -68.9680]
+        ]
+      }
+    ];
+
+    const MENDOZA_CONVIVENCIA_RULES = [
+      {
+        id: 'r1',
+        icon: '🥾',
+        title: '1. El Peatón Siempre Tiene Paso Prioritario',
+        description: 'En senderos de montaña compartidos, la persona a pie o corriendo tiene derecho de paso sobre la bicicleta y la moto. En pasos angostos, la bicicleta debe descender o frenar a paso de hombre.'
+      },
+      {
+        id: 'r2',
+        icon: '🚫',
+        title: '2. Prohibido Abrir Atajos y Huellas Clandestinas',
+        description: 'Cortar las "zetas" de los cerros destruye la jarilla y provoca cárcavas aluvionales en tormentas de verano.',
+        penaltyNote: 'Ley Provincial 6045: multas económicas y sanciones ambientales por degradación del suelo.'
+      },
+      {
+        id: 'r3',
+        icon: '🏍️',
+        title: '3. Motos Solo en Circuitos y Huellas Autorizadas',
+        description: 'El motocross y enduro están estrictamente prohibidos en Reservas Naturales (Divisadero Largo, Villavicencio) y senderos pedestres de Chacras. Utilizar circuitos habilitados como El Challao.',
+        penaltyNote: 'Policía Rural y Guardaparques proceden al secuestro del rodado.'
+      },
+      {
+        id: 'r4',
+        icon: '🎒',
+        title: '4. Filosofía "No Dejes Rastro" (Basura Cero)',
+        description: 'Todo lo que sube a la montaña, baja con vos. Envoltorios de geles, cámaras pinchadas y botellas deben regresar en tu mochila.'
+      },
+      {
+        id: 'r5',
+        icon: '🐕',
+        title: '5. Mascotas Controladas con Correa',
+        description: 'En la precordillera habitan zorros grises, águilas moras y yararás. Llevar a los perros atados evita peleas con fauna autóctona y accidentes.'
       }
     ];
 
@@ -1495,6 +1945,8 @@
     let polylineLayers = [];
     let markerLayers = [];
     let incidentLayers = [];
+    let polygonLayers = [];
+    let showProtectedAreasWeb = true;
     let userMarker = null;
 
     function getIncidentIconEmoji(type) {
@@ -1525,6 +1977,8 @@
       markerLayers = [];
       incidentLayers.forEach(i => map.removeLayer(i));
       incidentLayers = [];
+      polygonLayers.forEach(pl => map.removeLayer(pl));
+      polygonLayers = [];
 
       const filteredRoutes = currentFilter === 'todas'
         ? MENDOZA_ROUTES
@@ -1536,6 +1990,22 @@
 
       document.getElementById('stats-badge').innerText = `Mendoza • ${filteredRoutes.length} rutas • ${MENDOZA_POIS.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
       document.getElementById('fab-badge-count').innerText = filteredIncidents.length;
+
+      // Áreas Protegidas (Fase 3: Semáforo de Legalidad)
+      if (showProtectedAreasWeb && typeof MENDOZA_PROTECTED_AREAS !== 'undefined') {
+        MENDOZA_PROTECTED_AREAS.forEach(area => {
+          const poly = L.polygon(area.coordinates, {
+            color: area.strokeColor,
+            fillColor: area.fillColor,
+            fillOpacity: 0.16,
+            weight: 2,
+            dashArray: '5, 5'
+          }).addTo(map);
+
+          poly.on('click', () => showProtectedAreaCard(area));
+          polygonLayers.push(poly);
+        });
+      }
 
       // Rutas
       filteredRoutes.forEach(route => {
@@ -1627,11 +2097,58 @@
       document.getElementById('route-elev').innerText = `+${route.elevationGainM} m`;
       document.getElementById('route-surface').innerText = route.surface;
 
+      // Semáforo de Legalidad (Fase 3)
+      if (route.legality) {
+        const badgeEl = document.getElementById('route-legality-badge');
+        badgeEl.innerText = route.legality.badgeText;
+        badgeEl.style.borderColor = route.legality.tagColor;
+        badgeEl.style.color = route.legality.tagColor;
+
+        const pTrek = document.getElementById('route-pill-trek');
+        pTrek.className = 'mode-pill ' + (route.legality.allowedModes.trekking ? 'allowed' : 'forbidden');
+        pTrek.innerText = '🥾 ' + (route.legality.allowedModes.trekking ? '✓' : '✕');
+
+        const pBike = document.getElementById('route-pill-bike');
+        pBike.className = 'mode-pill ' + (route.legality.allowedModes.bicycle ? 'allowed' : 'forbidden');
+        pBike.innerText = '🚴 ' + (route.legality.allowedModes.bicycle ? '✓' : '✕');
+
+        const pMoto = document.getElementById('route-pill-moto');
+        pMoto.className = 'mode-pill ' + (route.legality.allowedModes.moto ? 'allowed' : 'forbidden');
+        pMoto.innerText = '🏍️ ' + (route.legality.allowedModes.moto ? '✓' : '✕');
+
+        document.getElementById('route-priority-text').innerText = '📌 Prioridad: ' + route.legality.priorityRule;
+
+        const warnEl = document.getElementById('route-motor-warning');
+        if (currentFilter === 'moto_trail' && !route.legality.allowedModes.moto) {
+          warnEl.style.display = 'block';
+          warnEl.innerText = '⚠️ ' + (route.legality.legalWarning || 'Zona protegida por Guardaparques. Prohibido motos.');
+        } else {
+          warnEl.style.display = 'none';
+        }
+      }
+
       const start = route.coordinates[0];
       const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${start[0]},${start[1]}`;
       document.getElementById('route-nav-link').href = navUrl;
 
       document.getElementById('route-card').classList.add('open');
+    }
+
+    function showProtectedAreaCard(area) {
+      closeCards();
+      document.getElementById('area-title').innerText = area.name;
+      document.getElementById('area-auth').innerText = area.authority;
+      const bEl = document.getElementById('area-badge');
+      bEl.innerText = area.category === 'reserva_natural' ? '🛡️ RESERVA PROTEGIDA' : (area.category === 'circuito_enduro' ? '🏍️ CIRCUITO HABILITADO' : '🌳 ZONA RECREATIVA');
+      bEl.style.borderColor = area.strokeColor;
+      bEl.style.color = area.strokeColor;
+
+      document.getElementById('area-desc').innerText = area.description;
+      const rulesList = document.getElementById('area-rules-list');
+      rulesList.innerHTML = area.rules.map(r => `<div class="protected-rule-item">• ${r}</div>`).join('');
+      document.getElementById('area-ranger-link').href = `tel:${area.contactRanger}`;
+
+      document.getElementById('protected-area-card').classList.add('open');
     }
 
     function showPoiCard(poi) {
@@ -1691,6 +2208,95 @@
       document.getElementById('route-card').classList.remove('open');
       document.getElementById('poi-card').classList.remove('open');
       document.getElementById('incident-card').classList.remove('open');
+      document.getElementById('protected-area-card').classList.remove('open');
+    }
+
+    // GESTIÓN DEL MODAL DE CONVIVENCIA Y ÁREAS PROTEGIDAS (FASE 3)
+    function openConvivenciaModal(tab = 'manual') {
+      document.getElementById('convivencia-modal').classList.add('open');
+      switchConvTab(tab);
+    }
+    function closeConvivenciaModal() {
+      document.getElementById('convivencia-modal').classList.remove('open');
+    }
+    function switchConvTab(tab) {
+      document.querySelectorAll('#convivencia-modal .safety-tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('conv-tab-btn-' + tab).classList.add('active');
+
+      document.getElementById('conv-pane-manual').style.display = tab === 'manual' ? 'block' : 'none';
+      document.getElementById('conv-pane-reservas').style.display = tab === 'reservas' ? 'block' : 'none';
+      document.getElementById('conv-pane-denuncia').style.display = tab === 'denuncia' ? 'block' : 'none';
+    }
+
+    function sendCitizenDenunciaWeb() {
+      const desc = document.getElementById('denuncia-desc').value.trim();
+      const zone = document.getElementById('denuncia-zone').value.trim();
+      if (!desc) {
+        alert('Por favor describe la infracción observada en la montaña.');
+        return;
+      }
+      alert(`✅ Denuncia Registrada con GPS en ${zone}.\n\nCoordenadas: ${currentUserCoords[0].toFixed(5)}, ${currentUserCoords[1].toFixed(5)}.\nPuedes llamar a Policía Rural (2614815460) o Guardaparques (2614257065) para intervención inmediata.`);
+      document.getElementById('denuncia-desc').value = '';
+      closeConvivenciaModal();
+    }
+
+    function initConvivenciaModalContent() {
+      // 1. Mandamientos
+      const rList = document.getElementById('convivencia-rules-list');
+      if (rList && typeof MENDOZA_CONVIVENCIA_RULES !== 'undefined') {
+        rList.innerHTML = MENDOZA_CONVIVENCIA_RULES.map(r => `
+          <div class="convivencia-card">
+            <div class="convivencia-card-header">
+              <span style="font-size: 18px;">${r.icon}</span>
+              <span class="convivencia-title">${r.title}</span>
+            </div>
+            <div class="convivencia-desc">${r.description}</div>
+            ${r.penaltyNote ? `<div class="convivencia-penalty">⚠️ ${r.penaltyNote}</div>` : ''}
+          </div>
+        `).join('');
+      }
+
+      // 2. Reservas
+      const pList = document.getElementById('protected-areas-list');
+      if (pList && typeof MENDOZA_PROTECTED_AREAS !== 'undefined') {
+        pList.innerHTML = MENDOZA_PROTECTED_AREAS.map(a => `
+          <div class="protected-area-item" style="border-left-color: ${a.strokeColor};">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+              <div style="font-size: 13px; font-weight: 900; color: #F8FAFC;">${a.name}</div>
+              <span class="legality-badge" style="border-color:${a.strokeColor}; color:${a.strokeColor}; font-size:10px;">${a.category === 'reserva_natural' ? 'Reserva' : (a.category === 'circuito_enduro' ? 'Enduro' : 'Parque')}</span>
+            </div>
+            <div style="font-size: 11px; color: #64748B; margin-bottom: 6px;">${a.authority}</div>
+            <div style="font-size: 12px; color: #94A3B8; margin-bottom: 8px;">${a.description}</div>
+            <div style="display:flex; gap: 6px; margin-bottom: 8px;">
+              <span class="mode-pill ${a.allowedModes.trekking ? 'allowed' : 'forbidden'}">🥾 ${a.allowedModes.trekking ? 'Permitido' : 'No apto'}</span>
+              <span class="mode-pill ${a.allowedModes.bicycle ? 'allowed' : 'forbidden'}">🚴 ${a.allowedModes.bicycle ? 'Permitido' : 'No apto'}</span>
+              <span class="mode-pill ${a.allowedModes.moto ? 'allowed' : 'forbidden'}">🏍️ ${a.allowedModes.moto ? 'Habilitado' : 'Prohibido'}</span>
+            </div>
+            <a href="tel:${a.contactRanger}" class="btn-focus" style="display:block; text-decoration:none; padding: 7px; font-size: 11px;">📞 Llamar Destacamento (${a.contactRanger})</a>
+          </div>
+        `).join('');
+      }
+
+      // 3. Autoridades
+      const rcList = document.getElementById('ranger-contacts-list');
+      if (rcList) {
+        rcList.innerHTML = `
+          <div class="em-card">
+            <div>
+              <div style="font-size: 13px; font-weight: 800; color: #F8FAFC;">Guardaparques Mendoza (DRNR)</div>
+              <div style="font-size: 10px; color: #64748B;">Control de Reservas y Senderos</div>
+            </div>
+            <a class="em-call-btn" href="tel:2614252090">📞 Llamar</a>
+          </div>
+          <div class="em-card">
+            <div>
+              <div style="font-size: 13px; font-weight: 800; color: #F8FAFC;">Policía Rural Mendoza</div>
+              <div style="font-size: 10px; color: #64748B;">Motos en zonas protegidas y furtivismo</div>
+            </div>
+            <a class="em-call-btn" href="tel:2614815460">📞 Llamar</a>
+          </div>
+        `;
+      }
     }
 
     function focusActiveRoute() {
@@ -1894,6 +2500,7 @@
 
     // Inicializar mapa y datos
     updateSosLinks(initialCoords[0], initialCoords[1]);
+    initConvivenciaModalContent();
     renderMapElements();
   </script>
 </body>

@@ -16,6 +16,7 @@ import {
 import MapView, {
   Polyline,
   Marker,
+  Polygon,
   PROVIDER_GOOGLE,
 } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -47,6 +48,13 @@ import {
   Send,
   Timer,
   Radio,
+  Scale,
+  ScrollText,
+  Trees,
+  BookOpen,
+  ShieldCheck,
+  AlertOctagon,
+  Check,
 } from 'lucide-react-native';
 
 import {
@@ -61,6 +69,9 @@ import {
   IncidentSeverity,
   GuardianSession,
   MedicalProfile,
+  ProtectedArea,
+  ConvivenciaRuleItem,
+  LegalityLevel,
 } from '../types/map';
 import {
   INITIAL_MENDOZA_REGION,
@@ -70,6 +81,9 @@ import {
   HIGH_CONTRAST_MAP_STYLE,
   MENDOZA_EMERGENCY_NUMBERS,
   DEFAULT_MEDICAL_PROFILE,
+  MENDOZA_PROTECTED_AREAS,
+  MENDOZA_CONVIVENCIA_RULES,
+  MENDOZA_RANGER_CONTACTS,
 } from '../data/routesAndPois';
 
 type FilterTab = 'todas' | RouteType;
@@ -121,6 +135,43 @@ export default function MapScreen() {
 
   // Ficha Médica Offline ICE
   const [medicalProfile, setMedicalProfile] = useState<MedicalProfile>(DEFAULT_MEDICAL_PROFILE);
+
+  // Estados de Convivencia y Áreas Protegidas (Fase 3: Semáforo de Legalidad)
+  const [showProtectedAreas, setShowProtectedAreas] = useState<boolean>(true);
+  const [selectedProtectedArea, setSelectedProtectedArea] = useState<ProtectedArea | null>(null);
+  const [isConvivenciaModalVisible, setIsConvivenciaModalVisible] = useState<boolean>(false);
+  const [convivenciaTab, setConvivenciaTab] = useState<'manual' | 'reservas' | 'denuncia'>('manual');
+  const [denunciaDescription, setDenunciaDescription] = useState<string>('');
+  const [denunciaZone, setDenunciaZone] = useState<string>('Reserva Natural Divisadero Largo');
+  const [denunciaType, setDenunciaType] = useState<string>('motos_en_reserva');
+
+  const handleSendDenuncia = () => {
+    if (!denunciaDescription.trim()) {
+      Alert.alert('Faltan detalles', 'Por favor describe la infracción observada en la montaña.');
+      return;
+    }
+    const gpsCoords = userLocation
+      ? `${userLocation.latitude.toFixed(5)}, ${userLocation.longitude.toFixed(5)}`
+      : '-32.88950, -68.86500 (Precordillera Gran Mendoza)';
+
+    Alert.alert(
+      '✅ Denuncia Registrada con GPS',
+      `Se ha registrado tu reporte en ${denunciaZone}.\n\nCoordenadas: ${gpsCoords}\n\nPuedes notificar de inmediato a la Policía Rural o Guardaparques para intervención rápida.`,
+      [
+        {
+          text: 'Llamar a Policía Rural',
+          onPress: () => Linking.openURL('tel:2614815460'),
+        },
+        {
+          text: 'Llamar a Guardaparques',
+          onPress: () => Linking.openURL('tel:2614257065'),
+        },
+        { text: 'Listo', style: 'cancel' },
+      ]
+    );
+    setDenunciaDescription('');
+    setIsConvivenciaModalVisible(false);
+  };
 
   // Efecto de cuenta regresiva en vivo del Ángel Guardián
   useEffect(() => {
@@ -554,6 +605,25 @@ export default function MapScreen() {
           </Marker>
         )}
 
+        {/* ÁREAS NATURALES PROTEGIDAS & ZONAS REGULADAS (SEMÁFORO DE LEGALIDAD) */}
+        {showProtectedAreas &&
+          MENDOZA_PROTECTED_AREAS.map((area) => (
+            <Polygon
+              key={area.id}
+              coordinates={area.coordinates}
+              fillColor={area.fillColor}
+              strokeColor={area.strokeColor}
+              strokeWidth={2}
+              tappable={true}
+              onPress={() => {
+                setSelectedRoute(null);
+                setSelectedPoi(null);
+                setSelectedIncident(null);
+                setSelectedProtectedArea(area);
+              }}
+            />
+          ))}
+
         {/* POLYLINES CON RENDERIZADO DE ALTO CONTRASTE */}
         {visibleRoutes.map((route) => {
           const isSelected = selectedRoute?.id === route.id;
@@ -850,6 +920,22 @@ export default function MapScreen() {
           )}
         </TouchableOpacity>
 
+        {/* Botón Semáforo de Legalidad & Manual de Convivencia (Fase 3) */}
+        <TouchableOpacity
+          style={[
+            styles.fabButton,
+            styles.fabConvivenciaButton,
+            showProtectedAreas && styles.fabConvivenciaButtonActive,
+          ]}
+          onPress={() => setIsConvivenciaModalVisible(true)}
+          activeOpacity={0.85}
+        >
+          <Scale size={20} color={showProtectedAreas ? '#00E676' : '#F8FAFC'} />
+          <View style={styles.fabMiniBadge}>
+            <Text style={styles.fabMiniBadgeText}>⚖️</Text>
+          </View>
+        </TouchableOpacity>
+
         {/* Selector de capa de mapa */}
         <TouchableOpacity
           style={styles.fabButton}
@@ -1043,6 +1129,85 @@ export default function MapScreen() {
             </View>
           </View>
 
+          {/* SEMÁFORO DE LEGALIDAD & CONVIVENCIA (FASE 3) */}
+          <View style={styles.legalityContainer}>
+            <View style={styles.legalityHeaderRow}>
+              <View
+                style={[
+                  styles.legalityBadge,
+                  {
+                    backgroundColor: selectedRoute.legality.tagColor + '20',
+                    borderColor: selectedRoute.legality.tagColor,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.legalityBadgeText,
+                    { color: selectedRoute.legality.tagColor },
+                  ]}
+                >
+                  {selectedRoute.legality.badgeText}
+                </Text>
+              </View>
+
+              <View style={styles.allowedModesPillsRow}>
+                <View
+                  style={[
+                    styles.modePill,
+                    selectedRoute.legality.allowedModes.trekking
+                      ? styles.modePillAllowed
+                      : styles.modePillForbidden,
+                  ]}
+                >
+                  <Text style={styles.modePillText}>
+                    🥾 {selectedRoute.legality.allowedModes.trekking ? '✓' : '✕'}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.modePill,
+                    selectedRoute.legality.allowedModes.bicycle
+                      ? styles.modePillAllowed
+                      : styles.modePillForbidden,
+                  ]}
+                >
+                  <Text style={styles.modePillText}>
+                    🚴 {selectedRoute.legality.allowedModes.bicycle ? '✓' : '✕'}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.modePill,
+                    selectedRoute.legality.allowedModes.moto
+                      ? styles.modePillAllowed
+                      : styles.modePillForbidden,
+                  ]}
+                >
+                  <Text style={styles.modePillText}>
+                    🏍️ {selectedRoute.legality.allowedModes.moto ? '✓' : '✕'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <Text style={styles.priorityRuleText}>
+              📌 <Text style={{ fontWeight: '700', color: '#F8FAFC' }}>Norma de Paso:</Text>{' '}
+              {selectedRoute.legality.priorityRule}
+            </Text>
+
+            {/* Advertencia Legal si el usuario activó modo moto e intenta transitar en zona ecológica */}
+            {selectedFilter === 'moto_trail' && !selectedRoute.legality.allowedModes.moto && (
+              <View style={styles.motorWarningBox}>
+                <AlertTriangle size={15} color="#FF1744" />
+                <Text style={styles.motorWarningText}>
+                  {selectedRoute.legality.legalWarning ||
+                    'Zona protegida por Guardaparques. Prohibido circular con vehículos a motor.'}
+                </Text>
+              </View>
+            )}
+          </View>
+
           {/* Botones de acción de ruta */}
           <View style={styles.actionButtonsRow}>
             <TouchableOpacity
@@ -1075,6 +1240,88 @@ export default function MapScreen() {
               <ExternalLink size={16} color="#05080E" />
               <Text style={styles.navigateButtonText}>Ir al Inicio</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* TARJETA INFERIOR: DETALLES DE ÁREA NATURAL PROTEGIDA (FASE 3) */}
+      {selectedProtectedArea && (
+        <View style={[styles.bottomCard, { paddingBottom: insets.bottom + 16 }]}>
+          <View style={styles.cardHeader}>
+            <View style={{ flex: 1 }}>
+              <View style={styles.cardHeaderTopRow}>
+                <View
+                  style={[
+                    styles.legalityBadge,
+                    {
+                      backgroundColor: selectedProtectedArea.strokeColor + '25',
+                      borderColor: selectedProtectedArea.strokeColor,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.legalityBadgeText,
+                      { color: selectedProtectedArea.strokeColor },
+                    ]}
+                  >
+                    {selectedProtectedArea.category === 'reserva_natural'
+                      ? '🛡️ RESERVA PROTEGIDA'
+                      : selectedProtectedArea.category === 'circuito_enduro'
+                      ? '🏍️ CIRCUITO HABILITADO'
+                      : '🌳 ZONA RECREATIVA'}
+                  </Text>
+                </View>
+                <Text style={styles.zoneText}>{selectedProtectedArea.authority}</Text>
+              </View>
+
+              <Text style={styles.cardTitle} numberOfLines={2}>
+                {selectedProtectedArea.name}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => setSelectedProtectedArea(null)}
+              style={styles.closeBtn}
+            >
+              <X size={20} color="#94A3B8" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.cardDescription}>{selectedProtectedArea.description}</Text>
+
+          <View style={styles.protectedRulesBox}>
+            <Text style={styles.protectedRulesHeader}>Reglamento de Convivencia y Acceso:</Text>
+            {selectedProtectedArea.rules.map((rule, idx) => (
+              <Text key={idx} style={styles.protectedRuleText}>
+                {rule}
+              </Text>
+            ))}
+          </View>
+
+          <View style={styles.actionButtonsRow}>
+            <TouchableOpacity
+              style={styles.focusRouteButton}
+              onPress={() => {
+                setSelectedProtectedArea(null);
+                setIsConvivenciaModalVisible(true);
+              }}
+              activeOpacity={0.85}
+            >
+              <ScrollText size={16} color="#00E676" />
+              <Text style={styles.focusRouteButtonText}>Guía Completa</Text>
+            </TouchableOpacity>
+
+            {selectedProtectedArea.contactRanger && (
+              <TouchableOpacity
+                style={styles.navigateButton}
+                onPress={() => Linking.openURL(`tel:${selectedProtectedArea.contactRanger}`)}
+                activeOpacity={0.88}
+              >
+                <PhoneCall size={16} color="#05080E" />
+                <Text style={styles.navigateButtonText}>Guardaparques</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       )}
@@ -1642,6 +1889,274 @@ export default function MapScreen() {
                   >
                     <CheckCircle2 size={18} color="#05080E" strokeWidth={3} />
                     <Text style={styles.saveMedicalBtnText}>Guardar Ficha Médica</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL: MANUAL DE CONVIVENCIA & ÁREAS PROTEGIDAS (FASE 3) */}
+      <Modal
+        visible={isConvivenciaModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsConvivenciaModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderTitleRow}>
+                <Scale size={22} color="#00E676" />
+                <Text style={styles.modalTitle}>Convivencia & Áreas Protegidas</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setIsConvivenciaModalVisible(false)}
+                style={styles.modalCloseBtn}
+              >
+                <X size={20} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Pestañas del Modal */}
+            <View style={styles.safetyTabsWrapper}>
+              <TouchableOpacity
+                style={[styles.safetyTabBtn, convivenciaTab === 'manual' && styles.safetyTabBtnActive]}
+                onPress={() => setConvivenciaTab('manual')}
+                activeOpacity={0.8}
+              >
+                <BookOpen
+                  size={15}
+                  color={convivenciaTab === 'manual' ? '#00E676' : '#94A3B8'}
+                />
+                <Text
+                  style={[
+                    styles.safetyTabBtnText,
+                    convivenciaTab === 'manual' && styles.safetyTabBtnTextActive,
+                  ]}
+                >
+                  Manual
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.safetyTabBtn, convivenciaTab === 'reservas' && styles.safetyTabBtnActive]}
+                onPress={() => setConvivenciaTab('reservas')}
+                activeOpacity={0.8}
+              >
+                <Trees
+                  size={15}
+                  color={convivenciaTab === 'reservas' ? '#00E676' : '#94A3B8'}
+                />
+                <Text
+                  style={[
+                    styles.safetyTabBtnText,
+                    convivenciaTab === 'reservas' && styles.safetyTabBtnTextActive,
+                  ]}
+                >
+                  Reservas
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.safetyTabBtn, convivenciaTab === 'denuncia' && styles.safetyTabBtnActive]}
+                onPress={() => setConvivenciaTab('denuncia')}
+                activeOpacity={0.8}
+              >
+                <AlertOctagon
+                  size={15}
+                  color={convivenciaTab === 'denuncia' ? '#FF1744' : '#94A3B8'}
+                />
+                <Text
+                  style={[
+                    styles.safetyTabBtnText,
+                    convivenciaTab === 'denuncia' && { color: '#FF1744', fontWeight: '800' },
+                  ]}
+                >
+                  Denunciar
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* TAB 1: MANUAL DE CONVIVENCIA */}
+              {convivenciaTab === 'manual' && (
+                <View>
+                  <Text style={styles.modalSubtitle}>
+                    Los 5 mandamientos de la montaña mendocina para garantizar el disfrute compartido, la seguridad deportiva y la conservación ambiental.
+                  </Text>
+
+                  {MENDOZA_CONVIVENCIA_RULES.map((rule) => (
+                    <View key={rule.id} style={styles.convivenciaCard}>
+                      <View style={styles.convivenciaCardHeader}>
+                        <Text style={styles.convivenciaIcon}>{rule.icon}</Text>
+                        <Text style={styles.convivenciaTitle}>{rule.title}</Text>
+                      </View>
+                      <Text style={styles.convivenciaDesc}>{rule.description}</Text>
+                      {rule.penaltyNote && (
+                        <View style={styles.convivenciaPenaltyBox}>
+                          <ShieldAlert size={14} color="#FFD600" />
+                          <Text style={styles.convivenciaPenaltyText}>{rule.penaltyNote}</Text>
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* TAB 2: MAPA DE RESERVAS & GUARDAPARQUES */}
+              {convivenciaTab === 'reservas' && (
+                <View>
+                  <Text style={styles.modalSubtitle}>
+                    Zonificación oficial de Mendoza. Pulsa para contactar destacamentos o ver normativas específicas.
+                  </Text>
+
+                  {MENDOZA_PROTECTED_AREAS.map((area) => (
+                    <View
+                      key={area.id}
+                      style={[
+                        styles.protectedAreaCard,
+                        { borderLeftColor: area.strokeColor },
+                      ]}
+                    >
+                      <View style={styles.protectedAreaHeader}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.protectedAreaName}>{area.name}</Text>
+                          <Text style={styles.protectedAreaAuth}>{area.authority}</Text>
+                        </View>
+                        <View
+                          style={[
+                            styles.areaCategoryBadge,
+                            { backgroundColor: area.strokeColor + '20', borderColor: area.strokeColor },
+                          ]}
+                        >
+                          <Text style={[styles.areaCategoryText, { color: area.strokeColor }]}>
+                            {area.category === 'reserva_natural'
+                              ? 'Reserva'
+                              : area.category === 'circuito_enduro'
+                              ? 'Enduro'
+                              : 'Parque'}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <Text style={styles.protectedAreaDesc}>{area.description}</Text>
+
+                      <View style={styles.allowedIconsRowSmall}>
+                        <Text style={styles.allowedPillSmall}>
+                          🥾 {area.allowedModes.trekking ? 'Permitido' : 'No apto'}
+                        </Text>
+                        <Text style={styles.allowedPillSmall}>
+                          🚴 {area.allowedModes.bicycle ? 'Permitido' : 'No apto'}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.allowedPillSmall,
+                            !area.allowedModes.moto && { color: '#FF1744', borderColor: '#FF1744' },
+                          ]}
+                        >
+                          🏍️ {area.allowedModes.moto ? 'Habilitado' : 'Prohibido'}
+                        </Text>
+                      </View>
+
+                      <TouchableOpacity
+                        style={styles.rangerCallBtn}
+                        onPress={() => Linking.openURL(`tel:${area.contactRanger}`)}
+                        activeOpacity={0.8}
+                      >
+                        <PhoneCall size={14} color="#00E676" />
+                        <Text style={styles.rangerCallText}>
+                          Llamar Destacamento ({area.contactRanger})
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+
+                  <Text style={styles.emergencyNumbersHeader}>AUTORIDADES DE CONTROL MENDOZA</Text>
+                  {MENDOZA_RANGER_CONTACTS.map((rc, idx) => (
+                    <TouchableOpacity
+                      key={idx}
+                      style={styles.emergencyNumberCard}
+                      onPress={() => Linking.openURL(`tel:${rc.phone}`)}
+                      activeOpacity={0.8}
+                    >
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.emergencyCardName}>{rc.title}</Text>
+                        <Text style={styles.emergencyCardDesc}>{rc.note}</Text>
+                      </View>
+                      <View style={[styles.emergencyCardCallBtn, { backgroundColor: '#00E676' }]}>
+                        <PhoneCall size={14} color="#05080E" strokeWidth={2.8} />
+                        <Text style={[styles.emergencyCardNumber, { color: '#05080E' }]}>{rc.phone}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+
+              {/* TAB 3: DENUNCIAR HUELLA CLANDESTINA / DAÑO AMBIENTAL */}
+              {convivenciaTab === 'denuncia' && (
+                <View>
+                  <Text style={styles.modalSubtitle}>
+                    Reporta huellas clandestinas abiertas sin autorización, motos en reservas protegidas o vandalismo ambiental. Se geolocaliza automáticamente con tu posición actual.
+                  </Text>
+
+                  <Text style={styles.inputSectionLabel}>TIPO DE INFRACCIÓN</Text>
+                  <View style={styles.bloodGroupRow}>
+                    {[
+                      { id: 'motos_en_reserva', label: '🏍️ Motos en Reserva' },
+                      { id: 'huella_clandestina', label: '⛏️ Huella Clandestina' },
+                      { id: 'basura', label: '🗑️ Basural / Residuos' },
+                      { id: 'fuego', label: '🔥 Fuego no autorizado' },
+                    ].map((item) => (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={[
+                          styles.bloodChip,
+                          denunciaType === item.id && { backgroundColor: '#FF1744', borderColor: '#FF1744' },
+                        ]}
+                        onPress={() => setDenunciaType(item.id)}
+                      >
+                        <Text
+                          style={[
+                            styles.bloodChipText,
+                            denunciaType === item.id && { color: '#FFFFFF', fontWeight: '900' },
+                          ]}
+                        >
+                          {item.label}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  <Text style={styles.inputSectionLabel}>ZONA O RESERVA AFECTADA</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={denunciaZone}
+                    onChangeText={setDenunciaZone}
+                    placeholder="Ej: Divisadero Largo, Cañadón Frías, Cerro Arco..."
+                    placeholderTextColor="#64748B"
+                  />
+
+                  <Text style={styles.inputSectionLabel}>DESCRIPCIÓN DE LA SITUACIÓN</Text>
+                  <TextInput
+                    style={[styles.textInput, styles.textArea]}
+                    value={denunciaDescription}
+                    onChangeText={setDenunciaDescription}
+                    placeholder="Describe qué observaste (ej: 3 motos de enduro cruzando el sendero peatonal de la reserva, apertura de atajo que corta la curva...)"
+                    placeholderTextColor="#64748B"
+                    multiline
+                  />
+
+                  <TouchableOpacity
+                    style={[styles.saveMedicalBtn, { backgroundColor: '#FF1744', shadowColor: '#FF1744' }]}
+                    onPress={handleSendDenuncia}
+                    activeOpacity={0.88}
+                  >
+                    <Send size={18} color="#FFFFFF" strokeWidth={2.5} />
+                    <Text style={[styles.saveMedicalBtnText, { color: '#FFFFFF' }]}>
+                      Registrar Denuncia Ambiental
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -2750,5 +3265,252 @@ const styles = StyleSheet.create({
     color: '#05080E',
     fontSize: 15,
     fontWeight: '900',
+  },
+
+  // FASE 3: SEMÁFORO DE LEGALIDAD Y CONVIVENCIA STYLES
+  fabConvivenciaButton: {
+    borderColor: '#00E676',
+    position: 'relative',
+  },
+  fabConvivenciaButtonActive: {
+    backgroundColor: '#052e16',
+    borderColor: '#00E676',
+  },
+  fabMiniBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#00E676',
+    borderRadius: 8,
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fabMiniBadgeText: {
+    color: '#05080E',
+    fontSize: 9,
+    fontWeight: '900',
+  },
+
+  // Tarjeta de Ruta: Semáforo y Reglas
+  legalityContainer: {
+    backgroundColor: '#1E293B',
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  legalityHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  legalityBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  legalityBadgeText: {
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.3,
+  },
+  allowedModesPillsRow: {
+    flexDirection: 'row',
+    gap: 5,
+  },
+  modePill: {
+    paddingHorizontal: 7,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  modePillAllowed: {
+    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: '#00E676',
+  },
+  modePillForbidden: {
+    backgroundColor: 'rgba(255, 23, 68, 0.15)',
+    borderColor: '#FF1744',
+  },
+  modePillText: {
+    color: '#F8FAFC',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  priorityRuleText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  motorWarningBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 23, 68, 0.16)',
+    padding: 9,
+    borderRadius: 8,
+    marginTop: 8,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#FF1744',
+  },
+  motorWarningText: {
+    color: '#FF8A80',
+    fontSize: 11,
+    fontWeight: '700',
+    flex: 1,
+    lineHeight: 15,
+  },
+
+  // Tarjeta de Área Natural Protegida
+  protectedRulesBox: {
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  protectedRulesHeader: {
+    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '800',
+    marginBottom: 6,
+  },
+  protectedRuleText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    lineHeight: 18,
+    marginBottom: 4,
+  },
+
+  // Modal de Convivencia
+  convivenciaCard: {
+    backgroundColor: '#1E293B',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  convivenciaCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  convivenciaIcon: {
+    fontSize: 18,
+  },
+  convivenciaTitle: {
+    color: '#F8FAFC',
+    fontSize: 14,
+    fontWeight: '800',
+    flex: 1,
+  },
+  convivenciaDesc: {
+    color: '#94A3B8',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  convivenciaPenaltyBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 214, 0, 0.1)',
+    borderRadius: 8,
+    padding: 8,
+    marginTop: 8,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 214, 0, 0.3)',
+  },
+  convivenciaPenaltyText: {
+    color: '#FFD600',
+    fontSize: 11,
+    fontWeight: '700',
+    flex: 1,
+    lineHeight: 15,
+  },
+
+  // Tarjetas de Reservas en Modal
+  protectedAreaCard: {
+    backgroundColor: '#1E293B',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderLeftWidth: 4,
+  },
+  protectedAreaHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+    gap: 8,
+  },
+  protectedAreaName: {
+    color: '#F8FAFC',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  protectedAreaAuth: {
+    color: '#64748B',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  areaCategoryBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  areaCategoryText: {
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  protectedAreaDesc: {
+    color: '#94A3B8',
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: 10,
+  },
+  allowedIconsRowSmall: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 10,
+    flexWrap: 'wrap',
+  },
+  allowedPillSmall: {
+    fontSize: 11,
+    color: '#00E676',
+    backgroundColor: '#0B0F17',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    fontWeight: '700',
+  },
+  rangerCallBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0B0F17',
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 7,
+    borderWidth: 1,
+    borderColor: '#00E676',
+  },
+  rangerCallText: {
+    color: '#00E676',
+    fontSize: 12,
+    fontWeight: '800',
   },
 });
