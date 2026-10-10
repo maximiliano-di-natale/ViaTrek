@@ -6,7 +6,7 @@ export interface Coordinate {
 // Alias compatible con react-native-maps y utilidades
 export type LatLng = Coordinate;
 
-export type RouteType = 'ciclovia' | 'sendero_mtb' | 'moto_trail';
+export type RouteType = 'ciclovia' | 'sendero_mtb' | 'moto_trail' | 'wine_trail';
 
 export type LegalityLevel = 'libre' | 'compartido_precaucion' | 'prohibido_motor' | 'circuito_enduro';
 
@@ -24,6 +24,29 @@ export interface TrailLegality {
   authority: string;
 }
 
+export interface WineRouteInfo {
+  wineries: string[];
+  gravelType: 'Asfalto y Ripio Suave' | 'Caminos Rurales y Alamedas' | 'Senderos entre Viñas';
+  recommendedBike: 'Gravel / MTB / Urbana Paseo';
+  tastingPoints: string[];
+  bikeFriendly: boolean;
+}
+
+export type ZondaAlertLevel = 'verde_optimo' | 'amarillo_precaucion' | 'naranja_alerta' | 'rojo_zonda_severo';
+
+export interface ZondaWeatherInfo {
+  alertLevel: ZondaAlertLevel;
+  windSpeedKmh: number;
+  gustSpeedKmh: number;
+  temperatureC: number;
+  humidityPercent: number;
+  fireRisk: 'Bajo' | 'Moderado' | 'Alto' | 'Extremo';
+  title: string;
+  summary: string;
+  recommendations: string[];
+  updatedAt: string;
+}
+
 export interface RouteItem {
   id: string;
   name: string;
@@ -36,6 +59,7 @@ export interface RouteItem {
   strokeColor: string;
   coordinates: Coordinate[];
   legality: TrailLegality;
+  wineInfo?: WineRouteInfo;
 }
 
 export interface ProtectedArea {
@@ -66,7 +90,13 @@ export interface ConvivenciaRuleItem {
   penaltyNote?: string;
 }
 
-export type POICategory = 'trailhead' | 'hidratacion' | 'mirador' | 'taller';
+export type POICategory =
+  | 'trailhead'
+  | 'hidratacion'
+  | 'mirador'
+  | 'taller'
+  | 'bodega_wine'
+  | 'refugio_almacen';
 
 export interface POIItem {
   id: string;
@@ -108,7 +138,7 @@ export interface TrailIncident {
   latitude: number;
   longitude: number;
   reportedAt: string;
-  affectedModes: ('ciclovia' | 'sendero_mtb' | 'moto_trail')[];
+  affectedModes: RouteType[];
   upvotes: number;
   resolvedVotes: number;
   author: string;

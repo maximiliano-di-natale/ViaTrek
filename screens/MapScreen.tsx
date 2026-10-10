@@ -55,6 +55,11 @@ import {
   ShieldCheck,
   AlertOctagon,
   Check,
+  Wind,
+  Wine,
+  Thermometer,
+  Flame,
+  ChevronRight,
 } from 'lucide-react-native';
 
 import {
@@ -72,6 +77,9 @@ import {
   ProtectedArea,
   ConvivenciaRuleItem,
   LegalityLevel,
+  ZondaWeatherInfo,
+  ZondaAlertLevel,
+  WineRouteInfo,
 } from '../types/map';
 import {
   INITIAL_MENDOZA_REGION,
@@ -84,6 +92,7 @@ import {
   MENDOZA_PROTECTED_AREAS,
   MENDOZA_CONVIVENCIA_RULES,
   MENDOZA_RANGER_CONTACTS,
+  INITIAL_ZONDA_WEATHER,
 } from '../data/routesAndPois';
 
 type FilterTab = 'todas' | RouteType;
@@ -98,6 +107,10 @@ export default function MapScreen() {
   const [showLayerMenu, setShowLayerMenu] = useState<boolean>(false);
   const [userLocation, setUserLocation] = useState<Coordinate | null>(null);
   const [isLocating, setIsLocating] = useState<boolean>(false);
+
+  // Estados Clima & Alerta Zonda (Fase 4: Identidad Mendocina)
+  const [zondaWeather, setZondaWeather] = useState<ZondaWeatherInfo>(INITIAL_ZONDA_WEATHER);
+  const [isZondaModalVisible, setIsZondaModalVisible] = useState<boolean>(false);
 
   // Elementos activos seleccionados
   const [selectedRoute, setSelectedRoute] = useState<RouteItem | null>(null);
@@ -286,6 +299,67 @@ export default function MapScreen() {
     });
   };
 
+  const handleCallDefensaCivil = () => {
+    handleCallEmergency('103');
+  };
+
+  const handleSimulateZonda = (level: ZondaAlertLevel) => {
+    if (level === 'rojo_zonda_severo') {
+      setZondaWeather({
+        alertLevel: 'rojo_zonda_severo',
+        windSpeedKmh: 58,
+        gustSpeedKmh: 95,
+        temperatureC: 34,
+        humidityPercent: 6,
+        fireRisk: 'Extremo',
+        title: '🚨 ALERTA ROJA: Viento Zonda Severo en Gran Mendoza y Quebradas',
+        summary: 'Ráfagas destructivas superiores a 90 km/h bajando en precordillera y el llano. Riesgo crítico de voladura de ramas y ramas caídas.',
+        recommendations: [
+          'SUSPENDER inmediatamente actividades en senderos y cerros.',
+          'Buscar resguardo en zonas urbanas bajo techo seguro.',
+          'Prohibición estricta de fuego y circulación vehicular en caminos de montaña.',
+          'Extrema precaución por polvo en suspensión y visibilidad nula.',
+        ],
+        updatedAt: 'Simulación En Vivo • Alerta Roja Zonda',
+      });
+    } else if (level === 'naranja_alerta') {
+      setZondaWeather({
+        alertLevel: 'naranja_alerta',
+        windSpeedKmh: 42,
+        gustSpeedKmh: 75,
+        temperatureC: 31,
+        humidityPercent: 9,
+        fireRisk: 'Extremo',
+        title: '🌬️ ALERTA NARANJA: Zonda Fuerte en Precordillera',
+        summary: 'Ráfagas intensas en El Challao, Potrerillos y Divisadero. Descenso de aire cálido y seco.',
+        recommendations: [
+          'No ascender a cumbres expuestas (Cerro Arco, Santo Tomás).',
+          'Hidratación forzada por extrema sequedad del aire.',
+          'Cuidado con ramas secas en zonas de alamedas y eucaliptos.',
+        ],
+        updatedAt: 'Simulación En Vivo • Alerta Naranja',
+      });
+    } else if (level === 'amarillo_precaucion') {
+      setZondaWeather(INITIAL_ZONDA_WEATHER);
+    } else {
+      setZondaWeather({
+        alertLevel: 'verde_optimo',
+        windSpeedKmh: 12,
+        gustSpeedKmh: 20,
+        temperatureC: 22,
+        humidityPercent: 48,
+        fireRisk: 'Bajo',
+        title: '🌤️ Condiciones Óptimas para Senderismo y Ciclismo',
+        summary: 'Tiempo estable en precordillera y viñedos. Vientos calmos del este, temperatura agradable y excelente visibilidad.',
+        recommendations: [
+          'Condiciones ideales para todas las modalidades (MTB, Trekking, Moto, Wine & Trail).',
+          'Llevar protección solar y agua habitual.',
+        ],
+        updatedAt: 'Tiempo Estable • Precordillera',
+      });
+    }
+  };
+
   const formatSecondsToClock = (totalSec: number) => {
     const hrs = Math.floor(totalSec / 3600);
     const mins = Math.floor((totalSec % 3600) / 60);
@@ -431,9 +505,13 @@ export default function MapScreen() {
         (p) => p.category === 'trailhead' || p.category === 'mirador' || p.category === 'hidratacion'
       );
     }
-    if (selectedFilter === 'moto_trail') {
+    if (selectedFilter === 'wine_trail') {
       return MENDOZA_POIS.filter(
-        (p) => p.category === 'trailhead' || p.category === 'mirador'
+        (p) =>
+          p.category === 'bodega_wine' ||
+          p.category === 'refugio_almacen' ||
+          p.category === 'trailhead' ||
+          p.category === 'hidratacion'
       );
     }
     return MENDOZA_POIS;
@@ -531,6 +609,10 @@ export default function MapScreen() {
         return '#E040FB'; // Magenta / Púrpura eléctrico
       case 'taller':
         return '#FFD600'; // Amarillo neón
+      case 'bodega_wine':
+        return '#E91E63'; // Rosa Malbec / Enoturismo
+      case 'refugio_almacen':
+        return '#FF9100'; // Naranja pulpería
       default:
         return '#FF5252';
     }
@@ -546,8 +628,27 @@ export default function MapScreen() {
         return <Eye size={16} color="#0B0F17" strokeWidth={2.4} />;
       case 'taller':
         return <Wrench size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'bodega_wine':
+        return <Wine size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'refugio_almacen':
+        return <Sparkles size={16} color="#0B0F17" strokeWidth={2.4} />;
       default:
         return <MapPin size={16} color="#0B0F17" strokeWidth={2.4} />;
+    }
+  };
+
+  const getZondaBadgeColor = (level: ZondaAlertLevel) => {
+    switch (level) {
+      case 'verde_optimo':
+        return '#00E676';
+      case 'amarillo_precaucion':
+        return '#FFD600';
+      case 'naranja_alerta':
+        return '#FF6D00';
+      case 'rojo_zonda_severo':
+        return '#FF1744';
+      default:
+        return '#FFD600';
     }
   };
 
@@ -842,6 +943,32 @@ export default function MapScreen() {
               Moto / Trail
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterPill,
+              selectedFilter === 'wine_trail' && styles.filterPillActiveWine,
+            ]}
+            onPress={() => {
+              setSelectedFilter('wine_trail');
+              setSelectedRoute(null);
+              setSelectedPoi(null);
+            }}
+            activeOpacity={0.8}
+          >
+            <Wine
+              size={15}
+              color={selectedFilter === 'wine_trail' ? '#E91E63' : '#94A3B8'}
+            />
+            <Text
+              style={[
+                styles.filterPillText,
+                selectedFilter === 'wine_trail' && { color: '#E91E63', fontWeight: '700' },
+              ]}
+            >
+              Wine & Trail
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Badge contador de rutas activas e incidentes en vivo */}
@@ -888,8 +1015,61 @@ export default function MapScreen() {
         </View>
       )}
 
+      {/* BANNER FLOTANTE: ALERTA VIENTO ZONDA EN VIVO (FASE 4: IDENTIDAD MENDOCINA) */}
+      <TouchableOpacity
+        style={[
+          styles.zondaBanner,
+          {
+            top: insets.top + (guardianSession.isActive ? 132 : 78),
+            borderColor: getZondaBadgeColor(zondaWeather.alertLevel),
+          },
+        ]}
+        onPress={() => setIsZondaModalVisible(true)}
+        activeOpacity={0.88}
+      >
+        <View style={styles.zondaBannerLeft}>
+          <View
+            style={[
+              styles.zondaPulseDot,
+              { backgroundColor: getZondaBadgeColor(zondaWeather.alertLevel) },
+            ]}
+          />
+          <Wind size={15} color={getZondaBadgeColor(zondaWeather.alertLevel)} strokeWidth={2.5} />
+          <View style={{ flex: 1, marginLeft: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={styles.zondaBannerTitle}>
+                {zondaWeather.alertLevel === 'rojo_zonda_severo'
+                  ? '🚨 ZONDA SEVERO EN PRECORDILLERA'
+                  : zondaWeather.alertLevel === 'naranja_alerta'
+                  ? '🌬️ ALERTA VIENTO ZONDA'
+                  : '⚠️ PRECAUCIÓN ZONDA'}
+              </Text>
+              <View
+                style={[
+                  styles.zondaLevelBadge,
+                  { backgroundColor: getZondaBadgeColor(zondaWeather.alertLevel) + '30' },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.zondaLevelBadgeText,
+                    { color: getZondaBadgeColor(zondaWeather.alertLevel) },
+                  ]}
+                >
+                  {zondaWeather.gustSpeedKmh} km/h
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.zondaBannerSubtitle} numberOfLines={1}>
+              Humedad {zondaWeather.humidityPercent}% • {zondaWeather.temperatureC}°C • Fuego: {zondaWeather.fireRisk.toUpperCase()}
+            </Text>
+          </View>
+        </View>
+        <ChevronRight size={16} color="#94A3B8" />
+      </TouchableOpacity>
+
       {/* FABs: BOTONES LATERALES DE ACCIÓN */}
-      <View style={[styles.fabContainer, { top: insets.top + (guardianSession.isActive ? 135 : 80) }]}>
+      <View style={[styles.fabContainer, { top: insets.top + (guardianSession.isActive ? 190 : 136) }]}>
         {/* Botón Seguridad & SOS (Fase 2) */}
         <TouchableOpacity
           style={[
@@ -1207,6 +1387,35 @@ export default function MapScreen() {
               </View>
             )}
           </View>
+
+          {/* EXPERIENCIA ENOTURÍSTICA: WINE & TRAIL (FASE 4) */}
+          {selectedRoute.wineInfo && (
+            <View style={styles.wineInfoContainer}>
+              <View style={styles.wineInfoHeaderRow}>
+                <Wine size={16} color="#E91E63" strokeWidth={2.4} />
+                <Text style={styles.wineInfoTitle}>CIRCUITO WINE & TRAIL MENDOZA</Text>
+              </View>
+              <Text style={styles.wineInfoDesc}>
+                🚲 Bici recomendada:{' '}
+                <Text style={{ color: '#F8FAFC', fontWeight: '700' }}>
+                  {selectedRoute.wineInfo.recommendedBike}
+                </Text>{' '}
+                • {selectedRoute.wineInfo.gravelType}
+              </Text>
+              <View style={styles.wineWineriesRow}>
+                {selectedRoute.wineInfo.wineries.map((winery, idx) => (
+                  <View key={idx} style={styles.wineWineryBadge}>
+                    <Text style={styles.wineWineryBadgeText}>🍷 {winery}</Text>
+                  </View>
+                ))}
+              </View>
+              {selectedRoute.wineInfo.tastingPoints.length > 0 && (
+                <Text style={styles.wineTastingPointsText}>
+                  📍 Paradas sugeridas: {selectedRoute.wineInfo.tastingPoints.join(' • ')}
+                </Text>
+              )}
+            </View>
+          )}
 
           {/* Botones de acción de ruta */}
           <View style={styles.actionButtonsRow}>
@@ -2164,6 +2373,169 @@ export default function MapScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* MODAL: ESTACIÓN METEOROLÓGICA & ALERTA VIENTO ZONDA (FASE 4) */}
+      <Modal
+        visible={isZondaModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsZondaModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderTitleRow}>
+                <Wind size={22} color={getZondaBadgeColor(zondaWeather.alertLevel)} strokeWidth={2.4} />
+                <View>
+                  <Text style={styles.modalTitle}>Estación Zonda Mendoza</Text>
+                  <Text style={styles.zondaSubtitle}>{zondaWeather.updatedAt}</Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={() => setIsZondaModalVisible(false)}
+                style={styles.modalCloseBtn}
+              >
+                <X size={20} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* Tarjeta de Nivel de Alerta Principal */}
+              <View
+                style={[
+                  styles.zondaHeroCard,
+                  { borderColor: getZondaBadgeColor(zondaWeather.alertLevel) },
+                ]}
+              >
+                <View style={styles.zondaHeroHeader}>
+                  <View
+                    style={[
+                      styles.zondaHeroBadge,
+                      { backgroundColor: getZondaBadgeColor(zondaWeather.alertLevel) },
+                    ]}
+                  >
+                    <Text style={styles.zondaHeroBadgeText}>
+                      {zondaWeather.alertLevel === 'rojo_zonda_severo'
+                        ? '🚨 ALERTA ROJA'
+                        : zondaWeather.alertLevel === 'naranja_alerta'
+                        ? '🌬️ ALERTA NARANJA'
+                        : zondaWeather.alertLevel === 'amarillo_precaucion'
+                        ? '⚠️ ALERTA AMARILLA'
+                        : '✅ CONDICIÓN ÓPTIMA'}
+                    </Text>
+                  </View>
+                  <Text style={styles.zondaHeroFireRisk}>
+                    Riesgo Fuego: <Text style={{ color: '#FF1744', fontWeight: '800' }}>{zondaWeather.fireRisk.toUpperCase()}</Text>
+                  </Text>
+                </View>
+
+                <Text style={styles.zondaHeroTitle}>{zondaWeather.title}</Text>
+                <Text style={styles.zondaHeroSummary}>{zondaWeather.summary}</Text>
+              </View>
+
+              {/* Grid de Métricas Meteorológicas en Tiempo Real */}
+              <View style={styles.weatherMetricsGrid}>
+                <View style={styles.weatherMetricCard}>
+                  <Wind size={18} color="#00E676" />
+                  <Text style={styles.weatherMetricLabel}>RÁFAGAS MÁX</Text>
+                  <Text style={styles.weatherMetricValue}>{zondaWeather.gustSpeedKmh} km/h</Text>
+                </View>
+
+                <View style={styles.weatherMetricCard}>
+                  <Compass size={18} color="#2979FF" />
+                  <Text style={styles.weatherMetricLabel}>VIENTO SOST.</Text>
+                  <Text style={styles.weatherMetricValue}>{zondaWeather.windSpeedKmh} km/h</Text>
+                </View>
+
+                <View style={styles.weatherMetricCard}>
+                  <Thermometer size={18} color="#FF6D00" />
+                  <Text style={styles.weatherMetricLabel}>TEMPERATURA</Text>
+                  <Text style={styles.weatherMetricValue}>{zondaWeather.temperatureC}°C</Text>
+                </View>
+
+                <View style={styles.weatherMetricCard}>
+                  <Droplet size={18} color="#FF1744" />
+                  <Text style={styles.weatherMetricLabel}>HUMEDAD</Text>
+                  <Text style={[styles.weatherMetricValue, { color: '#FF1744' }]}>
+                    {zondaWeather.humidityPercent}%
+                  </Text>
+                </View>
+              </View>
+
+              {/* Protocolo de Seguridad al Aire Libre */}
+              <View style={styles.zondaProtocolCard}>
+                <View style={styles.zondaProtocolHeader}>
+                  <ShieldCheck size={18} color="#FFD600" />
+                  <Text style={styles.zondaProtocolTitle}>
+                    Protocolo de Montaña ante Zonda
+                  </Text>
+                </View>
+                {zondaWeather.recommendations.map((rec, idx) => (
+                  <View key={idx} style={styles.zondaRecItem}>
+                    <Text style={styles.zondaRecBullet}>•</Text>
+                    <Text style={styles.zondaRecText}>{rec}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {/* Selector de Simulación / Test en Vivo */}
+              <View style={styles.zondaSimulateContainer}>
+                <Text style={styles.zondaSimulateTitle}>SIMULADOR METEOROLÓGICO MENDOZA</Text>
+                <View style={styles.zondaSimulateRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.zondaSimBtn,
+                      zondaWeather.alertLevel === 'verde_optimo' && styles.zondaSimBtnActive,
+                    ]}
+                    onPress={() => handleSimulateZonda('verde_optimo')}
+                  >
+                    <Text style={styles.zondaSimBtnText}>🟢 Calmo</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.zondaSimBtn,
+                      zondaWeather.alertLevel === 'amarillo_precaucion' && styles.zondaSimBtnActive,
+                    ]}
+                    onPress={() => handleSimulateZonda('amarillo_precaucion')}
+                  >
+                    <Text style={styles.zondaSimBtnText}>🟡 Amarillo</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.zondaSimBtn,
+                      zondaWeather.alertLevel === 'naranja_alerta' && styles.zondaSimBtnActive,
+                    ]}
+                    onPress={() => handleSimulateZonda('naranja_alerta')}
+                  >
+                    <Text style={styles.zondaSimBtnText}>🟠 Naranja</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.zondaSimBtn,
+                      zondaWeather.alertLevel === 'rojo_zonda_severo' && styles.zondaSimBtnActive,
+                    ]}
+                    onPress={() => handleSimulateZonda('rojo_zonda_severo')}
+                  >
+                    <Text style={styles.zondaSimBtnText}>🔴 Severo</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Botón de Emergencia Defensa Civil 103 */}
+              <TouchableOpacity
+                style={styles.defensaCivilBtn}
+                onPress={handleCallDefensaCivil}
+                activeOpacity={0.88}
+              >
+                <PhoneCall size={18} color="#FFFFFF" strokeWidth={2.4} />
+                <Text style={styles.defensaCivilBtnText}>
+                  Llamar a Defensa Civil Mendoza (Línea 103)
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -2277,6 +2649,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(41, 121, 255, 0.16)',
     borderWidth: 1,
     borderColor: '#2979FF',
+  },
+  filterPillActiveWine: {
+    backgroundColor: 'rgba(233, 30, 99, 0.18)',
+    borderWidth: 1,
+    borderColor: '#E91E63',
   },
   filterPillText: {
     fontSize: 12,
@@ -3512,5 +3889,277 @@ const styles = StyleSheet.create({
     color: '#00E676',
     fontSize: 12,
     fontWeight: '800',
+  },
+
+  // Banner Flotante Alerta Viento Zonda (Fase 4)
+  zondaBanner: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 998,
+    borderWidth: 1.5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  zondaBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 6,
+  },
+  zondaPulseDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 4.5,
+    marginRight: 6,
+  },
+  zondaBannerTitle: {
+    color: '#F8FAFC',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
+  zondaLevelBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  zondaLevelBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  zondaBannerSubtitle: {
+    color: '#94A3B8',
+    fontSize: 10,
+    marginTop: 2,
+  },
+
+  // Enoturismo Wine & Trail (Fase 4)
+  wineInfoContainer: {
+    backgroundColor: 'rgba(233, 30, 99, 0.1)',
+    borderColor: '#E91E63',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  wineInfoHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  wineInfoTitle: {
+    color: '#E91E63',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  wineInfoDesc: {
+    color: '#94A3B8',
+    fontSize: 11,
+    lineHeight: 16,
+    marginBottom: 6,
+  },
+  wineWineriesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 6,
+  },
+  wineWineryBadge: {
+    backgroundColor: 'rgba(233, 30, 99, 0.22)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 0.5,
+    borderColor: '#E91E63',
+  },
+  wineWineryBadgeText: {
+    color: '#FCE4EC',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  wineTastingPointsText: {
+    color: '#CBD5E1',
+    fontSize: 11,
+    fontStyle: 'italic',
+  },
+
+  // Estación Meteorológica Zonda Modal
+  zondaSubtitle: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginTop: 1,
+  },
+  zondaHeroCard: {
+    backgroundColor: '#0F172A',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1.5,
+    marginBottom: 14,
+  },
+  zondaHeroHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  zondaHeroBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  zondaHeroBadgeText: {
+    color: '#05080E',
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  zondaHeroFireRisk: {
+    color: '#94A3B8',
+    fontSize: 11,
+  },
+  zondaHeroTitle: {
+    color: '#F8FAFC',
+    fontSize: 14,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  zondaHeroSummary: {
+    color: '#CBD5E1',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  weatherMetricsGrid: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 14,
+  },
+  weatherMetricCard: {
+    flex: 1,
+    backgroundColor: '#131B2E',
+    borderRadius: 10,
+    padding: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  weatherMetricLabel: {
+    color: '#94A3B8',
+    fontSize: 9,
+    fontWeight: '800',
+    marginTop: 4,
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  weatherMetricValue: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  zondaProtocolCard: {
+    backgroundColor: '#0F172A',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 214, 0, 0.3)',
+    marginBottom: 14,
+  },
+  zondaProtocolHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  zondaProtocolTitle: {
+    color: '#FFD600',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  zondaRecItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+    marginBottom: 5,
+  },
+  zondaRecBullet: {
+    color: '#FFD600',
+    fontSize: 14,
+    lineHeight: 18,
+  },
+  zondaRecText: {
+    flex: 1,
+    color: '#CBD5E1',
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  zondaSimulateContainer: {
+    backgroundColor: '#131B2E',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: 14,
+  },
+  zondaSimulateTitle: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  zondaSimulateRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  zondaSimBtn: {
+    flex: 1,
+    backgroundColor: '#0B0F17',
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  zondaSimBtnActive: {
+    borderColor: '#00E676',
+    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+  },
+  zondaSimBtnText: {
+    color: '#F8FAFC',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  defensaCivilBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF1744',
+    paddingVertical: 13,
+    borderRadius: 12,
+    gap: 8,
+    shadowColor: '#FF1744',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+    marginBottom: 10,
+  },
+  defensaCivilBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '900',
   },
 });

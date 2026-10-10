@@ -6,6 +6,8 @@ import {
   MedicalProfile,
   ProtectedArea,
   ConvivenciaRuleItem,
+  ZondaWeatherInfo,
+  WineRouteInfo,
 } from '../types/map';
 
 export const INITIAL_MENDOZA_REGION: MapRegion = {
@@ -13,6 +15,25 @@ export const INITIAL_MENDOZA_REGION: MapRegion = {
   longitude: -68.8650,
   latitudeDelta: 0.16,
   longitudeDelta: 0.16,
+};
+
+export const INITIAL_ZONDA_WEATHER: ZondaWeatherInfo = {
+  alertLevel: 'amarillo_precaucion',
+  windSpeedKmh: 35,
+  gustSpeedKmh: 68,
+  temperatureC: 29,
+  humidityPercent: 12,
+  fireRisk: 'Extremo',
+  title: 'Alerta Preventiva por Viento Zonda en Precordillera',
+  summary: 'Ráfagas descendentes registradas en Potrerillos y Uspallata. Se prevé descenso progresivo al llano y quebradas en las próximas horas.',
+  recommendations: [
+    'Descender de filos y cumbres expuestas (Cerro Arco, Santo Tomás) antes del pico de ráfagas.',
+    'Evitar senderos bajo arboledas viejas (eucaliptos y álamos con ramas quebradizas).',
+    'Llevar reserva doble de hidratación (la humedad del 12% deshidrata rápidamente).',
+    'Prohibición total de cualquier tipo de fuego (Riesgo Extremo de Incendio Forestal).',
+    'En bicicleta o moto: cuidado extremo con ráfagas cruzadas en tramos abiertos.',
+  ],
+  updatedAt: 'Hoy 16:30 • Red Estaciones SMN Mendoza',
 };
 
 export const MENDOZA_ROUTES: RouteItem[] = [
@@ -207,6 +228,73 @@ export const MENDOZA_ROUTES: RouteItem[] = [
       authority: 'Dirección Provincial de Vialidad & Reserva Villavicencio',
     },
   },
+  {
+    id: 'ruta-wine-chacras-vistalba',
+    name: 'Circuito Wine & Trail: Viñedos de Chacras & Vistalba',
+    zone: 'Luján de Cuyo (Tierra del Malbec)',
+    type: 'wine_trail',
+    distanceKm: 16.8,
+    elevationGainM: 110,
+    difficulty: 'Fácil',
+    surface: 'Mixto',
+    strokeColor: '#E91E63', // Rosa malbec vibrante
+    coordinates: [
+      { latitude: -33.0010, longitude: -68.8870 }, // Plaza Chacras de Coria
+      { latitude: -33.0120, longitude: -68.8810 }, // Callejón de las Bodegas
+      { latitude: -33.0240, longitude: -68.8750 }, // Bodega Nieto Senetiner
+      { latitude: -33.0360, longitude: -68.8680 }, // Kaiken & Viñedos Vistalba
+      { latitude: -33.0480, longitude: -68.8620 }, // Finca Las Compuertas
+      { latitude: -33.0550, longitude: -68.8550 }, // Río Mendoza / Compuertas
+    ],
+    legality: {
+      status: 'libre',
+      badgeText: '🍷 Ruta Enoturística Abierta',
+      tagColor: '#E91E63',
+      allowedModes: { trekking: true, bicycle: true, moto: false },
+      priorityRule: 'Cicloturismo y caminatas rurales entre viñedos. Prioridad al peatón en callejones vecinales.',
+      authority: 'Municipalidad de Luján de Cuyo & Bodegas de Mendoza',
+    },
+    wineInfo: {
+      wineries: ['Bodega Nieto Senetiner', 'Bodega Kaiken', 'Finca Las Compuertas', 'Pulmary Orgánica'],
+      gravelType: 'Caminos Rurales y Alamedas',
+      recommendedBike: 'Gravel / MTB / Urbana Paseo',
+      tastingPoints: ['Espacio Kaiken Wine Garden', 'Almacén de Chacras'],
+      bikeFriendly: true,
+    },
+  },
+  {
+    id: 'ruta-wine-maipu-caminos',
+    name: 'Caminos del Vino de Maipú: Olivos & Bodegas Centenarias',
+    zone: 'Maipú Primera Zona Vitivinícola',
+    type: 'wine_trail',
+    distanceKm: 14.2,
+    elevationGainM: 40,
+    difficulty: 'Fácil',
+    surface: 'Asfalto',
+    strokeColor: '#E91E63',
+    coordinates: [
+      { latitude: -32.9780, longitude: -68.7850 }, // Estación Gutiérrez / Metrotranvía
+      { latitude: -32.9860, longitude: -68.7750 }, // Museo del Vino Giol
+      { latitude: -32.9990, longitude: -68.7610 }, // Bodega Trapiche / Ozamis
+      { latitude: -33.0110, longitude: -68.7520 }, // Olivícola Pasrai
+      { latitude: -33.0220, longitude: -68.7450 }, // Bodega Cecchin Orgánica
+    ],
+    legality: {
+      status: 'libre',
+      badgeText: '🍷 Ciclovía del Vino Maipú',
+      tagColor: '#E91E63',
+      allowedModes: { trekking: true, bicycle: true, moto: false },
+      priorityRule: 'Ciclovía turística y calzada compartida. Convivencia con cicloturistas y visitantes internacionales.',
+      authority: 'Municipalidad de Maipú',
+    },
+    wineInfo: {
+      wineries: ['Bodega Trapiche', 'Bodega Giol Histórica', 'Familia Cecchin', 'Olivícola Pasrai'],
+      gravelType: 'Asfalto y Ripio Suave',
+      recommendedBike: 'Gravel / MTB / Urbana Paseo',
+      tastingPoints: ['Trapiche Wine Bar', 'Jardín de Olivos Pasrai'],
+      bikeFriendly: true,
+    },
+  },
 ];
 
 export const MENDOZA_POIS: POIItem[] = [
@@ -249,6 +337,30 @@ export const MENDOZA_POIS: POIItem[] = [
     latitude: -32.8868,
     longitude: -68.8930,
     description: 'Mirador panorámico con vista a la Ciudad de Mendoza y Parque San Martín.',
+  },
+  {
+    id: 'poi-bodega-kaiken',
+    name: 'Bodega Kaiken (Bicicletero & Jardín Enoturístico)',
+    category: 'bodega_wine',
+    latitude: -33.0360,
+    longitude: -68.8680,
+    description: 'Estación de recarga de agua para ciclistas, bicicleteros seguros, copas al paso y vista a la Cordillera de los Andes.',
+  },
+  {
+    id: 'poi-bodega-trapiche',
+    name: 'Bodega Trapiche (Edificio Histórico 1912 & Wine Bar)',
+    category: 'bodega_wine',
+    latitude: -32.9990,
+    longitude: -68.7610,
+    description: 'Parada clásica de cicloturismo en Maipú. Arquitectura florentina, estación de inflado y jardines con olivos.',
+  },
+  {
+    id: 'poi-almacen-chacras',
+    name: 'Pulpería & Almacén de Montaña El Puesto',
+    category: 'refugio_almacen',
+    latitude: -33.0020,
+    longitude: -68.8890,
+    description: 'Abastecimiento de frutas secas, empanadas mendocinas, agua mineral y bebidas isotónicas para deportistas.',
   },
 ];
 

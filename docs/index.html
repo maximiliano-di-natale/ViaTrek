@@ -111,6 +111,12 @@
       font-weight: 800;
       border: 1px solid rgba(41, 121, 255, 0.5);
     }
+    .filter-pill.active-wine_trail {
+      background: rgba(233, 30, 99, 0.18);
+      color: #E91E63;
+      font-weight: 800;
+      border: 1px solid rgba(233, 30, 99, 0.5);
+    }
     .stats-badge {
       pointer-events: auto;
       margin-top: 7px;
@@ -123,6 +129,68 @@
       font-weight: 600;
       border: 1px solid rgba(255, 255, 255, 0.08);
       letter-spacing: 0.3px;
+    }
+
+    /* BARRA FLOTANTE ALERTA VIENTO ZONDA EN VIVO (FASE 4) */
+    .zonda-banner {
+      position: absolute;
+      top: 94px;
+      left: 12px;
+      right: 12px;
+      max-width: 480px;
+      margin: 0 auto;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid #FFD600;
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 999;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .zonda-banner:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(255, 109, 0, 0.25);
+    }
+    .zonda-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .zonda-pulse-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 4.5px;
+      background: #FFD600;
+      box-shadow: 0 0 8px #FFD600;
+      animation: pulse 1.6s infinite;
+      flex-shrink: 0;
+    }
+    .zonda-banner-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #F8FAFC;
+      letter-spacing: 0.3px;
+    }
+    .zonda-banner-badge {
+      background: rgba(255, 214, 0, 0.2);
+      color: #FFD600;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 900;
+      margin-left: 5px;
+    }
+    .zonda-banner-sub {
+      font-size: 10px;
+      color: #94A3B8;
+      margin-top: 1px;
     }
 
     /* BARRA FLOTANTE ÁNGEL GUARDIÁN ACTIVO */
@@ -204,7 +272,7 @@
     /* FLOATING ACTION BUTTONS */
     .fab-container {
       position: absolute;
-      top: 100px;
+      top: 148px;
       right: 14px;
       z-index: 1000;
       display: flex;
@@ -472,6 +540,52 @@
       font-size: 11px;
       font-weight: 700;
       line-height: 1.35;
+    }
+
+    /* ENOTURISMO WINE & TRAIL (FASE 4) */
+    .wine-box {
+      background: rgba(233, 30, 99, 0.1);
+      border: 1px solid #E91E63;
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    .wine-box-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #E91E63;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      margin-bottom: 4px;
+    }
+    .wine-box-desc {
+      color: #94A3B8;
+      font-size: 11px;
+      line-height: 15px;
+      margin-bottom: 6px;
+    }
+    .wineries-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+    .winery-chip {
+      background: rgba(233, 30, 99, 0.22);
+      color: #FCE4EC;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      border: 0.5px solid #E91E63;
+    }
+    .wine-tasting-text {
+      color: #CBD5E1;
+      font-size: 10.5px;
+      font-style: italic;
     }
 
     /* REGLAS DE ÁREA PROTEGIDA */
@@ -1026,10 +1140,28 @@
       <button class="filter-pill" id="pill-moto_trail" onclick="setFilter('moto_trail')">
         🏍️ Moto / Trail
       </button>
+      <button class="filter-pill" id="pill-wine_trail" onclick="setFilter('wine_trail')">
+        🍷 Wine & Trail
+      </button>
     </div>
     <div class="stats-badge" id="stats-badge">
-      Mendoza • 5 rutas • 5 POIs • ⚠️ 5 alertas en vivo
+      Mendoza • 7 rutas • 8 POIs • ⚠️ 5 alertas en vivo
     </div>
+  </div>
+
+  <!-- BARRA FLOTANTE ALERTA VIENTO ZONDA EN VIVO (FASE 4: IDENTIDAD MENDOCINA) -->
+  <div class="zonda-banner" id="zonda-banner" onclick="openZondaModal()">
+    <div class="zonda-banner-left">
+      <div class="zonda-pulse-dot" id="zonda-dot"></div>
+      <div>
+        <div style="display: flex; align-items: center;">
+          <span class="zonda-banner-title" id="zonda-title-banner">🌬️ ALERTA VIENTO ZONDA</span>
+          <span class="zonda-banner-badge" id="zonda-speed-badge">68 km/h</span>
+        </div>
+        <div class="zonda-banner-sub" id="zonda-sub-banner">Humedad 12% • 29°C • Fuego: EXTREMO</div>
+      </div>
+    </div>
+    <div style="color: #94A3B8; font-size: 14px; font-weight: bold; margin-left: 6px;">›</div>
   </div>
 
   <!-- BARRA FLOTANTE ÁNGEL GUARDIÁN ACTIVO (CUENTA REGRESIVA EN VIVO) -->
@@ -1141,6 +1273,14 @@
       <div class="motor-warning-box" id="route-motor-warning" style="display: none;">
         ⚠️ Zona protegida por Guardaparques. Prohibido circular en moto.
       </div>
+    </div>
+
+    <!-- EXPERIENCIA ENOTURÍSTICA WINE & TRAIL (FASE 4) -->
+    <div class="wine-box" id="route-wine-box" style="display: none;">
+      <div class="wine-box-header">🍷 CIRCUITO WINE & TRAIL MENDOZA</div>
+      <div class="wine-box-desc" id="route-wine-desc">Bici recomendada: Gravel / MTB • Asfalto y Ripio Suave</div>
+      <div class="wineries-chips-row" id="route-wineries-row"></div>
+      <div class="wine-tasting-text" id="route-tasting-text"></div>
     </div>
 
     <div class="action-row">
@@ -1453,6 +1593,80 @@
     </div>
   </div>
 
+  <!-- MODAL: ESTACIÓN METEOROLÓGICA & ALERTA VIENTO ZONDA (FASE 4) -->
+  <div class="modal-overlay" id="zonda-modal">
+    <div class="modal-content" style="border-top-color: #FF6D00;">
+      <div class="modal-header">
+        <div class="modal-title" style="color: #FFD600;">🌬️ Estación Zonda Mendoza</div>
+        <button class="close-btn" onclick="closeZondaModal()">✕</button>
+      </div>
+
+      <p class="modal-subtitle" id="zonda-updated-text">
+        Monitoreo meteorológico en tiempo real para deportistas y senderistas en Precordillera.
+      </p>
+
+      <div style="background: #080C14; border: 1.5px solid #FFD600; border-radius: 14px; padding: 12px; margin-bottom: 12px;" id="zonda-modal-hero">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="background: #FFD600; color: #05080E; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 5px;" id="zonda-modal-level-badge">
+            ⚠️ ALERTA AMARILLA
+          </span>
+          <span style="font-size: 11px; color: #94A3B8;">Riesgo Fuego: <strong style="color: #FF1744;" id="zonda-modal-fire">EXTREMO</strong></span>
+        </div>
+        <div style="font-size: 13px; font-weight: 800; color: #F8FAFC; margin-bottom: 3px;" id="zonda-modal-title">
+          Alerta Preventiva por Viento Zonda en Precordillera
+        </div>
+        <div style="font-size: 11.5px; color: #CBD5E1; line-height: 16px;" id="zonda-modal-summary">
+          Ráfagas descendentes registradas en Potrerillos y Uspallata. Se prevé descenso progresivo al llano y quebradas.
+        </div>
+      </div>
+
+      <!-- METRICS GRID -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;">
+        <div style="background: #131B2E; padding: 8px 4px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 9px; font-weight: 800; color: #94A3B8;">RÁFAGAS</div>
+          <div style="font-size: 13px; font-weight: 900; color: #00E676; margin-top: 3px;" id="zonda-metric-gusts">68 km/h</div>
+        </div>
+        <div style="background: #131B2E; padding: 8px 4px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 9px; font-weight: 800; color: #94A3B8;">SOSTENIDO</div>
+          <div style="font-size: 13px; font-weight: 900; color: #2979FF; margin-top: 3px;" id="zonda-metric-wind">35 km/h</div>
+        </div>
+        <div style="background: #131B2E; padding: 8px 4px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 9px; font-weight: 800; color: #94A3B8;">TEMP.</div>
+          <div style="font-size: 13px; font-weight: 900; color: #FF6D00; margin-top: 3px;" id="zonda-metric-temp">29°C</div>
+        </div>
+        <div style="background: #131B2E; padding: 8px 4px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 9px; font-weight: 800; color: #94A3B8;">HUMEDAD</div>
+          <div style="font-size: 13px; font-weight: 900; color: #FF1744; margin-top: 3px;" id="zonda-metric-humidity">12%</div>
+        </div>
+      </div>
+
+      <!-- SAFETY PROTOCOL -->
+      <div style="background: #0F172A; border: 1px solid rgba(255, 214, 0, 0.3); border-radius: 12px; padding: 12px; margin-bottom: 12px;">
+        <div style="font-size: 12px; font-weight: 800; color: #FFD600; margin-bottom: 6px;">
+          🛡️ Protocolo de Montaña ante Zonda:
+        </div>
+        <div id="zonda-recs-list" style="font-size: 11px; color: #CBD5E1; line-height: 16px;"></div>
+      </div>
+
+      <!-- SIMULATION CONTROLS -->
+      <div style="background: #131B2E; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; margin-bottom: 12px;">
+        <div style="font-size: 10px; font-weight: 800; color: #94A3B8; text-align: center; margin-bottom: 6px;">
+          SIMULADOR METEOROLÓGICO MENDOZA
+        </div>
+        <div style="display: flex; gap: 5px;">
+          <button class="btn-extend-mini" style="flex: 1;" onclick="simulateZondaWeb('verde')">🟢 Calmo</button>
+          <button class="btn-extend-mini" style="flex: 1;" onclick="simulateZondaWeb('amarillo')">🟡 Amarillo</button>
+          <button class="btn-extend-mini" style="flex: 1;" onclick="simulateZondaWeb('naranja')">🟠 Naranja</button>
+          <button class="btn-extend-mini" style="flex: 1;" onclick="simulateZondaWeb('rojo')">🔴 Severo</button>
+        </div>
+      </div>
+
+      <a href="tel:103" style="display: flex; align-items: center; justify-content: center; background: #FF1744; color: #FFFFFF; font-weight: 900; font-size: 13px; padding: 12px; border-radius: 12px; text-decoration: none; gap: 8px; box-shadow: 0 4px 14px rgba(255,23,68,0.4); margin-bottom: 6px;">
+        📞 Llamar a Defensa Civil Mendoza (103)
+      </a>
+    </div>
+  </div>
+
   <script>
     // DATASET REAL DE MENDOZA
     const MENDOZA_ROUTES = [
@@ -1645,6 +1859,74 @@
           priorityRule: 'Ripio precordillerano. Prioridad a peatones en cruces de vertientes.',
           authority: 'Vialidad Provincial & Comunidad de Puestos'
         }
+      },
+      {
+        id: 'ruta-wine-chacras-vistalba',
+        name: 'Circuito Wine & Trail Chacras de Coria - Vistalba (Gravel)',
+        zone: 'Luján de Cuyo / Primera Zona',
+        type: 'wine_trail',
+        distanceKm: 16.5,
+        elevationGainM: 110,
+        difficulty: 'Fácil',
+        surface: 'Mixto',
+        strokeColor: '#E91E63',
+        coordinates: [
+          [-32.9980, -68.8780],
+          [-33.0060, -68.8820],
+          [-33.0130, -68.8890],
+          [-33.0240, -68.8950],
+          [-33.0310, -68.9020],
+          [-33.0380, -68.9090]
+        ],
+        legality: {
+          status: 'libre',
+          badgeText: '🍷 Ruta Enológica Habilitada',
+          tagColor: '#E91E63',
+          allowedModes: { trekking: true, bicycle: true, moto: false },
+          priorityRule: 'Tránsito compartido con caminos vecinales y callejones vitivinícolas.',
+          legalWarning: 'Cuidar acequias y no ingresar a hileras de viñedos privados sin autorización de visita.',
+          authority: 'Municipio de Luján de Cuyo & Bodegas de Vistalba'
+        },
+        wineInfo: {
+          wineries: ['Nieto Senetiner', 'Kaiken', 'Vistalba', 'Carmelo Patti'],
+          gravelType: 'Asfalto y Ripio Suave',
+          recommendedBike: 'Gravel / MTB / Urbana Paseo',
+          tastingPoints: ['Almacén de Chacras', 'Plaza de Chacras', 'Callejón de la Palmera'],
+          bikeFriendly: true
+        }
+      },
+      {
+        id: 'ruta-wine-maipu-caminos',
+        name: 'Caminos del Vino Histórico Maipú & Estación Gutiérrez',
+        zone: 'Maipú / Cuna del Vino',
+        type: 'wine_trail',
+        distanceKm: 14.2,
+        elevationGainM: 70,
+        difficulty: 'Fácil',
+        surface: 'Asfalto',
+        strokeColor: '#E91E63',
+        coordinates: [
+          [-32.9780, -68.7900],
+          [-32.9830, -68.7840],
+          [-32.9920, -68.7760],
+          [-33.0010, -68.7690],
+          [-33.0100, -68.7610]
+        ],
+        legality: {
+          status: 'libre',
+          badgeText: '🍷 Ciclovía Enoturística',
+          tagColor: '#E91E63',
+          allowedModes: { trekking: true, bicycle: true, moto: false },
+          priorityRule: 'Ciclovía urbana y rural señalizada entre olivares y bodegas centenarias.',
+          authority: 'Municipio de Maipú & Asociación Enoturismo'
+        },
+        wineInfo: {
+          wineries: ['Trapiche', 'Bodega Giol (Museo)', 'López', 'Casa del Visitante'],
+          gravelType: 'Caminos Rurales y Alamedas',
+          recommendedBike: 'Gravel / MTB / Urbana Paseo',
+          tastingPoints: ['Estación Metrotranvía Gutiérrez', 'Museo Nacional del Vino'],
+          bikeFriendly: true
+        }
       }
     ];
 
@@ -1811,8 +2093,59 @@
         latitude: -32.8868,
         longitude: -68.8930,
         description: 'Mirador panorámico con vista a la Ciudad de Mendoza y Parque San Martín.'
+      },
+      {
+        id: 'poi-bodega-kaiken',
+        name: 'Bodega Kaikén (Parada Wine & Trail)',
+        category: 'bodega_wine',
+        icon: '🍷',
+        color: '#E91E63',
+        latitude: -33.0240,
+        longitude: -68.8950,
+        description: 'Bodega con jardines biodinámicos, degustación al paso y punto de recarga de agua para ciclistas.'
+      },
+      {
+        id: 'poi-bodega-trapiche',
+        name: 'Bodega Trapiche & Espacio Trapiche',
+        category: 'bodega_wine',
+        icon: '🍷',
+        color: '#E91E63',
+        latitude: -32.9830,
+        longitude: -68.7840,
+        description: 'Edificio patrimonial de 1912 estilo florentino. Estacionamiento seguro para bicicletas.'
+      },
+      {
+        id: 'poi-almacen-chacras',
+        name: 'Almacén de Campo & Pulpería Chacras',
+        category: 'refugio_almacen',
+        icon: '🥪',
+        color: '#FF9100',
+        latitude: -33.0060,
+        longitude: -68.8820,
+        description: 'Punto de descanso para gravel y trekking: sándwiches de jamón crudo, frutos secos e hidratación fresca.'
       }
     ];
+
+    // ESTACIÓN METEOROLÓGICA Y ALERTA VIENTO ZONDA (FASE 4)
+    const INITIAL_ZONDA_WEATHER = {
+      alertLevel: 'amarillo_precaucion',
+      windSpeedKmh: 35,
+      gustSpeedKmh: 68,
+      temperatureC: 29,
+      humidityPercent: 12,
+      fireRisk: 'Extremo',
+      title: 'Alerta Preventiva por Viento Zonda en Precordillera',
+      summary: 'Ráfagas descendentes registradas en Potrerillos y Uspallata. Se prevé descenso progresivo al llano y quebradas en las próximas horas.',
+      recommendations: [
+        'Descender de filos y cumbres expuestas (Cerro Arco, Santo Tomás) antes del pico de ráfagas.',
+        'Evitar senderos bajo arboledas viejas (eucaliptos y álamos con ramas quebradizas).',
+        'Llevar reserva doble de hidratación (la humedad del 12% deshidrata rápidamente).',
+        'Prohibición total de cualquier tipo de fuego (Riesgo Extremo de Incendio Forestal).',
+        'En bicicleta o moto: cuidado extremo con ráfagas cruzadas en tramos abiertos.'
+      ],
+      updatedAt: 'Hoy 16:30 • Red Estaciones SMN Mendoza'
+    };
+    let currentZonda = { ...INITIAL_ZONDA_WEATHER };
 
     // DATASET DE ALERTAS COMUNITARIAS
     let MENDOZA_INCIDENTS = [
@@ -1988,7 +2321,16 @@
         ? MENDOZA_INCIDENTS
         : MENDOZA_INCIDENTS.filter(i => i.affectedModes.includes(currentFilter));
 
-      document.getElementById('stats-badge').innerText = `Mendoza • ${filteredRoutes.length} rutas • ${MENDOZA_POIS.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
+      let filteredPois = MENDOZA_POIS;
+      if (currentFilter === 'wine_trail') {
+        filteredPois = MENDOZA_POIS.filter(p => p.category === 'bodega_wine' || p.category === 'refugio_almacen' || p.category === 'trailhead');
+      } else if (currentFilter === 'ciclovia') {
+        filteredPois = MENDOZA_POIS.filter(p => p.category === 'taller' || p.category === 'trailhead' || p.category === 'mirador');
+      } else if (currentFilter === 'sendero_mtb') {
+        filteredPois = MENDOZA_POIS.filter(p => p.category === 'trailhead' || p.category === 'mirador');
+      }
+
+      document.getElementById('stats-badge').innerText = `Mendoza • ${filteredRoutes.length} rutas • ${filteredPois.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
       document.getElementById('fab-badge-count').innerText = filteredIncidents.length;
 
       // Áreas Protegidas (Fase 3: Semáforo de Legalidad)
@@ -2031,7 +2373,7 @@
       });
 
       // POIs
-      MENDOZA_POIS.forEach(poi => {
+      filteredPois.forEach(poi => {
         const customIcon = L.divIcon({
           className: '',
           html: `<div class="custom-poi-marker"><div class="poi-inner-badge" style="background-color: ${poi.color}; color: #05080E;">${poi.icon}</div></div>`,
@@ -2125,6 +2467,21 @@
         } else {
           warnEl.style.display = 'none';
         }
+      }
+
+      // Experiencia Enoturística Wine & Trail (Fase 4)
+      const wineBox = document.getElementById('route-wine-box');
+      if (route.wineInfo) {
+        wineBox.style.display = 'block';
+        document.getElementById('route-wine-desc').innerText = `Bici recomendada: ${route.wineInfo.recommendedBike} • ${route.wineInfo.gravelType}`;
+        const chipsRow = document.getElementById('route-wineries-row');
+        chipsRow.innerHTML = route.wineInfo.wineries.map(w => `<span class="winery-chip">🍷 ${w}</span>`).join('');
+        const tastingEl = document.getElementById('route-tasting-text');
+        tastingEl.innerText = route.wineInfo.tastingPoints.length > 0
+          ? `📍 Paradas sugeridas: ${route.wineInfo.tastingPoints.join(' • ')}`
+          : '';
+      } else {
+        wineBox.style.display = 'none';
       }
 
       const start = route.coordinates[0];
@@ -2431,7 +2788,7 @@
       guardianReturnTimestamp = Date.now() + guardianSelectedHours * 3600 * 1000;
 
       document.getElementById('guardian-banner').style.display = 'flex';
-      document.getElementById('fab-container').style.top = '155px';
+      document.getElementById('fab-container').style.top = '204px';
       document.getElementById('fab-safety-btn').classList.add('active-guardian');
       document.getElementById('guardian-banner-dest').innerText = `GUARDIÁN ACTIVO • ${dest.toUpperCase()}`;
       document.getElementById('guardian-dest-label').innerText = dest;
@@ -2472,7 +2829,7 @@
       if (guardianTimerInterval) clearInterval(guardianTimerInterval);
 
       document.getElementById('guardian-banner').style.display = 'none';
-      document.getElementById('fab-container').style.top = '100px';
+      document.getElementById('fab-container').style.top = '148px';
       document.getElementById('fab-safety-btn').classList.remove('active-guardian');
 
       document.getElementById('guardian-inactive-view').style.display = 'block';
@@ -2498,9 +2855,124 @@
       closeSafetyModal();
     }
 
+    // GESTIÓN DEL MODAL METEOROLÓGICO Y ALERTA VIENTO ZONDA (FASE 4)
+    function openZondaModal() {
+      updateZondaUI();
+      document.getElementById('zonda-modal').classList.add('open');
+    }
+
+    function closeZondaModal() {
+      document.getElementById('zonda-modal').classList.remove('open');
+    }
+
+    function updateZondaUI() {
+      const z = currentZonda;
+      let badgeBg = '#FFD600';
+      let badgeLabel = '⚠️ ALERTA AMARILLA';
+      if (z.alertLevel === 'rojo_zonda_severo') {
+        badgeBg = '#FF1744';
+        badgeLabel = '🚨 ALERTA ROJA';
+      } else if (z.alertLevel === 'naranja_alerta') {
+        badgeBg = '#FF6D00';
+        badgeLabel = '🌬️ ALERTA NARANJA';
+      } else if (z.alertLevel === 'verde_optimo') {
+        badgeBg = '#00E676';
+        badgeLabel = '✅ CONDICIÓN ÓPTIMA';
+      }
+
+      // Banner flotante
+      document.getElementById('zonda-dot').style.backgroundColor = badgeBg;
+      document.getElementById('zonda-dot').style.boxShadow = `0 0 8px ${badgeBg}`;
+      document.getElementById('zonda-title-banner').innerText = z.alertLevel === 'rojo_zonda_severo'
+        ? '🚨 ZONDA SEVERO EN PRECORDILLERA'
+        : (z.alertLevel === 'naranja_alerta' ? '🌬️ ALERTA VIENTO ZONDA' : '⚠️ PRECAUCIÓN ZONDA');
+      document.getElementById('zonda-speed-badge').innerText = `${z.gustSpeedKmh} km/h`;
+      document.getElementById('zonda-speed-badge').style.color = badgeBg;
+      document.getElementById('zonda-speed-badge').style.background = `${badgeBg}33`;
+      document.getElementById('zonda-sub-banner').innerText = `Humedad ${z.humidityPercent}% • ${z.temperatureC}°C • Fuego: ${z.fireRisk.toUpperCase()}`;
+      document.getElementById('zonda-banner').style.borderColor = badgeBg;
+
+      // Modal
+      const modalBadge = document.getElementById('zonda-modal-level-badge');
+      modalBadge.innerText = badgeLabel;
+      modalBadge.style.backgroundColor = badgeBg;
+      modalBadge.style.color = '#05080E';
+      document.getElementById('zonda-modal-fire').innerText = z.fireRisk.toUpperCase();
+      document.getElementById('zonda-modal-title').innerText = z.title;
+      document.getElementById('zonda-modal-summary').innerText = z.summary;
+      document.getElementById('zonda-updated-text').innerText = z.updatedAt;
+
+      document.getElementById('zonda-metric-gusts').innerText = `${z.gustSpeedKmh} km/h`;
+      document.getElementById('zonda-metric-wind').innerText = `${z.windSpeedKmh} km/h`;
+      document.getElementById('zonda-metric-temp').innerText = `${z.temperatureC}°C`;
+      document.getElementById('zonda-metric-humidity').innerText = `${z.humidityPercent}%`;
+
+      const recsList = document.getElementById('zonda-recs-list');
+      recsList.innerHTML = z.recommendations.map(r => `<div style="margin-bottom: 4px;">• ${r}</div>`).join('');
+    }
+
+    function simulateZondaWeb(level) {
+      if (level === 'rojo') {
+        currentZonda = {
+          alertLevel: 'rojo_zonda_severo',
+          windSpeedKmh: 58,
+          gustSpeedKmh: 95,
+          temperatureC: 34,
+          humidityPercent: 6,
+          fireRisk: 'Extremo',
+          title: '🚨 ALERTA ROJA: Viento Zonda Severo en Gran Mendoza y Quebradas',
+          summary: 'Ráfagas destructivas superiores a 90 km/h bajando en precordillera y el llano. Riesgo crítico de voladura de ramas y ramas caídas.',
+          recommendations: [
+            'SUSPENDER inmediatamente actividades en senderos y cerros.',
+            'Buscar resguardo en zonas urbanas bajo techo seguro.',
+            'Prohibición estricta de fuego y circulación vehicular en caminos de montaña.',
+            'Extrema precaución por polvo en suspensión y visibilidad nula.'
+          ],
+          updatedAt: 'Simulación En Vivo • Alerta Roja Zonda'
+        };
+      } else if (level === 'naranja') {
+        currentZonda = {
+          alertLevel: 'naranja_alerta',
+          windSpeedKmh: 42,
+          gustSpeedKmh: 75,
+          temperatureC: 31,
+          humidityPercent: 9,
+          fireRisk: 'Extremo',
+          title: '🌬️ ALERTA NARANJA: Zonda Fuerte en Precordillera',
+          summary: 'Ráfagas intensas en El Challao, Potrerillos y Divisadero. Descenso de aire cálido y seco.',
+          recommendations: [
+            'No ascender a cumbres expuestas (Cerro Arco, Santo Tomás).',
+            'Hidratación forzada por extrema sequedad del aire.',
+            'Cuidado con ramas secas en zonas de alamedas y eucaliptos.'
+          ],
+          updatedAt: 'Simulación En Vivo • Alerta Naranja'
+        };
+      } else if (level === 'amarillo') {
+        currentZonda = { ...INITIAL_ZONDA_WEATHER };
+      } else {
+        currentZonda = {
+          alertLevel: 'verde_optimo',
+          windSpeedKmh: 12,
+          gustSpeedKmh: 20,
+          temperatureC: 22,
+          humidityPercent: 48,
+          fireRisk: 'Bajo',
+          title: '🌤️ Condiciones Óptimas para Senderismo y Ciclismo',
+          summary: 'Tiempo estable en precordillera y viñedos. Vientos calmos del este, temperatura agradable y excelente visibilidad.',
+          recommendations: [
+            'Condiciones ideales para todas las modalidades (MTB, Trekking, Moto, Wine & Trail).',
+            'Llevar protección solar y agua habitual.'
+          ],
+          updatedAt: 'Tiempo Estable • Precordillera'
+        };
+      }
+      updateZondaUI();
+    }
+
     // Inicializar mapa y datos
     updateSosLinks(initialCoords[0], initialCoords[1]);
     initConvivenciaModalContent();
+    updateZondaUI();
     renderMapElements();
   </script>
 </body>
