@@ -1387,12 +1387,256 @@
     .btn-gpx:hover {
       background: rgba(0, 229, 255, 0.25);
     }
+  
+    /* ESTILOS WIKILOC COMPLETO */
+    .route-focus-banner {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      max-width: 580px;
+      margin: 0 auto;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid #FF6D00;
+      border-radius: 16px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+      box-shadow: 0 8px 24px rgba(255, 109, 0, 0.35);
+      animation: slideDownBanner 0.3s ease-out;
+    }
+    .route-focus-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      overflow: hidden;
+    }
+    .route-focus-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
+      background: #FF6D00;
+      box-shadow: 0 0 10px #FF6D00;
+      animation: pulse 1.5s infinite;
+      flex-shrink: 0;
+    }
+    .route-focus-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #F8FAFC;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .route-focus-sub {
+      font-size: 11px;
+      color: #94A3B8;
+      font-weight: 600;
+    }
+    .route-focus-close-btn {
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #F8FAFC;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .route-focus-close-btn:hover {
+      background: #334155;
+      color: #FF6D00;
+    }
+    .wikiloc-start-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .wikiloc-start-pin {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background: #00E676;
+      border: 2.5px solid #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(0, 230, 118, 0.7);
+    }
+    .wikiloc-start-badge {
+      background: #00E676;
+      color: #05080E;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #FFFFFF;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+    .wikiloc-waypoint-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .wikiloc-waypoint-pin {
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      background: #FFD600;
+      border: 2px solid #05080E;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+      transition: transform 0.2s ease;
+    }
+    .wikiloc-waypoint-pin:hover {
+      transform: scale(1.2);
+    }
+    .wikiloc-gps-btn {
+      width: 100%;
+      background: #00E676;
+      color: #05080E;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 14px rgba(0, 230, 118, 0.35);
+      transition: all 0.2s ease;
+    }
+    .wikiloc-gps-btn:hover {
+      background: #00C853;
+      transform: translateY(-1px);
+    }
+    .wikiloc-author-box {
+      display: flex;
+      align-items: center;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 10px;
+      gap: 10px;
+    }
+    .wikiloc-author-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+      background: #FF6D00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-weight: 900;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .wikiloc-author-info {
+      flex: 1;
+    }
+    .wikiloc-author-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #F8FAFC;
+    }
+    .wikiloc-author-sub {
+      font-size: 10px;
+      color: #94A3B8;
+      font-weight: 600;
+    }
+    .wikiloc-author-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .wikiloc-social-pill {
+      background: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #F8FAFC;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .wikiloc-social-pill:hover {
+      border-color: #00E676;
+      color: #00E676;
+    }
+    .wikiloc-stats-card {
+      background: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    .wikiloc-stats-title {
+      font-size: 10px;
+      font-weight: 900;
+      color: #94A3B8;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .wikiloc-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .wikiloc-stat-cell {
+      display: flex;
+      flex-direction: column;
+    }
+    .wikiloc-stat-cell-label {
+      font-size: 10px;
+      color: #64748B;
+      font-weight: 600;
+    }
+    .wikiloc-stat-cell-val {
+      font-size: 12px;
+      color: #F8FAFC;
+      font-weight: 800;
+      margin-top: 1px;
+    }
+  
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
-  <div class="header-container">
+  
+  <!-- BANNER FLOTANTE DE RECORRIDO ENFOCADO (ESTILO WIKILOC) -->
+  <div class="route-focus-banner" id="route-focus-banner" style="display: none;">
+    <div class="route-focus-banner-left">
+      <div class="route-focus-dot"></div>
+      <div>
+        <div class="route-focus-title" id="focus-banner-title">📍 Recorrido</div>
+        <div class="route-focus-sub" id="focus-banner-sub">-- km • +-- m • Circular</div>
+      </div>
+    </div>
+    <button class="route-focus-close-btn" onclick="clearRouteFocus()">✕ Ver todas</button>
+  </div>
+  
+  <div class="header-container" id="main-header-container">
     <div class="filter-pills-wrapper">
       <button class="filter-pill active-todas" id="pill-todas" onclick="setFilter('todas')">
         ✨ Todas
@@ -1585,7 +1829,58 @@
       <div class="elevation-bars-row" id="route-elevation-bars"></div>
     </div>
 
-    <div class="action-row">
+    
+    <!-- BOTÓN PROMINENTE ENVÍA RUTA AL GPS -->
+    <button class="wikiloc-gps-btn" onclick="downloadActiveRouteGpx()">
+      📥 Envía ruta al GPS (Descargar GPX)
+    </button>
+
+    <!-- AUTOR & SOCIAL WIKILOC -->
+    <div class="wikiloc-author-box">
+      <div class="wikiloc-author-avatar">MD</div>
+      <div class="wikiloc-author-info">
+        <div class="wikiloc-author-name" id="route-author-name">Maxi Di Natale</div>
+        <div class="wikiloc-author-sub" id="route-author-role">Guía de Montaña • Verificado ViaTrek</div>
+      </div>
+      <div class="wikiloc-author-actions">
+        <button class="wikiloc-social-pill" onclick="handleApplauseWeb()" id="route-applause-btn">
+          👏 <span id="route-applause-count">18</span>
+        </button>
+        <button class="wikiloc-social-pill">💬 6</button>
+      </div>
+    </div>
+
+    <!-- TABLA DE ESTADÍSTICAS TÉCNICAS (ESTILO WIKILOC) -->
+    <div class="wikiloc-stats-card" id="wikiloc-stats-box">
+      <div class="wikiloc-stats-title">ESTADÍSTICAS DE LA RUTA</div>
+      <div class="wikiloc-stats-grid">
+        <div class="wikiloc-stat-cell">
+          <span class="wikiloc-stat-cell-label">Distancia</span>
+          <span class="wikiloc-stat-cell-val" id="stat-dist">-- km</span>
+        </div>
+        <div class="wikiloc-stat-cell">
+          <span class="wikiloc-stat-cell-label">Tipo de ruta</span>
+          <span class="wikiloc-stat-cell-val" id="stat-type">Circular 🔄</span>
+        </div>
+        <div class="wikiloc-stat-cell">
+          <span class="wikiloc-stat-cell-label">Desnivel positivo</span>
+          <span class="wikiloc-stat-cell-val" style="color: #00E676;" id="stat-elev-pos">+-- m</span>
+        </div>
+        <div class="wikiloc-stat-cell">
+          <span class="wikiloc-stat-cell-label">Desnivel negativo</span>
+          <span class="wikiloc-stat-cell-val" style="color: #FFB300;" id="stat-elev-neg">--- m</span>
+        </div>
+        <div class="wikiloc-stat-cell">
+          <span class="wikiloc-stat-cell-label">Altitud máxima</span>
+          <span class="wikiloc-stat-cell-val" id="stat-elev-max">-- m</span>
+        </div>
+        <div class="wikiloc-stat-cell">
+          <span class="wikiloc-stat-cell-label">Altitud mínima</span>
+          <span class="wikiloc-stat-cell-val" id="stat-elev-min">-- m</span>
+        </div>
+      </div>
+    </div>
+  <div class="action-row">
       <button class="btn-focus" onclick="focusActiveRoute()">Enfocar</button>
       <button class="btn-gpx" onclick="downloadActiveRouteGpx()">📥 GPX</button>
       <a class="btn-nav" id="route-nav-link" href="#" target="_blank">Ir al Inicio</a>
@@ -2241,6 +2536,36 @@
       "priorityRule": "Singletrack compartido. Peatones y corredores tienen prioridad en curvas ciegas.",
       "legalWarning": "Prohibido ingreso de motos a combustión por degradación del estrato vegetal.",
       "authority": "Comunidad de Senderos de Chacras & Municipio de Luján"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0035,
+        "longitude": -68.892,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0065,
+        "longitude": -68.903,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Puesto El Manzano",
+        "icon": "🥪",
+        "latitude": -33.002,
+        "longitude": -68.908,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2315,6 +2640,36 @@
       },
       "priorityRule": "Sendero sobre cornisa con vista panorámica a viñedos. Bajar velocidad en tramos estrechos.",
       "authority": "Municipio de Luján de Cuyo"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0062,
+        "longitude": -68.8965,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador El Balcón",
+        "icon": "📷",
+        "latitude": -33.011,
+        "longitude": -68.9045,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.012,
+        "longitude": -68.916,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2379,6 +2734,36 @@
       },
       "priorityRule": "Singletrack fluido entre vegetación autóctona de chañares. Respetar flora nativa.",
       "authority": "Senderos de Chacras"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.004,
+        "longitude": -68.894,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0058,
+        "longitude": -68.8985,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.006,
+        "longitude": -68.9055,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2453,6 +2838,36 @@
       },
       "priorityRule": "Travesía técnica de huella estrecha. Precaución en zetas empinadas y cruces secos.",
       "authority": "Municipio de Luján de Cuyo"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0062,
+        "longitude": -68.8965,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0115,
+        "longitude": -68.913,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.014,
+        "longitude": -68.924,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2522,6 +2937,36 @@
       },
       "priorityRule": "Cañadón natural con sombra de álamos y vertiente. Apto para toda la familia.",
       "authority": "Dirección de Recursos Naturales Renovables"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0035,
+        "longitude": -68.892,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.9975,
+        "longitude": -68.908,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.9955,
+        "longitude": -68.914,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2586,6 +3031,36 @@
       },
       "priorityRule": "Sendero verde de iniciación. Ideal para principiantes, niños y caminatas suaves.",
       "authority": "Senderos de Chacras"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.002,
+        "longitude": -68.89,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0035,
+        "longitude": -68.894,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.0038,
+        "longitude": -68.9015,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2650,6 +3125,36 @@
       },
       "priorityRule": "Ascenso a cumbre destacada de la zona. Vistas 360° al pedemonte y Cordillera.",
       "authority": "Municipio de Luján de Cuyo"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0062,
+        "longitude": -68.8965,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.003,
+        "longitude": -68.904,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.989,
+        "longitude": -68.916,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2709,6 +3214,43 @@
       },
       "priorityRule": "Descenso rápido con peraltes naturales. Peatones deben circular con máxima atención.",
       "authority": "Senderos de Chacras"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.008,
+        "longitude": -68.908,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.005,
+        "longitude": -68.904,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.998,
+        "longitude": -68.903,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -33.001,
+        "longitude": -68.897,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2773,6 +3315,43 @@
       },
       "priorityRule": "Travesía de montaña entre cuencas. Prohibido motos a combustión fuera de caminos vecinales.",
       "authority": "Municipios de Godoy Cruz y Luján de Cuyo"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0035,
+        "longitude": -68.892,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.992,
+        "longitude": -68.9055,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.973,
+        "longitude": -68.924,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.952,
+        "longitude": -68.899,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2847,6 +3426,43 @@
         "Parada Gourmet Vistalba"
       ],
       "bikeFriendly": true
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0035,
+        "longitude": -68.892,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.012,
+        "longitude": -68.885,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.036,
+        "longitude": -68.868,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -33.029,
+        "longitude": -68.855,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2917,6 +3533,43 @@
       "priorityRule": "Peatones tienen paso prioritario en subida y bajada. Prohibido cortar zetas.",
       "legalWarning": "Prohibido ingreso de motos a combustión sobre la huella de ascenso (Ley 6045).",
       "authority": "Municipio de Las Heras y Guardaparques"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.842,
+        "longitude": -68.924,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Curva de las Zetas",
+        "icon": "📷",
+        "latitude": -32.836,
+        "longitude": -68.938,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Pista de Despegue Parapente",
+        "icon": "🪂",
+        "latitude": -32.8325,
+        "longitude": -68.947,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.828,
+        "longitude": -68.956,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -2972,6 +3625,43 @@
       },
       "priorityRule": "Zona de lanzamiento de parapentes. No obstruir la rampa de despegue.",
       "authority": "Club Mendoza de Vuelo Libre & Las Heras"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.842,
+        "longitude": -68.924,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Curva de las Zetas",
+        "icon": "📷",
+        "latitude": -32.839,
+        "longitude": -68.932,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Pista de Despegue Parapente",
+        "icon": "🪂",
+        "latitude": -32.8365,
+        "longitude": -68.939,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.8335,
+        "longitude": -68.944,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3031,6 +3721,43 @@
       },
       "priorityRule": "Filo aéreo ventoso con caída a ambos lados. Exclusivo senderismo a pie.",
       "authority": "Guardaparques de Mendoza"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.828,
+        "longitude": -68.956,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Curva de las Zetas",
+        "icon": "📷",
+        "latitude": -32.826,
+        "longitude": -68.961,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Pista de Despegue Parapente",
+        "icon": "🪂",
+        "latitude": -32.822,
+        "longitude": -68.97,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.821,
+        "longitude": -68.972,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3095,6 +3822,43 @@
       },
       "priorityRule": "Ascenso exigente de jornada completa. Registro obligatorio y agua suficiente.",
       "authority": "Cuerpo de Guardaparques de Mendoza"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.842,
+        "longitude": -68.924,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.836,
+        "longitude": -68.938,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.821,
+        "longitude": -68.972,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.811,
+        "longitude": -68.972,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3164,6 +3928,36 @@
       },
       "priorityRule": "Huella de cañadón y lecho seco. Respetar paso de animales y senderistas.",
       "authority": "Municipio de Las Heras"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.842,
+        "longitude": -68.924,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.832,
+        "longitude": -68.936,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.848,
+        "longitude": -68.941,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3234,6 +4028,36 @@
       "priorityRule": "Zona habilitada para motocross y enduro deportivo. Casco y pechera obligatorios.",
       "legalWarning": "Prohibido salirse de las huellas habilitadas hacia la Reserva Villavicencio.",
       "authority": "Comunidad Enduro Mendoza / Las Heras"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.825,
+        "longitude": -68.92,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.811,
+        "longitude": -68.938,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.815,
+        "longitude": -68.955,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3293,6 +4117,43 @@
       },
       "priorityRule": "Ruta provincial de ripio. Máximo 40 km/h en caracoles. Prioridad al vehículo en subida.",
       "authority": "Dirección Provincial de Vialidad Mendoza"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.528,
+        "longitude": -69.018,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.518,
+        "longitude": -69.025,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.492,
+        "longitude": -69.048,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.481,
+        "longitude": -69.062,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3357,6 +4218,36 @@
       },
       "priorityRule": "Circuito recreativo y turístico. Peatones con paso prioritario en sendas.",
       "authority": "Dirección de Parques y Paseos Públicos"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.8885,
+        "longitude": -68.878,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.8872,
+        "longitude": -68.884,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.8868,
+        "longitude": -68.893,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3416,6 +4307,43 @@
       },
       "priorityRule": "Terreno aluvional seco. Precaución en época de tormentas de verano.",
       "authority": "Dirección de Hidráulica Mendoza"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.9055,
+        "longitude": -68.895,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.898,
+        "longitude": -68.902,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.879,
+        "longitude": -68.905,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.872,
+        "longitude": -68.912,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3481,6 +4409,36 @@
       "priorityRule": "Reserva Natural Protegida. Registro en seccional de guardaparques obligatorio.",
       "legalWarning": "Prohibición estricta de vehículos a combustión y animales domésticos (Ley 6045).",
       "authority": "Cuerpo de Guardaparques de Mendoza (DRNR)"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.874,
+        "longitude": -68.928,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.871,
+        "longitude": -68.934,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.864,
+        "longitude": -68.947,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3546,6 +4504,43 @@
       "priorityRule": "Peatones tienen paso prioritario en cruces señalizados. Bicis máx 25 km/h.",
       "legalWarning": "Prohibida la circulación de motos a combustión en carriles de ciclovía (Ley 9024).",
       "authority": "Municipios de Godoy Cruz y Ciudad de Mendoza"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.9341,
+        "longitude": -68.8472,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.9235,
+        "longitude": -68.8465,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.9032,
+        "longitude": -68.8441,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.883,
+        "longitude": -68.8385,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3605,6 +4600,43 @@
       },
       "priorityRule": "Zona de paseo familiar: prioridad absoluta al peatón y deportistas a pie.",
       "authority": "Dirección de Parques y Paseos Públicos de Mendoza"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.8885,
+        "longitude": -68.862,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.8892,
+        "longitude": -68.8745,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.881,
+        "longitude": -68.8825,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.886,
+        "longitude": -68.8912,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3674,6 +4706,36 @@
       },
       "priorityRule": "Senderos ribereños de embalse. Respetar áreas de avistaje de aves y bañistas.",
       "authority": "Municipio de Luján de Cuyo & Náutica Mendoza"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.962,
+        "longitude": -69.198,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.978,
+        "longitude": -69.215,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.975,
+        "longitude": -69.231,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3738,6 +4800,36 @@
       },
       "priorityRule": "Sendero de quebrada por el lecho del arroyo. Calzado con buen agarre.",
       "authority": "Comunidad Vecinal El Salto & Guardaparques"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.005,
+        "longitude": -69.262,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.009,
+        "longitude": -69.269,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Cascada Natural de Vertiente",
+        "icon": "🌊",
+        "latitude": -33.018,
+        "longitude": -69.284,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3797,6 +4889,36 @@
       },
       "priorityRule": "Bosque de pinos de montaña. Prohibición estricta de fuego.",
       "authority": "Municipio de Luján de Cuyo"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.001,
+        "longitude": -69.245,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0045,
+        "longitude": -69.251,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.005,
+        "longitude": -69.262,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3856,6 +4978,43 @@
       },
       "priorityRule": "Huella de cornisa geológica. Vehículos y deportistas comparten trazado.",
       "authority": "Turismo San Rafael & Vialidad Provincial"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -34.811,
+        "longitude": -68.482,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -34.825,
+        "longitude": -68.495,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -34.845,
+        "longitude": -68.512,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -34.855,
+        "longitude": -68.52,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3915,6 +5074,36 @@
       },
       "priorityRule": "Sendero de ribera de lago. Cuidado con turistas y embarcaderos.",
       "authority": "Municipio de San Rafael"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -34.805,
+        "longitude": -68.475,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -34.811,
+        "longitude": -68.482,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -34.822,
+        "longitude": -68.492,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   },
   {
@@ -3979,6 +5168,36 @@
       },
       "priorityRule": "Sendero perimetral de lago artificial y cañón del río Diamante.",
       "authority": "Club Náutico Los Reyunos & Municipio de San Rafael"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -34.595,
+        "longitude": -68.642,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -34.588,
+        "longitude": -68.649,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -34.576,
+        "longitude": -68.662,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
     }
   }
 ];
@@ -4748,6 +5967,8 @@
           lineJoin: 'round',
           lineCap: 'round'
         }).addTo(map);
+        casing._routeId = route.id;
+        casing._isCasing = true;
 
         const core = L.polyline(route.coordinates, {
           color: route.strokeColor,
@@ -4756,6 +5977,8 @@
           lineJoin: 'round',
           lineCap: 'round'
         }).addTo(map);
+        core._routeId = route.id;
+        core._isCasing = false;
 
         core.on('click', () => showRouteCard(route));
         casing.on('click', () => showRouteCard(route));
@@ -4837,6 +6060,12 @@
       currentActiveRoute = route;
       closeCards();
 
+      // Ajustar cámara para ver el recorrido 100% completo (Fit Bounds Wikiloc)
+      focusActiveRoute();
+
+      // Resaltar la ruta activa y atenuar las demás
+      renderRouteFocusMode(route);
+
       document.getElementById('route-color-dot').style.backgroundColor = route.strokeColor;
       document.getElementById('route-title').innerText = route.name;
       document.getElementById('route-zone').innerText = route.zone;
@@ -4857,6 +6086,20 @@
       document.getElementById('route-dist').innerText = `${route.distanceKm} km`;
       document.getElementById('route-elev').innerText = `+${route.elevationGainM} m`;
       document.getElementById('route-surface').innerText = route.surface;
+
+      // Actualizar Tabla de Estadísticas Técnicas Wikiloc
+      document.getElementById('stat-dist').innerText = `${route.distanceKm} km`;
+      document.getElementById('stat-type').innerText = route.isCircular ? 'Circular 🔄' : 'Solo ida ➡️';
+      document.getElementById('stat-elev-pos').innerText = `+${route.elevationGainM} m`;
+      document.getElementById('stat-elev-neg').innerText = `-${route.elevationGainM} m`;
+      document.getElementById('stat-elev-max').innerText = route.elevationProfile ? `${route.elevationProfile.maxElevM} m` : '-- m';
+      document.getElementById('stat-elev-min').innerText = route.elevationProfile ? `${route.elevationProfile.minElevM} m` : '-- m';
+
+      if (route.author) {
+        document.getElementById('route-author-name').innerText = route.author.name;
+        document.getElementById('route-author-role').innerText = route.author.role || 'Guía de Montaña';
+        document.getElementById('route-applause-count').innerText = route.author.applauseCount || 18;
+      }
 
       // Perfil Altimétrico estilo Wikiloc
       const elevBox = document.getElementById('route-elevation-box');
@@ -4907,19 +6150,12 @@
         }
       }
 
-      // Experiencia Enoturística Wine & Trail (Fase 4)
-      const wineBox = document.getElementById('route-wine-box');
-      if (route.wineInfo) {
-        wineBox.style.display = 'block';
-        document.getElementById('route-wine-desc').innerText = `Bici recomendada: ${route.wineInfo.recommendedBike} • ${route.wineInfo.gravelType}`;
-        const chipsRow = document.getElementById('route-wineries-row');
-        chipsRow.innerHTML = route.wineInfo.wineries.map(w => `<span class="winery-chip">🍷 ${w}</span>`).join('');
-        const tastingEl = document.getElementById('route-tasting-text');
-        tastingEl.innerText = route.wineInfo.tastingPoints.length > 0
-          ? `📍 Paradas sugeridas: ${route.wineInfo.tastingPoints.join(' • ')}`
-          : '';
-      } else {
-        wineBox.style.display = 'none';
+      // Banner Superior de Recorrido Enfocado
+      const focusBanner = document.getElementById('route-focus-banner');
+      if (focusBanner) {
+        focusBanner.style.display = 'flex';
+        document.getElementById('focus-banner-title').innerText = '📍 ' + route.name;
+        document.getElementById('focus-banner-sub').innerText = `${route.distanceKm} km • +${route.elevationGainM}m • ${route.isCircular ? 'Circular 🔄' : 'Solo ida ➡️'}`;
       }
 
       const start = route.coordinates[0];
@@ -5376,10 +6612,109 @@ trkpts + '\n' +
       URL.revokeObjectURL(url);
     }
 
+    
+    let activeRouteMarkers = [];
+
+    function renderRouteFocusMode(activeRoute) {
+      // Limpiar marcadores previos de ruta
+      activeRouteMarkers.forEach(m => map.removeLayer(m));
+      activeRouteMarkers = [];
+
+      // Ajustar opacidad de las polilíneas: resaltar la activa y atenuar las demás
+      polylineLayers.forEach(poly => {
+        if (poly._routeId === activeRoute.id) {
+          poly.setStyle({ opacity: 1, weight: poly._isCasing ? 12 : 7 });
+          poly.bringToFront();
+        } else {
+          poly.setStyle({ opacity: 0.12, weight: poly._isCasing ? 4 : 2 });
+        }
+      });
+
+      // Marcador de Inicio 🟢
+      const startCoord = activeRoute.coordinates[0];
+      const startIcon = L.divIcon({
+        className: '',
+        html: `<div class="wikiloc-start-marker"><div class="wikiloc-start-pin">🟢</div><div class="wikiloc-start-badge">SALIDA</div></div>`,
+        iconSize: [40, 50],
+        iconAnchor: [20, 48]
+      });
+      const startMarker = L.marker(startCoord, { icon: startIcon }).addTo(map);
+      activeRouteMarkers.push(startMarker);
+
+      // Waypoints intermedios 🟡
+      if (activeRoute.waypoints && activeRoute.waypoints.length > 0) {
+        activeRoute.waypoints.forEach(wp => {
+          const wpIcon = L.divIcon({
+            className: '',
+            html: `<div class="wikiloc-waypoint-marker" title="${wp.title}"><div class="wikiloc-waypoint-pin">${wp.icon}</div></div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+          });
+          const wpMarker = L.marker([wp.latitude, wp.longitude], { icon: wpIcon }).addTo(map);
+          wpMarker.bindPopup(`<strong>${wp.icon} ${wp.title}</strong><br><small>${wp.description || ''}</small>`);
+          activeRouteMarkers.push(wpMarker);
+        });
+      }
+
+      // Marcador de Llegada 🏁 si no es circular
+      if (!activeRoute.isCircular && activeRoute.coordinates.length > 1) {
+        const endCoord = activeRoute.coordinates[activeRoute.coordinates.length - 1];
+        const endIcon = L.divIcon({
+          className: '',
+          html: `<div class="wikiloc-start-marker"><div class="wikiloc-start-pin" style="background:#FFD700;">🏁</div><div class="wikiloc-start-badge" style="background:#FFD700; color:#05080E;">LLEGADA</div></div>`,
+          iconSize: [40, 50],
+          iconAnchor: [20, 48]
+        });
+        const endMarker = L.marker(endCoord, { icon: endIcon }).addTo(map);
+        activeRouteMarkers.push(endMarker);
+      }
+    }
+
+    function clearRouteFocus() {
+      currentActiveRoute = null;
+      activeRouteMarkers.forEach(m => map.removeLayer(m));
+      activeRouteMarkers = [];
+
+      const focusBanner = document.getElementById('route-focus-banner');
+      if (focusBanner) focusBanner.style.display = 'none';
+
+      // Restaurar opacidades de todas las polilíneas
+      polylineLayers.forEach(poly => {
+        poly.setStyle({ opacity: poly._isCasing ? 0.95 : 1, weight: poly._isCasing ? 8 : 4.5 });
+      });
+
+      closeCards();
+    }
+
+    let webApplauded = false;
+    function handleApplauseWeb() {
+      const el = document.getElementById('route-applause-count');
+      if (!el) return;
+      let count = parseInt(el.innerText, 10) || 18;
+      if (!webApplauded) {
+        count += 1;
+        webApplauded = true;
+        document.getElementById('route-applause-btn').style.borderColor = '#00E676';
+        document.getElementById('route-applause-btn').style.color = '#00E676';
+      } else {
+        count -= 1;
+        webApplauded = false;
+        document.getElementById('route-applause-btn').style.borderColor = '';
+        document.getElementById('route-applause-btn').style.color = '';
+      }
+      el.innerText = count;
+    }
+
     function focusActiveRoute() {
       if (!currentActiveRoute) return;
       const bounds = L.latLngBounds(currentActiveRoute.coordinates);
-      map.fitBounds(bounds, { padding: [100, 100], maxZoom: 15 });
+      map.fitBounds(bounds, {
+        paddingTopLeft: [40, 100],
+        paddingBottomRight: [40, 270],
+        maxZoom: 15,
+        animate: true,
+        duration: 0.8
+      });
     }
 
     function locateUser() {

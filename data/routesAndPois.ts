@@ -109,1017 +109,2743 @@ export const INITIAL_ZONDA_WEATHER: ZondaWeatherInfo = {
 // ============================================================================
 
 export const MENDOZA_ROUTES: RouteItem[] = [
-  // --------------------------------------------------------------------------
-  // ZONA 1: CHACRAS DE CORIA (SENDEROS DE MONTAÑA CON NOMBRE REAL)
-  // --------------------------------------------------------------------------
   {
-    id: 'sendero-chacras-teletubbies',
-    name: 'Sendero Los Teletubbies',
-    zone: 'Chacras de Coria / Pedemonte',
-    regionId: 'chacras',
-    type: 'sendero_mtb',
-    distanceKm: 4.8,
-    elevationGainM: 140,
-    difficulty: 'Fácil',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -33.0035, longitude: -68.8920 },
-      { latitude: -33.0048, longitude: -68.8972 },
-      { latitude: -33.0065, longitude: -68.9030 },
-      { latitude: -33.0082, longitude: -68.9078 },
-      { latitude: -33.0055, longitude: -68.9112 },
-      { latitude: -33.0020, longitude: -68.9080 },
-      { latitude: -33.0010, longitude: -68.9025 },
-      { latitude: -33.0035, longitude: -68.8920 },
+    "id": "sendero-chacras-teletubbies",
+    "name": "Sendero Los Teletubbies",
+    "zone": "Chacras de Coria / Pedemonte",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 4.8,
+    "elevationGainM": 140,
+    "difficulty": "Fácil",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -33.0035,
+        "longitude": -68.892
+      },
+      {
+        "latitude": -33.0048,
+        "longitude": -68.8972
+      },
+      {
+        "latitude": -33.0065,
+        "longitude": -68.903
+      },
+      {
+        "latitude": -33.0082,
+        "longitude": -68.9078
+      },
+      {
+        "latitude": -33.0055,
+        "longitude": -68.9112
+      },
+      {
+        "latitude": -33.002,
+        "longitude": -68.908
+      },
+      {
+        "latitude": -33.001,
+        "longitude": -68.9025
+      },
+      {
+        "latitude": -33.0035,
+        "longitude": -68.892
+      }
     ],
-    elevationProfile: {
-      minElevM: 980,
-      maxElevM: 1120,
-      elevationGainM: 140,
-      points: [980, 1010, 1055, 1120, 1080, 1030, 995, 980],
+    "elevationProfile": {
+      "minElevM": 980,
+      "maxElevM": 1120,
+      "elevationGainM": 140,
+      "points": [
+        980,
+        1010,
+        1055,
+        1120,
+        1080,
+        1030,
+        995,
+        980
+      ]
     },
-    gpxFileName: 'viatrek_chacras_teletubbies.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Singletrack compartido. Peatones y corredores tienen prioridad en curvas ciegas.',
-      legalWarning: 'Prohibido ingreso de motos a combustión por degradación del estrato vegetal.',
-      authority: 'Comunidad de Senderos de Chacras & Municipio de Luján',
+    "gpxFileName": "viatrek_chacras_teletubbies.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Singletrack compartido. Peatones y corredores tienen prioridad en curvas ciegas.",
+      "legalWarning": "Prohibido ingreso de motos a combustión por degradación del estrato vegetal.",
+      "authority": "Comunidad de Senderos de Chacras & Municipio de Luján"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0035,
+        "longitude": -68.892,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0065,
+        "longitude": -68.903,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Puesto El Manzano",
+        "icon": "🥪",
+        "latitude": -33.002,
+        "longitude": -68.908,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-chacras-el-balcon',
-    name: 'Sendero El Balcón de Abajo',
-    zone: 'Chacras de Coria / Pedemonte',
-    regionId: 'chacras',
-    type: 'sendero_mtb',
-    distanceKm: 5.6,
-    elevationGainM: 190,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E5FF',
-    coordinates: [
-      { latitude: -33.0062, longitude: -68.8965 },
-      { latitude: -33.0085, longitude: -68.9010 },
-      { latitude: -33.0110, longitude: -68.9045 },
-      { latitude: -33.0135, longitude: -68.9090 },
-      { latitude: -33.0160, longitude: -68.9135 },
-      { latitude: -33.0120, longitude: -68.9160 },
-      { latitude: -33.0090, longitude: -68.9110 },
-      { latitude: -33.0062, longitude: -68.8965 },
+    "id": "sendero-chacras-el-balcon",
+    "name": "Sendero El Balcón de Abajo",
+    "zone": "Chacras de Coria / Pedemonte",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 5.6,
+    "elevationGainM": 190,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E5FF",
+    "coordinates": [
+      {
+        "latitude": -33.0062,
+        "longitude": -68.8965
+      },
+      {
+        "latitude": -33.0085,
+        "longitude": -68.901
+      },
+      {
+        "latitude": -33.011,
+        "longitude": -68.9045
+      },
+      {
+        "latitude": -33.0135,
+        "longitude": -68.909
+      },
+      {
+        "latitude": -33.016,
+        "longitude": -68.9135
+      },
+      {
+        "latitude": -33.012,
+        "longitude": -68.916
+      },
+      {
+        "latitude": -33.009,
+        "longitude": -68.911
+      },
+      {
+        "latitude": -33.0062,
+        "longitude": -68.8965
+      }
     ],
-    elevationProfile: {
-      minElevM: 1010,
-      maxElevM: 1200,
-      elevationGainM: 190,
-      points: [1010, 1045, 1110, 1165, 1200, 1140, 1070, 1010],
+    "elevationProfile": {
+      "minElevM": 1010,
+      "maxElevM": 1200,
+      "elevationGainM": 190,
+      "points": [
+        1010,
+        1045,
+        1110,
+        1165,
+        1200,
+        1140,
+        1070,
+        1010
+      ]
     },
-    gpxFileName: 'viatrek_chacras_el_balcon.gpx',
-    legality: {
-      status: 'compartido_precaucion',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#00E5FF',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Sendero sobre cornisa con vista panorámica a viñedos. Bajar velocidad en tramos estrechos.',
-      authority: 'Municipio de Luján de Cuyo',
+    "gpxFileName": "viatrek_chacras_el_balcon.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#00E5FF",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Sendero sobre cornisa con vista panorámica a viñedos. Bajar velocidad en tramos estrechos.",
+      "authority": "Municipio de Luján de Cuyo"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0062,
+        "longitude": -68.8965,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador El Balcón",
+        "icon": "📷",
+        "latitude": -33.011,
+        "longitude": -68.9045,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.012,
+        "longitude": -68.916,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-chacras-los-chanares',
-    name: 'Sendero Los Chañares (1 y 2)',
-    zone: 'Chacras de Coria / Pedemonte',
-    regionId: 'chacras',
-    type: 'sendero_mtb',
-    distanceKm: 3.9,
-    elevationGainM: 110,
-    difficulty: 'Fácil',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#76FF03',
-    coordinates: [
-      { latitude: -33.0040, longitude: -68.8940 },
-      { latitude: -33.0058, longitude: -68.8985 },
-      { latitude: -33.0075, longitude: -68.9020 },
-      { latitude: -33.0060, longitude: -68.9055 },
-      { latitude: -33.0032, longitude: -68.9015 },
-      { latitude: -33.0040, longitude: -68.8940 },
+    "id": "sendero-chacras-los-chanares",
+    "name": "Sendero Los Chañares (1 y 2)",
+    "zone": "Chacras de Coria / Pedemonte",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 3.9,
+    "elevationGainM": 110,
+    "difficulty": "Fácil",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#76FF03",
+    "coordinates": [
+      {
+        "latitude": -33.004,
+        "longitude": -68.894
+      },
+      {
+        "latitude": -33.0058,
+        "longitude": -68.8985
+      },
+      {
+        "latitude": -33.0075,
+        "longitude": -68.902
+      },
+      {
+        "latitude": -33.006,
+        "longitude": -68.9055
+      },
+      {
+        "latitude": -33.0032,
+        "longitude": -68.9015
+      },
+      {
+        "latitude": -33.004,
+        "longitude": -68.894
+      }
     ],
-    elevationProfile: {
-      minElevM: 990,
-      maxElevM: 1100,
-      elevationGainM: 110,
-      points: [990, 1020, 1070, 1100, 1045, 990],
+    "elevationProfile": {
+      "minElevM": 990,
+      "maxElevM": 1100,
+      "elevationGainM": 110,
+      "points": [
+        990,
+        1020,
+        1070,
+        1100,
+        1045,
+        990
+      ]
     },
-    gpxFileName: 'viatrek_chacras_los_chanares.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#76FF03',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Singletrack fluido entre vegetación autóctona de chañares. Respetar flora nativa.',
-      authority: 'Senderos de Chacras',
+    "gpxFileName": "viatrek_chacras_los_chanares.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#76FF03",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Singletrack fluido entre vegetación autóctona de chañares. Respetar flora nativa.",
+      "authority": "Senderos de Chacras"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.004,
+        "longitude": -68.894,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0058,
+        "longitude": -68.8985,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.006,
+        "longitude": -68.9055,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-chacras-la-cuyanita',
-    name: 'Sendero La Cuyanita',
-    zone: 'Chacras de Coria / Pedemonte',
-    regionId: 'chacras',
-    type: 'sendero_mtb',
-    distanceKm: 6.2,
-    elevationGainM: 220,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#FF9100',
-    coordinates: [
-      { latitude: -33.0062, longitude: -68.8965 },
-      { latitude: -33.0090, longitude: -68.9050 },
-      { latitude: -33.0115, longitude: -68.9130 },
-      { latitude: -33.0150, longitude: -68.9210 },
-      { latitude: -33.0180, longitude: -68.9270 },
-      { latitude: -33.0140, longitude: -68.9240 },
-      { latitude: -33.0100, longitude: -68.9150 },
-      { latitude: -33.0062, longitude: -68.8965 },
+    "id": "sendero-chacras-la-cuyanita",
+    "name": "Sendero La Cuyanita",
+    "zone": "Chacras de Coria / Pedemonte",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 6.2,
+    "elevationGainM": 220,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF9100",
+    "coordinates": [
+      {
+        "latitude": -33.0062,
+        "longitude": -68.8965
+      },
+      {
+        "latitude": -33.009,
+        "longitude": -68.905
+      },
+      {
+        "latitude": -33.0115,
+        "longitude": -68.913
+      },
+      {
+        "latitude": -33.015,
+        "longitude": -68.921
+      },
+      {
+        "latitude": -33.018,
+        "longitude": -68.927
+      },
+      {
+        "latitude": -33.014,
+        "longitude": -68.924
+      },
+      {
+        "latitude": -33.01,
+        "longitude": -68.915
+      },
+      {
+        "latitude": -33.0062,
+        "longitude": -68.8965
+      }
     ],
-    elevationProfile: {
-      minElevM: 1010,
-      maxElevM: 1230,
-      elevationGainM: 220,
-      points: [1010, 1060, 1130, 1180, 1230, 1190, 1090, 1010],
+    "elevationProfile": {
+      "minElevM": 1010,
+      "maxElevM": 1230,
+      "elevationGainM": 220,
+      "points": [
+        1010,
+        1060,
+        1130,
+        1180,
+        1230,
+        1190,
+        1090,
+        1010
+      ]
     },
-    gpxFileName: 'viatrek_chacras_la_cuyanita.gpx',
-    legality: {
-      status: 'compartido_precaucion',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#FF9100',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Travesía técnica de huella estrecha. Precaución en zetas empinadas y cruces secos.',
-      authority: 'Municipio de Luján de Cuyo',
+    "gpxFileName": "viatrek_chacras_la_cuyanita.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#FF9100",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Travesía técnica de huella estrecha. Precaución en zetas empinadas y cruces secos.",
+      "authority": "Municipio de Luján de Cuyo"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0062,
+        "longitude": -68.8965,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0115,
+        "longitude": -68.913,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.014,
+        "longitude": -68.924,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-chacras-quebrada-alamo',
-    name: 'Sendero Quebrada del Álamo',
-    zone: 'Chacras de Coria / Pedemonte',
-    regionId: 'chacras',
-    type: 'trekking',
-    distanceKm: 5.1,
-    elevationGainM: 175,
-    difficulty: 'Fácil',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -33.0035, longitude: -68.8920 },
-      { latitude: -33.0010, longitude: -68.8995 },
-      { latitude: -32.9975, longitude: -68.9080 },
-      { latitude: -32.9930, longitude: -68.9220 },
-      { latitude: -32.9955, longitude: -68.9140 },
-      { latitude: -33.0000, longitude: -68.9030 },
-      { latitude: -33.0035, longitude: -68.8920 },
+    "id": "sendero-chacras-quebrada-alamo",
+    "name": "Sendero Quebrada del Álamo",
+    "zone": "Chacras de Coria / Pedemonte",
+    "regionId": "chacras",
+    "type": "trekking",
+    "distanceKm": 5.1,
+    "elevationGainM": 175,
+    "difficulty": "Fácil",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -33.0035,
+        "longitude": -68.892
+      },
+      {
+        "latitude": -33.001,
+        "longitude": -68.8995
+      },
+      {
+        "latitude": -32.9975,
+        "longitude": -68.908
+      },
+      {
+        "latitude": -32.993,
+        "longitude": -68.922
+      },
+      {
+        "latitude": -32.9955,
+        "longitude": -68.914
+      },
+      {
+        "latitude": -33,
+        "longitude": -68.903
+      },
+      {
+        "latitude": -33.0035,
+        "longitude": -68.892
+      }
     ],
-    elevationProfile: {
-      minElevM: 980,
-      maxElevM: 1155,
-      elevationGainM: 175,
-      points: [980, 1020, 1070, 1155, 1110, 1040, 980],
+    "elevationProfile": {
+      "minElevM": 980,
+      "maxElevM": 1155,
+      "elevationGainM": 175,
+      "points": [
+        980,
+        1020,
+        1070,
+        1155,
+        1110,
+        1040,
+        980
+      ]
     },
-    gpxFileName: 'viatrek_chacras_quebrada_alamo.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Cañadón natural con sombra de álamos y vertiente. Apto para toda la familia.',
-      authority: 'Dirección de Recursos Naturales Renovables',
+    "gpxFileName": "viatrek_chacras_quebrada_alamo.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Cañadón natural con sombra de álamos y vertiente. Apto para toda la familia.",
+      "authority": "Dirección de Recursos Naturales Renovables"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0035,
+        "longitude": -68.892,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.9975,
+        "longitude": -68.908,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.9955,
+        "longitude": -68.914,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-chacras-los-olivillos',
-    name: 'Sendero Los Olivillos Completo',
-    zone: 'Chacras de Coria / Pedemonte',
-    regionId: 'chacras',
-    type: 'sendero_mtb',
-    distanceKm: 3.2,
-    elevationGainM: 75,
-    difficulty: 'Fácil',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E5FF',
-    coordinates: [
-      { latitude: -33.0020, longitude: -68.8900 },
-      { latitude: -33.0035, longitude: -68.8940 },
-      { latitude: -33.0050, longitude: -68.8980 },
-      { latitude: -33.0038, longitude: -68.9015 },
-      { latitude: -33.0018, longitude: -68.8960 },
-      { latitude: -33.0020, longitude: -68.8900 },
+    "id": "sendero-chacras-los-olivillos",
+    "name": "Sendero Los Olivillos Completo",
+    "zone": "Chacras de Coria / Pedemonte",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 3.2,
+    "elevationGainM": 75,
+    "difficulty": "Fácil",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E5FF",
+    "coordinates": [
+      {
+        "latitude": -33.002,
+        "longitude": -68.89
+      },
+      {
+        "latitude": -33.0035,
+        "longitude": -68.894
+      },
+      {
+        "latitude": -33.005,
+        "longitude": -68.898
+      },
+      {
+        "latitude": -33.0038,
+        "longitude": -68.9015
+      },
+      {
+        "latitude": -33.0018,
+        "longitude": -68.896
+      },
+      {
+        "latitude": -33.002,
+        "longitude": -68.89
+      }
     ],
-    elevationProfile: {
-      minElevM: 970,
-      maxElevM: 1045,
-      elevationGainM: 75,
-      points: [970, 990, 1020, 1045, 1005, 970],
+    "elevationProfile": {
+      "minElevM": 970,
+      "maxElevM": 1045,
+      "elevationGainM": 75,
+      "points": [
+        970,
+        990,
+        1020,
+        1045,
+        1005,
+        970
+      ]
     },
-    gpxFileName: 'viatrek_chacras_los_olivillos.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Iniciación & Flow',
-      tagColor: '#00E5FF',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Sendero verde de iniciación. Ideal para principiantes, niños y caminatas suaves.',
-      authority: 'Senderos de Chacras',
+    "gpxFileName": "viatrek_chacras_los_olivillos.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Iniciación & Flow",
+      "tagColor": "#00E5FF",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Sendero verde de iniciación. Ideal para principiantes, niños y caminatas suaves.",
+      "authority": "Senderos de Chacras"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.002,
+        "longitude": -68.89,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0035,
+        "longitude": -68.894,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.0038,
+        "longitude": -68.9015,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-chacras-cerro-peni',
-    name: 'Sendero Cumbre Cerro Peni (1.150 m)',
-    zone: 'Chacras de Coria / Precordillera',
-    regionId: 'chacras',
-    type: 'trekking',
-    distanceKm: 4.5,
-    elevationGainM: 240,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#E040FB',
-    coordinates: [
-      { latitude: -33.0062, longitude: -68.8965 },
-      { latitude: -33.0030, longitude: -68.9040 },
-      { latitude: -32.9975, longitude: -68.9130 },
-      { latitude: -32.9890, longitude: -68.9160 },
-      { latitude: -32.9940, longitude: -68.9100 },
-      { latitude: -33.0062, longitude: -68.8965 },
+    "id": "sendero-chacras-cerro-peni",
+    "name": "Sendero Cumbre Cerro Peni (1.150 m)",
+    "zone": "Chacras de Coria / Precordillera",
+    "regionId": "chacras",
+    "type": "trekking",
+    "distanceKm": 4.5,
+    "elevationGainM": 240,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#E040FB",
+    "coordinates": [
+      {
+        "latitude": -33.0062,
+        "longitude": -68.8965
+      },
+      {
+        "latitude": -33.003,
+        "longitude": -68.904
+      },
+      {
+        "latitude": -32.9975,
+        "longitude": -68.913
+      },
+      {
+        "latitude": -32.989,
+        "longitude": -68.916
+      },
+      {
+        "latitude": -32.994,
+        "longitude": -68.91
+      },
+      {
+        "latitude": -33.0062,
+        "longitude": -68.8965
+      }
     ],
-    elevationProfile: {
-      minElevM: 1010,
-      maxElevM: 1250,
-      elevationGainM: 240,
-      points: [1010, 1070, 1140, 1250, 1160, 1010],
+    "elevationProfile": {
+      "minElevM": 1010,
+      "maxElevM": 1250,
+      "elevationGainM": 240,
+      "points": [
+        1010,
+        1070,
+        1140,
+        1250,
+        1160,
+        1010
+      ]
     },
-    gpxFileName: 'viatrek_chacras_cerro_peni.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Cumbre Panorámica',
-      tagColor: '#E040FB',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Ascenso a cumbre destacada de la zona. Vistas 360° al pedemonte y Cordillera.',
-      authority: 'Municipio de Luján de Cuyo',
+    "gpxFileName": "viatrek_chacras_cerro_peni.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Cumbre Panorámica",
+      "tagColor": "#E040FB",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Ascenso a cumbre destacada de la zona. Vistas 360° al pedemonte y Cordillera.",
+      "authority": "Municipio de Luján de Cuyo"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0062,
+        "longitude": -68.8965,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.003,
+        "longitude": -68.904,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.989,
+        "longitude": -68.916,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-chacras-bajada-vertiente',
-    name: 'Sendero Bajada Vertiente & Toboganes',
-    zone: 'Chacras de Coria / Pedemonte',
-    regionId: 'chacras',
-    type: 'sendero_mtb',
-    distanceKm: 3.8,
-    elevationGainM: 95,
-    difficulty: 'Técnico',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#FF3D00',
-    coordinates: [
-      { latitude: -33.0080, longitude: -68.9080 },
-      { latitude: -33.0050, longitude: -68.9040 },
-      { latitude: -33.0015, longitude: -68.9080 },
-      { latitude: -32.9980, longitude: -68.9030 },
-      { latitude: -33.0010, longitude: -68.8970 },
+    "id": "sendero-chacras-bajada-vertiente",
+    "name": "Sendero Bajada Vertiente & Toboganes",
+    "zone": "Chacras de Coria / Pedemonte",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 3.8,
+    "elevationGainM": 95,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF3D00",
+    "coordinates": [
+      {
+        "latitude": -33.008,
+        "longitude": -68.908
+      },
+      {
+        "latitude": -33.005,
+        "longitude": -68.904
+      },
+      {
+        "latitude": -33.0015,
+        "longitude": -68.908
+      },
+      {
+        "latitude": -32.998,
+        "longitude": -68.903
+      },
+      {
+        "latitude": -33.001,
+        "longitude": -68.897
+      }
     ],
-    elevationProfile: {
-      minElevM: 1020,
-      maxElevM: 1115,
-      elevationGainM: 95,
-      points: [1115, 1090, 1060, 1040, 1020],
+    "elevationProfile": {
+      "minElevM": 1020,
+      "maxElevM": 1115,
+      "elevationGainM": 95,
+      "points": [
+        1115,
+        1090,
+        1060,
+        1040,
+        1020
+      ]
     },
-    gpxFileName: 'viatrek_chacras_bajada_vertiente.gpx',
-    legality: {
-      status: 'compartido_precaucion',
-      badgeText: '⚠️ Descenso Técnico MTB / Running',
-      tagColor: '#FF3D00',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Descenso rápido con peraltes naturales. Peatones deben circular con máxima atención.',
-      authority: 'Senderos de Chacras',
+    "gpxFileName": "viatrek_chacras_bajada_vertiente.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "⚠️ Descenso Técnico MTB / Running",
+      "tagColor": "#FF3D00",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Descenso rápido con peraltes naturales. Peatones deben circular con máxima atención.",
+      "authority": "Senderos de Chacras"
     },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.008,
+        "longitude": -68.908,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.005,
+        "longitude": -68.904,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.998,
+        "longitude": -68.903,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -33.001,
+        "longitude": -68.897,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-chacras-dique-frias',
-    name: 'Cruce Precordillerano Chacras a Dique Frías',
-    zone: 'Luján de Cuyo / Godoy Cruz Precordillera',
-    regionId: 'chacras',
-    type: 'sendero_mtb',
-    distanceKm: 12.4,
-    elevationGainM: 380,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#FF6D00',
-    coordinates: [
-      { latitude: -33.0035, longitude: -68.8920 },
-      { latitude: -32.9920, longitude: -68.9055 },
-      { latitude: -32.9810, longitude: -68.9180 },
-      { latitude: -32.9730, longitude: -68.9240 },
-      { latitude: -32.9610, longitude: -68.9120 },
-      { latitude: -32.9520, longitude: -68.8990 },
+    "id": "sendero-chacras-dique-frias",
+    "name": "Cruce Precordillerano Chacras a Dique Frías",
+    "zone": "Luján de Cuyo / Godoy Cruz Precordillera",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 12.4,
+    "elevationGainM": 380,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      {
+        "latitude": -33.0035,
+        "longitude": -68.892
+      },
+      {
+        "latitude": -32.992,
+        "longitude": -68.9055
+      },
+      {
+        "latitude": -32.981,
+        "longitude": -68.918
+      },
+      {
+        "latitude": -32.973,
+        "longitude": -68.924
+      },
+      {
+        "latitude": -32.961,
+        "longitude": -68.912
+      },
+      {
+        "latitude": -32.952,
+        "longitude": -68.899
+      }
     ],
-    elevationProfile: {
-      minElevM: 980,
-      maxElevM: 1360,
-      elevationGainM: 380,
-      points: [980, 1090, 1220, 1360, 1210, 1050],
+    "elevationProfile": {
+      "minElevM": 980,
+      "maxElevM": 1360,
+      "elevationGainM": 380,
+      "points": [
+        980,
+        1090,
+        1220,
+        1360,
+        1210,
+        1050
+      ]
     },
-    gpxFileName: 'viatrek_chacras_cruce_frias.gpx',
-    legality: {
-      status: 'compartido_precaucion',
-      badgeText: '🌟 Multimodal: Travesía Precordillerana',
-      tagColor: '#FFD600',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Travesía de montaña entre cuencas. Prohibido motos a combustión fuera de caminos vecinales.',
-      authority: 'Municipios de Godoy Cruz y Luján de Cuyo',
+    "gpxFileName": "viatrek_chacras_cruce_frias.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🌟 Multimodal: Travesía Precordillerana",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Travesía de montaña entre cuencas. Prohibido motos a combustión fuera de caminos vecinales.",
+      "authority": "Municipios de Godoy Cruz y Luján de Cuyo"
     },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0035,
+        "longitude": -68.892,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.992,
+        "longitude": -68.9055,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.973,
+        "longitude": -68.924,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.952,
+        "longitude": -68.899,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'ruta-wine-chacras-vistalba',
-    name: 'Circuito Wine & Trail: Viñedos de Chacras & Vistalba',
-    zone: 'Luján de Cuyo Enoturismo',
-    regionId: 'chacras',
-    type: 'wine_trail',
-    distanceKm: 8.8,
-    elevationGainM: 120,
-    difficulty: 'Fácil',
-    surface: 'Mixto',
-    strokeColor: '#E91E63',
-    coordinates: [
-      { latitude: -33.0035, longitude: -68.8920 },
-      { latitude: -33.0120, longitude: -68.8850 },
-      { latitude: -33.0240, longitude: -68.8780 },
-      { latitude: -33.0360, longitude: -68.8680 },
-      { latitude: -33.0290, longitude: -68.8550 },
+    "id": "ruta-wine-chacras-vistalba",
+    "name": "Circuito Wine & Trail: Viñedos de Chacras & Vistalba",
+    "zone": "Luján de Cuyo Enoturismo",
+    "regionId": "chacras",
+    "type": "wine_trail",
+    "distanceKm": 8.8,
+    "elevationGainM": 120,
+    "difficulty": "Fácil",
+    "surface": "Mixto",
+    "strokeColor": "#E91E63",
+    "coordinates": [
+      {
+        "latitude": -33.0035,
+        "longitude": -68.892
+      },
+      {
+        "latitude": -33.012,
+        "longitude": -68.885
+      },
+      {
+        "latitude": -33.024,
+        "longitude": -68.878
+      },
+      {
+        "latitude": -33.036,
+        "longitude": -68.868
+      },
+      {
+        "latitude": -33.029,
+        "longitude": -68.855
+      }
     ],
-    elevationProfile: {
-      minElevM: 940,
-      maxElevM: 1060,
-      elevationGainM: 120,
-      points: [980, 1010, 1035, 1060, 1020],
+    "elevationProfile": {
+      "minElevM": 940,
+      "maxElevM": 1060,
+      "elevationGainM": 120,
+      "points": [
+        980,
+        1010,
+        1035,
+        1060,
+        1020
+      ]
     },
-    gpxFileName: 'viatrek_wine_chacras_vistalba.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🍷 Enoturismo Gravel & Bici',
-      tagColor: '#E91E63',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Caminos rurales y callejones entre viñedos de Malbec.',
-      authority: 'Enoturismo Mendoza / Luján de Cuyo',
+    "gpxFileName": "viatrek_wine_chacras_vistalba.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🍷 Enoturismo Gravel & Bici",
+      "tagColor": "#E91E63",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Caminos rurales y callejones entre viñedos de Malbec.",
+      "authority": "Enoturismo Mendoza / Luján de Cuyo"
     },
-    wineInfo: {
-      wineries: ['Bodega Kaiken', 'Bodega Nieto Senetiner', 'Bodega Vistalba', 'Bodega Fabre Montmayou'],
-      gravelType: 'Caminos Rurales y Alamedas',
-      recommendedBike: 'Gravel / MTB / Urbana Paseo',
-      tastingPoints: ['Wine Bar Kaiken', 'Parada Gourmet Vistalba'],
-      bikeFriendly: true,
+    "wineInfo": {
+      "wineries": [
+        "Bodega Kaiken",
+        "Bodega Nieto Senetiner",
+        "Bodega Vistalba",
+        "Bodega Fabre Montmayou"
+      ],
+      "gravelType": "Caminos Rurales y Alamedas",
+      "recommendedBike": "Gravel / MTB / Urbana Paseo",
+      "tastingPoints": [
+        "Wine Bar Kaiken",
+        "Parada Gourmet Vistalba"
+      ],
+      "bikeFriendly": true
     },
-  },
-
-  // --------------------------------------------------------------------------
-  // ZONA 2: EL CHALLAO & CERRO ARCO (MONTAÑA, FILOS Y CIRCUITOS)
-  // --------------------------------------------------------------------------
-  {
-    id: 'sendero-cerro-arco-cumbre',
-    name: 'Ascenso Clásico Cerro Arco (a las Antenas)',
-    zone: 'El Challao / Las Heras',
-    regionId: 'challao_arco',
-    type: 'trekking',
-    distanceKm: 9.2,
-    elevationGainM: 540,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#FF6D00',
-    coordinates: [
-      { latitude: -32.8420, longitude: -68.9240 },
-      { latitude: -32.8390, longitude: -68.9320 },
-      { latitude: -32.8360, longitude: -68.9380 },
-      { latitude: -32.8340, longitude: -68.9430 },
-      { latitude: -32.8325, longitude: -68.9470 },
-      { latitude: -32.8315, longitude: -68.9485 },
-      { latitude: -32.8280, longitude: -68.9560 },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.0035,
+        "longitude": -68.892,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.012,
+        "longitude": -68.885,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.036,
+        "longitude": -68.868,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -33.029,
+        "longitude": -68.855,
+        "description": "Finalización del recorrido"
+      }
     ],
-    elevationProfile: {
-      minElevM: 1140,
-      maxElevM: 1680,
-      elevationGainM: 540,
-      points: [1140, 1220, 1310, 1420, 1530, 1610, 1680],
-    },
-    gpxFileName: 'viatrek_cerro_arco_clasico.gpx',
-    legality: {
-      status: 'compartido_precaucion',
-      badgeText: '🌟 Multimodal: Trekking + MTB + E-Bike',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Peatones tienen paso prioritario en subida y bajada. Prohibido cortar zetas.',
-      legalWarning: 'Prohibido ingreso de motos a combustión sobre la huella de ascenso (Ley 6045).',
-      authority: 'Municipio de Las Heras y Guardaparques',
-    },
-  },
-  {
-    id: 'sendero-arco-despegue-parapente',
-    name: 'Sendero de los Parapentistas (Despegue Arco)',
-    zone: 'El Challao / Las Heras',
-    regionId: 'challao_arco',
-    type: 'trekking',
-    distanceKm: 5.4,
-    elevationGainM: 360,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E5FF',
-    coordinates: [
-      { latitude: -32.8420, longitude: -68.9240 },
-      { latitude: -32.8390, longitude: -68.9320 },
-      { latitude: -32.8365, longitude: -68.9390 },
-      { latitude: -32.8335, longitude: -68.9440 },
-    ],
-    elevationProfile: {
-      minElevM: 1140,
-      maxElevM: 1500,
-      elevationGainM: 360,
-      points: [1140, 1230, 1340, 1450, 1500],
-    },
-    gpxFileName: 'viatrek_arco_despegue_parapente.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Mirador & Despegue',
-      tagColor: '#00E5FF',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Zona de lanzamiento de parapentes. No obstruir la rampa de despegue.',
-      authority: 'Club Mendoza de Vuelo Libre & Las Heras',
-    },
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-arco-filo-santo-tomas',
-    name: 'Travesía de Filo: Cerro Arco a Cerro Santo Tomás (1.820 m)',
-    zone: 'El Challao Precordillera Profunda',
-    regionId: 'challao_arco',
-    type: 'trekking',
-    distanceKm: 7.8,
-    elevationGainM: 410,
-    difficulty: 'Técnico',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#E040FB',
-    coordinates: [
-      { latitude: -32.8280, longitude: -68.9560 },
-      { latitude: -32.8260, longitude: -68.9610 },
-      { latitude: -32.8240, longitude: -68.9660 },
-      { latitude: -32.8220, longitude: -68.9700 },
-      { latitude: -32.8210, longitude: -68.9720 },
+    "id": "sendero-cerro-arco-cumbre",
+    "name": "Ascenso Clásico Cerro Arco (a las Antenas)",
+    "zone": "El Challao / Las Heras",
+    "regionId": "challao_arco",
+    "type": "trekking",
+    "distanceKm": 9.2,
+    "elevationGainM": 540,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      {
+        "latitude": -32.842,
+        "longitude": -68.924
+      },
+      {
+        "latitude": -32.839,
+        "longitude": -68.932
+      },
+      {
+        "latitude": -32.836,
+        "longitude": -68.938
+      },
+      {
+        "latitude": -32.834,
+        "longitude": -68.943
+      },
+      {
+        "latitude": -32.8325,
+        "longitude": -68.947
+      },
+      {
+        "latitude": -32.8315,
+        "longitude": -68.9485
+      },
+      {
+        "latitude": -32.828,
+        "longitude": -68.956
+      }
     ],
-    elevationProfile: {
-      minElevM: 1620,
-      maxElevM: 1820,
-      elevationGainM: 410,
-      points: [1680, 1630, 1710, 1765, 1820],
+    "elevationProfile": {
+      "minElevM": 1140,
+      "maxElevM": 1680,
+      "elevationGainM": 540,
+      "points": [
+        1140,
+        1220,
+        1310,
+        1420,
+        1530,
+        1610,
+        1680
+      ]
     },
-    gpxFileName: 'viatrek_filo_arco_santo_tomas.gpx',
-    legality: {
-      status: 'compartido_precaucion',
-      badgeText: '⛰️ Filo Expuesto: Trekking Técnico',
-      tagColor: '#E040FB',
-      allowedModes: { trekking: true, bicycle: false, moto: false },
-      priorityRule: 'Filo aéreo ventoso con caída a ambos lados. Exclusivo senderismo a pie.',
-      authority: 'Guardaparques de Mendoza',
+    "gpxFileName": "viatrek_cerro_arco_clasico.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🌟 Multimodal: Trekking + MTB + E-Bike",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Peatones tienen paso prioritario en subida y bajada. Prohibido cortar zetas.",
+      "legalWarning": "Prohibido ingreso de motos a combustión sobre la huella de ascenso (Ley 6045).",
+      "authority": "Municipio de Las Heras y Guardaparques"
     },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.842,
+        "longitude": -68.924,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Curva de las Zetas",
+        "icon": "📷",
+        "latitude": -32.836,
+        "longitude": -68.938,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Pista de Despegue Parapente",
+        "icon": "🪂",
+        "latitude": -32.8325,
+        "longitude": -68.947,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.828,
+        "longitude": -68.956,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-cumbre-cerro-gateado',
-    name: 'Sendero Cumbre Cerro Gateado (2.130 m)',
-    zone: 'El Challao Precordillera Alta',
-    regionId: 'challao_arco',
-    type: 'trekking',
-    distanceKm: 14.5,
-    elevationGainM: 820,
-    difficulty: 'Técnico',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#FF1744',
-    coordinates: [
-      { latitude: -32.8420, longitude: -68.9240 },
-      { latitude: -32.8360, longitude: -68.9380 },
-      { latitude: -32.8280, longitude: -68.9560 },
-      { latitude: -32.8210, longitude: -68.9720 },
-      { latitude: -32.8150, longitude: -68.9750 },
-      { latitude: -32.8110, longitude: -68.9720 },
+    "id": "sendero-arco-despegue-parapente",
+    "name": "Sendero de los Parapentistas (Despegue Arco)",
+    "zone": "El Challao / Las Heras",
+    "regionId": "challao_arco",
+    "type": "trekking",
+    "distanceKm": 5.4,
+    "elevationGainM": 360,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E5FF",
+    "coordinates": [
+      {
+        "latitude": -32.842,
+        "longitude": -68.924
+      },
+      {
+        "latitude": -32.839,
+        "longitude": -68.932
+      },
+      {
+        "latitude": -32.8365,
+        "longitude": -68.939
+      },
+      {
+        "latitude": -32.8335,
+        "longitude": -68.944
+      }
     ],
-    elevationProfile: {
-      minElevM: 1140,
-      maxElevM: 2130,
-      elevationGainM: 820,
-      points: [1140, 1350, 1680, 1820, 1990, 2130],
+    "elevationProfile": {
+      "minElevM": 1140,
+      "maxElevM": 1500,
+      "elevationGainM": 360,
+      "points": [
+        1140,
+        1230,
+        1340,
+        1450,
+        1500
+      ]
     },
-    gpxFileName: 'viatrek_cumbre_cerro_gateado.gpx',
-    legality: {
-      status: 'compartido_precaucion',
-      badgeText: '🏔️ Alta Montaña: Exclusivo Trekking',
-      tagColor: '#FF1744',
-      allowedModes: { trekking: true, bicycle: false, moto: false },
-      priorityRule: 'Ascenso exigente de jornada completa. Registro obligatorio y agua suficiente.',
-      authority: 'Cuerpo de Guardaparques de Mendoza',
+    "gpxFileName": "viatrek_arco_despegue_parapente.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Mirador & Despegue",
+      "tagColor": "#00E5FF",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Zona de lanzamiento de parapentes. No obstruir la rampa de despegue.",
+      "authority": "Club Mendoza de Vuelo Libre & Las Heras"
     },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.842,
+        "longitude": -68.924,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Curva de las Zetas",
+        "icon": "📷",
+        "latitude": -32.839,
+        "longitude": -68.932,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Pista de Despegue Parapente",
+        "icon": "🪂",
+        "latitude": -32.8365,
+        "longitude": -68.939,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.8335,
+        "longitude": -68.944,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-quebrada-san-isidro-aspero',
-    name: 'Circuito Quebrada de San Isidro & Cerro Áspero',
-    zone: 'El Challao Quebradas',
-    regionId: 'challao_arco',
-    type: 'sendero_mtb',
-    distanceKm: 11.0,
-    elevationGainM: 320,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -32.8420, longitude: -68.9240 },
-      { latitude: -32.8380, longitude: -68.9310 },
-      { latitude: -32.8320, longitude: -68.9360 },
-      { latitude: -32.8400, longitude: -68.9400 },
-      { latitude: -32.8480, longitude: -68.9410 },
-      { latitude: -32.8520, longitude: -68.9330 },
-      { latitude: -32.8420, longitude: -68.9240 },
+    "id": "sendero-arco-filo-santo-tomas",
+    "name": "Travesía de Filo: Cerro Arco a Cerro Santo Tomás (1.820 m)",
+    "zone": "El Challao Precordillera Profunda",
+    "regionId": "challao_arco",
+    "type": "trekking",
+    "distanceKm": 7.8,
+    "elevationGainM": 410,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#E040FB",
+    "coordinates": [
+      {
+        "latitude": -32.828,
+        "longitude": -68.956
+      },
+      {
+        "latitude": -32.826,
+        "longitude": -68.961
+      },
+      {
+        "latitude": -32.824,
+        "longitude": -68.966
+      },
+      {
+        "latitude": -32.822,
+        "longitude": -68.97
+      },
+      {
+        "latitude": -32.821,
+        "longitude": -68.972
+      }
     ],
-    elevationProfile: {
-      minElevM: 1120,
-      maxElevM: 1450,
-      elevationGainM: 320,
-      points: [1120, 1180, 1260, 1370, 1450, 1320, 1120],
+    "elevationProfile": {
+      "minElevM": 1620,
+      "maxElevM": 1820,
+      "elevationGainM": 410,
+      "points": [
+        1680,
+        1630,
+        1710,
+        1765,
+        1820
+      ]
     },
-    gpxFileName: 'viatrek_quebrada_san_isidro_aspero.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Huella de cañadón y lecho seco. Respetar paso de animales y senderistas.',
-      authority: 'Municipio de Las Heras',
+    "gpxFileName": "viatrek_filo_arco_santo_tomas.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "⛰️ Filo Expuesto: Trekking Técnico",
+      "tagColor": "#E040FB",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": false,
+        "moto": false
+      },
+      "priorityRule": "Filo aéreo ventoso con caída a ambos lados. Exclusivo senderismo a pie.",
+      "authority": "Guardaparques de Mendoza"
     },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.828,
+        "longitude": -68.956,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Curva de las Zetas",
+        "icon": "📷",
+        "latitude": -32.826,
+        "longitude": -68.961,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Pista de Despegue Parapente",
+        "icon": "🪂",
+        "latitude": -32.822,
+        "longitude": -68.97,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.821,
+        "longitude": -68.972,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-circuito-chapadmalal-enduro',
-    name: 'Pistas de Enduro & Huellas El Challao',
-    zone: 'El Challao Circuito Deportivo',
-    regionId: 'challao_arco',
-    type: 'moto_trail',
-    distanceKm: 15.6,
-    elevationGainM: 410,
-    difficulty: 'Técnico',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#2979FF',
-    coordinates: [
-      { latitude: -32.8250, longitude: -68.9200 },
-      { latitude: -32.8180, longitude: -68.9290 },
-      { latitude: -32.8110, longitude: -68.9380 },
-      { latitude: -32.8050, longitude: -68.9480 },
-      { latitude: -32.8150, longitude: -68.9550 },
-      { latitude: -32.8280, longitude: -68.9410 },
-      { latitude: -32.8250, longitude: -68.9200 },
+    "id": "sendero-cumbre-cerro-gateado",
+    "name": "Sendero Cumbre Cerro Gateado (2.130 m)",
+    "zone": "El Challao Precordillera Alta",
+    "regionId": "challao_arco",
+    "type": "trekking",
+    "distanceKm": 14.5,
+    "elevationGainM": 820,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF1744",
+    "coordinates": [
+      {
+        "latitude": -32.842,
+        "longitude": -68.924
+      },
+      {
+        "latitude": -32.836,
+        "longitude": -68.938
+      },
+      {
+        "latitude": -32.828,
+        "longitude": -68.956
+      },
+      {
+        "latitude": -32.821,
+        "longitude": -68.972
+      },
+      {
+        "latitude": -32.815,
+        "longitude": -68.975
+      },
+      {
+        "latitude": -32.811,
+        "longitude": -68.972
+      }
     ],
-    elevationProfile: {
-      minElevM: 1090,
-      maxElevM: 1510,
-      elevationGainM: 410,
-      points: [1090, 1180, 1310, 1460, 1510, 1340, 1090],
+    "elevationProfile": {
+      "minElevM": 1140,
+      "maxElevM": 2130,
+      "elevationGainM": 820,
+      "points": [
+        1140,
+        1350,
+        1680,
+        1820,
+        1990,
+        2130
+      ]
     },
-    gpxFileName: 'viatrek_enduro_el_challao.gpx',
-    legality: {
-      status: 'circuito_enduro',
-      badgeText: '🏍️ Circuito Motos & Enduro Habilitado',
-      tagColor: '#2979FF',
-      allowedModes: { trekking: false, bicycle: true, moto: true },
-      priorityRule: 'Zona habilitada para motocross y enduro deportivo. Casco y pechera obligatorios.',
-      legalWarning: 'Prohibido salirse de las huellas habilitadas hacia la Reserva Villavicencio.',
-      authority: 'Comunidad Enduro Mendoza / Las Heras',
+    "gpxFileName": "viatrek_cumbre_cerro_gateado.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🏔️ Alta Montaña: Exclusivo Trekking",
+      "tagColor": "#FF1744",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": false,
+        "moto": false
+      },
+      "priorityRule": "Ascenso exigente de jornada completa. Registro obligatorio y agua suficiente.",
+      "authority": "Cuerpo de Guardaparques de Mendoza"
     },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.842,
+        "longitude": -68.924,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.836,
+        "longitude": -68.938,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.821,
+        "longitude": -68.972,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.811,
+        "longitude": -68.972,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'ruta-moto-villavicencio-caracoles',
-    name: 'Ruta Histórica Caracoles de Villavicencio (RP 52)',
-    zone: 'Las Heras / Precordillera Norte',
-    regionId: 'challao_arco',
-    type: 'moto_trail',
-    distanceKm: 28.4,
-    elevationGainM: 890,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#2979FF',
-    coordinates: [
-      { latitude: -32.5280, longitude: -69.0180 },
-      { latitude: -32.5180, longitude: -69.0250 },
-      { latitude: -32.5050, longitude: -69.0340 },
-      { latitude: -32.4920, longitude: -69.0480 },
-      { latitude: -32.4810, longitude: -69.0620 },
+    "id": "sendero-quebrada-san-isidro-aspero",
+    "name": "Circuito Quebrada de San Isidro & Cerro Áspero",
+    "zone": "El Challao Quebradas",
+    "regionId": "challao_arco",
+    "type": "sendero_mtb",
+    "distanceKm": 11,
+    "elevationGainM": 320,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -32.842,
+        "longitude": -68.924
+      },
+      {
+        "latitude": -32.838,
+        "longitude": -68.931
+      },
+      {
+        "latitude": -32.832,
+        "longitude": -68.936
+      },
+      {
+        "latitude": -32.84,
+        "longitude": -68.94
+      },
+      {
+        "latitude": -32.848,
+        "longitude": -68.941
+      },
+      {
+        "latitude": -32.852,
+        "longitude": -68.933
+      },
+      {
+        "latitude": -32.842,
+        "longitude": -68.924
+      }
     ],
-    elevationProfile: {
-      minElevM: 1750,
-      maxElevM: 3100,
-      elevationGainM: 890,
-      points: [1750, 2040, 2380, 2750, 3100],
+    "elevationProfile": {
+      "minElevM": 1120,
+      "maxElevM": 1450,
+      "elevationGainM": 320,
+      "points": [
+        1120,
+        1180,
+        1260,
+        1370,
+        1450,
+        1320,
+        1120
+      ]
     },
-    gpxFileName: 'viatrek_caracoles_villavicencio_rp52.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Cicloturismo, Moto & 4x4',
-      tagColor: '#2979FF',
-      allowedModes: { trekking: true, bicycle: true, moto: true },
-      priorityRule: 'Ruta provincial de ripio. Máximo 40 km/h en caracoles. Prioridad al vehículo en subida.',
-      authority: 'Dirección Provincial de Vialidad Mendoza',
+    "gpxFileName": "viatrek_quebrada_san_isidro_aspero.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Huella de cañadón y lecho seco. Respetar paso de animales y senderistas.",
+      "authority": "Municipio de Las Heras"
     },
-  },
-
-  // --------------------------------------------------------------------------
-  // ZONA 3: CERRO DE LA GLORIA, DIQUE FRÍAS & PARQUE SAN MARTÍN
-  // --------------------------------------------------------------------------
-  {
-    id: 'sendero-cerro-gloria-ecoparque',
-    name: 'Circuito Monumento Cerro de la Gloria & Ecoparque',
-    zone: 'Ciudad de Mendoza / Parque San Martín',
-    regionId: 'frias_gloria',
-    type: 'trekking',
-    distanceKm: 4.8,
-    elevationGainM: 120,
-    difficulty: 'Fácil',
-    surface: 'Mixto',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -32.8885, longitude: -68.8780 },
-      { latitude: -32.8872, longitude: -68.8840 },
-      { latitude: -32.8845, longitude: -68.8890 },
-      { latitude: -32.8868, longitude: -68.8930 },
-      { latitude: -32.8895, longitude: -68.8905 },
-      { latitude: -32.8885, longitude: -68.8780 },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.842,
+        "longitude": -68.924,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.832,
+        "longitude": -68.936,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.848,
+        "longitude": -68.941,
+        "description": "Hito intermedio característico del sendero"
+      }
     ],
-    elevationProfile: {
-      minElevM: 860,
-      maxElevM: 980,
-      elevationGainM: 120,
-      points: [860, 890, 930, 980, 920, 860],
-    },
-    gpxFileName: 'viatrek_cerro_gloria_ecoparque.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Peatonal & Bici Urbana',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Circuito recreativo y turístico. Peatones con paso prioritario en sendas.',
-      authority: 'Dirección de Parques y Paseos Públicos',
-    },
-  },
-  {
-    id: 'sendero-dique-frias-papagayos',
-    name: 'Cañadón Dique Frías & Quebrada de Papagayos',
-    zone: 'Godoy Cruz / Capital Precordillera',
-    regionId: 'frias_gloria',
-    type: 'sendero_mtb',
-    distanceKm: 8.5,
-    elevationGainM: 210,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#FF6D00',
-    coordinates: [
-      { latitude: -32.9055, longitude: -68.8950 },
-      { latitude: -32.8980, longitude: -68.9020 },
-      { latitude: -32.8890, longitude: -68.9080 },
-      { latitude: -32.8790, longitude: -68.9050 },
-      { latitude: -32.8720, longitude: -68.9120 },
-    ],
-    elevationProfile: {
-      minElevM: 910,
-      maxElevM: 1120,
-      elevationGainM: 210,
-      points: [910, 960, 1020, 1080, 1120],
-    },
-    gpxFileName: 'viatrek_dique_frias_papagayos.gpx',
-    legality: {
-      status: 'compartido_precaucion',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#FF6D00',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Terreno aluvional seco. Precaución en época de tormentas de verano.',
-      authority: 'Dirección de Hidráulica Mendoza',
-    },
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-divisadero-largo',
-    name: 'Quebrada de Divisadero Largo (Reserva Protegida)',
-    zone: 'Ciudad de Mendoza / Reserva Natural',
-    regionId: 'frias_gloria',
-    type: 'trekking',
-    distanceKm: 5.2,
-    elevationGainM: 160,
-    difficulty: 'Fácil',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -32.8740, longitude: -68.9280 },
-      { latitude: -32.8710, longitude: -68.9340 },
-      { latitude: -32.8680, longitude: -68.9410 },
-      { latitude: -32.8640, longitude: -68.9470 },
-      { latitude: -32.8700, longitude: -68.9370 },
-      { latitude: -32.8740, longitude: -68.9280 },
+    "id": "sendero-circuito-chapadmalal-enduro",
+    "name": "Pistas de Enduro & Huellas El Challao",
+    "zone": "El Challao Circuito Deportivo",
+    "regionId": "challao_arco",
+    "type": "moto_trail",
+    "distanceKm": 15.6,
+    "elevationGainM": 410,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#2979FF",
+    "coordinates": [
+      {
+        "latitude": -32.825,
+        "longitude": -68.92
+      },
+      {
+        "latitude": -32.818,
+        "longitude": -68.929
+      },
+      {
+        "latitude": -32.811,
+        "longitude": -68.938
+      },
+      {
+        "latitude": -32.805,
+        "longitude": -68.948
+      },
+      {
+        "latitude": -32.815,
+        "longitude": -68.955
+      },
+      {
+        "latitude": -32.828,
+        "longitude": -68.941
+      },
+      {
+        "latitude": -32.825,
+        "longitude": -68.92
+      }
     ],
-    elevationProfile: {
-      minElevM: 1020,
-      maxElevM: 1180,
-      elevationGainM: 160,
-      points: [1020, 1060, 1110, 1180, 1100, 1020],
+    "elevationProfile": {
+      "minElevM": 1090,
+      "maxElevM": 1510,
+      "elevationGainM": 410,
+      "points": [
+        1090,
+        1180,
+        1310,
+        1460,
+        1510,
+        1340,
+        1090
+      ]
     },
-    gpxFileName: 'viatrek_divisadero_largo.gpx',
-    legality: {
-      status: 'prohibido_motor',
-      badgeText: '🥾 Exclusivo Senderismo Protegido',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Reserva Natural Protegida. Registro en seccional de guardaparques obligatorio.',
-      legalWarning: 'Prohibición estricta de vehículos a combustión y animales domésticos (Ley 6045).',
-      authority: 'Cuerpo de Guardaparques de Mendoza (DRNR)',
+    "gpxFileName": "viatrek_enduro_el_challao.gpx",
+    "legality": {
+      "status": "circuito_enduro",
+      "badgeText": "🏍️ Circuito Motos & Enduro Habilitado",
+      "tagColor": "#2979FF",
+      "allowedModes": {
+        "trekking": false,
+        "bicycle": true,
+        "moto": true
+      },
+      "priorityRule": "Zona habilitada para motocross y enduro deportivo. Casco y pechera obligatorios.",
+      "legalWarning": "Prohibido salirse de las huellas habilitadas hacia la Reserva Villavicencio.",
+      "authority": "Comunidad Enduro Mendoza / Las Heras"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.825,
+        "longitude": -68.92,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.811,
+        "longitude": -68.938,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.815,
+        "longitude": -68.955,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'ciclovia-troncal-central',
-    name: 'Ciclovía Troncal Godoy Cruz - Mendoza Capital',
-    zone: 'Gran Mendoza',
-    regionId: 'frias_gloria',
-    type: 'ciclovia',
-    distanceKm: 7.2,
-    elevationGainM: 45,
-    difficulty: 'Fácil',
-    surface: 'Asfalto',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -32.9341, longitude: -68.8472 },
-      { latitude: -32.9235, longitude: -68.8465 },
-      { latitude: -32.9150, longitude: -68.8450 },
-      { latitude: -32.9032, longitude: -68.8441 },
-      { latitude: -32.8955, longitude: -68.8430 },
-      { latitude: -32.8830, longitude: -68.8385 },
+    "id": "ruta-moto-villavicencio-caracoles",
+    "name": "Ruta Histórica Caracoles de Villavicencio (RP 52)",
+    "zone": "Las Heras / Precordillera Norte",
+    "regionId": "challao_arco",
+    "type": "moto_trail",
+    "distanceKm": 28.4,
+    "elevationGainM": 890,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#2979FF",
+    "coordinates": [
+      {
+        "latitude": -32.528,
+        "longitude": -69.018
+      },
+      {
+        "latitude": -32.518,
+        "longitude": -69.025
+      },
+      {
+        "latitude": -32.505,
+        "longitude": -69.034
+      },
+      {
+        "latitude": -32.492,
+        "longitude": -69.048
+      },
+      {
+        "latitude": -32.481,
+        "longitude": -69.062
+      }
     ],
-    elevationProfile: {
-      minElevM: 740,
-      maxElevM: 785,
-      elevationGainM: 45,
-      points: [740, 750, 760, 770, 780, 785],
+    "elevationProfile": {
+      "minElevM": 1750,
+      "maxElevM": 3100,
+      "elevationGainM": 890,
+      "points": [
+        1750,
+        2040,
+        2380,
+        2750,
+        3100
+      ]
     },
-    gpxFileName: 'viatrek_ciclovia_troncal_godoycruz.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🟢 Libre Multimodal Urbano',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Peatones tienen paso prioritario en cruces señalizados. Bicis máx 25 km/h.',
-      legalWarning: 'Prohibida la circulación de motos a combustión en carriles de ciclovía (Ley 9024).',
-      authority: 'Municipios de Godoy Cruz y Ciudad de Mendoza',
+    "gpxFileName": "viatrek_caracoles_villavicencio_rp52.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Cicloturismo, Moto & 4x4",
+      "tagColor": "#2979FF",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": true
+      },
+      "priorityRule": "Ruta provincial de ripio. Máximo 40 km/h en caracoles. Prioridad al vehículo en subida.",
+      "authority": "Dirección Provincial de Vialidad Mendoza"
     },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.528,
+        "longitude": -69.018,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.518,
+        "longitude": -69.025,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.492,
+        "longitude": -69.048,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.481,
+        "longitude": -69.062,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'ciclovia-parque-general-san-martin',
-    name: 'Circuito Parque General San Martín & El Rosedal',
-    zone: 'Ciudad de Mendoza',
-    regionId: 'frias_gloria',
-    type: 'ciclovia',
-    distanceKm: 6.5,
-    elevationGainM: 90,
-    difficulty: 'Fácil',
-    surface: 'Asfalto',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -32.8885, longitude: -68.8620 },
-      { latitude: -32.8892, longitude: -68.8745 },
-      { latitude: -32.8851, longitude: -68.8790 },
-      { latitude: -32.8810, longitude: -68.8825 },
-      { latitude: -32.8860, longitude: -68.8912 },
+    "id": "sendero-cerro-gloria-ecoparque",
+    "name": "Circuito Monumento Cerro de la Gloria & Ecoparque",
+    "zone": "Ciudad de Mendoza / Parque San Martín",
+    "regionId": "frias_gloria",
+    "type": "trekking",
+    "distanceKm": 4.8,
+    "elevationGainM": 120,
+    "difficulty": "Fácil",
+    "surface": "Mixto",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -32.8885,
+        "longitude": -68.878
+      },
+      {
+        "latitude": -32.8872,
+        "longitude": -68.884
+      },
+      {
+        "latitude": -32.8845,
+        "longitude": -68.889
+      },
+      {
+        "latitude": -32.8868,
+        "longitude": -68.893
+      },
+      {
+        "latitude": -32.8895,
+        "longitude": -68.8905
+      },
+      {
+        "latitude": -32.8885,
+        "longitude": -68.878
+      }
     ],
-    elevationProfile: {
-      minElevM: 810,
-      maxElevM: 900,
-      elevationGainM: 90,
-      points: [810, 830, 860, 885, 900],
+    "elevationProfile": {
+      "minElevM": 860,
+      "maxElevM": 980,
+      "elevationGainM": 120,
+      "points": [
+        860,
+        890,
+        930,
+        980,
+        920,
+        860
+      ]
     },
-    gpxFileName: 'viatrek_parque_san_martin.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🟢 Parque Recreativo Multimodal',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Zona de paseo familiar: prioridad absoluta al peatón y deportistas a pie.',
-      authority: 'Dirección de Parques y Paseos Públicos de Mendoza',
+    "gpxFileName": "viatrek_cerro_gloria_ecoparque.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Peatonal & Bici Urbana",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Circuito recreativo y turístico. Peatones con paso prioritario en sendas.",
+      "authority": "Dirección de Parques y Paseos Públicos"
     },
-  },
-
-  // --------------------------------------------------------------------------
-  // ZONA 4: POTRERILLOS & EL SALTO (ALTA MONTAÑA, DIQUE Y CASCADAS)
-  // --------------------------------------------------------------------------
-  {
-    id: 'sendero-potrerillos-perilago',
-    name: 'Circuito Perilago Dique Potrerillos & Bahía de los Vientos',
-    zone: 'Luján Alta Montaña / Dique Potrerillos',
-    regionId: 'potrerillos',
-    type: 'sendero_mtb',
-    distanceKm: 14.8,
-    elevationGainM: 190,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E5FF',
-    coordinates: [
-      { latitude: -32.9620, longitude: -69.1980 },
-      { latitude: -32.9700, longitude: -69.2080 },
-      { latitude: -32.9780, longitude: -69.2150 },
-      { latitude: -32.9850, longitude: -69.2220 },
-      { latitude: -32.9750, longitude: -69.2310 },
-      { latitude: -32.9650, longitude: -69.2200 },
-      { latitude: -32.9620, longitude: -69.1980 },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.8885,
+        "longitude": -68.878,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.8872,
+        "longitude": -68.884,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.8868,
+        "longitude": -68.893,
+        "description": "Hito intermedio característico del sendero"
+      }
     ],
-    elevationProfile: {
-      minElevM: 1380,
-      maxElevM: 1570,
-      elevationGainM: 190,
-      points: [1380, 1420, 1480, 1540, 1570, 1460, 1380],
-    },
-    gpxFileName: 'viatrek_potrerillos_perilago.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking + MTB + Gravel',
-      tagColor: '#00E5FF',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Senderos ribereños de embalse. Respetar áreas de avistaje de aves y bañistas.',
-      authority: 'Municipio de Luján de Cuyo & Náutica Mendoza',
-    },
-  },
-  {
-    id: 'sendero-cascada-del-salto',
-    name: 'Quebrada de la Cascada del Salto (Las Vegas)',
-    zone: 'Potrerillos / Valle de Las Vegas',
-    regionId: 'potrerillos',
-    type: 'trekking',
-    distanceKm: 6.8,
-    elevationGainM: 310,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -33.0050, longitude: -69.2620 },
-      { latitude: -33.0090, longitude: -69.2690 },
-      { latitude: -33.0135, longitude: -69.2760 },
-      { latitude: -33.0180, longitude: -69.2840 },
-      { latitude: -33.0135, longitude: -69.2760 },
-      { latitude: -33.0050, longitude: -69.2620 },
-    ],
-    elevationProfile: {
-      minElevM: 1850,
-      maxElevM: 2160,
-      elevationGainM: 310,
-      points: [1850, 1920, 2010, 2160, 2010, 1850],
-    },
-    gpxFileName: 'viatrek_cascada_del_salto.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🥾 Exclusivo Senderismo Pedestre',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: false, moto: false },
-      priorityRule: 'Sendero de quebrada por el lecho del arroyo. Calzado con buen agarre.',
-      authority: 'Comunidad Vecinal El Salto & Guardaparques',
-    },
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-bosque-valle-sol',
-    name: 'Senderos del Bosque Las Carditas & Valle del Sol',
-    zone: 'Potrerillos / El Salto',
-    regionId: 'potrerillos',
-    type: 'trekking',
-    distanceKm: 5.6,
-    elevationGainM: 150,
-    difficulty: 'Fácil',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#76FF03',
-    coordinates: [
-      { latitude: -33.0010, longitude: -69.2450 },
-      { latitude: -33.0045, longitude: -69.2510 },
-      { latitude: -33.0080, longitude: -69.2580 },
-      { latitude: -33.0050, longitude: -69.2620 },
-      { latitude: -33.0010, longitude: -69.2450 },
+    "id": "sendero-dique-frias-papagayos",
+    "name": "Cañadón Dique Frías & Quebrada de Papagayos",
+    "zone": "Godoy Cruz / Capital Precordillera",
+    "regionId": "frias_gloria",
+    "type": "sendero_mtb",
+    "distanceKm": 8.5,
+    "elevationGainM": 210,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      {
+        "latitude": -32.9055,
+        "longitude": -68.895
+      },
+      {
+        "latitude": -32.898,
+        "longitude": -68.902
+      },
+      {
+        "latitude": -32.889,
+        "longitude": -68.908
+      },
+      {
+        "latitude": -32.879,
+        "longitude": -68.905
+      },
+      {
+        "latitude": -32.872,
+        "longitude": -68.912
+      }
     ],
-    elevationProfile: {
-      minElevM: 1780,
-      maxElevM: 1930,
-      elevationGainM: 150,
-      points: [1780, 1830, 1890, 1930, 1780],
+    "elevationProfile": {
+      "minElevM": 910,
+      "maxElevM": 1120,
+      "elevationGainM": 210,
+      "points": [
+        910,
+        960,
+        1020,
+        1080,
+        1120
+      ]
     },
-    gpxFileName: 'viatrek_bosque_valle_sol.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking & MTB',
-      tagColor: '#76FF03',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Bosque de pinos de montaña. Prohibición estricta de fuego.',
-      authority: 'Municipio de Luján de Cuyo',
+    "gpxFileName": "viatrek_dique_frias_papagayos.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#FF6D00",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Terreno aluvional seco. Precaución en época de tormentas de verano.",
+      "authority": "Dirección de Hidráulica Mendoza"
     },
-  },
-
-  // --------------------------------------------------------------------------
-  // ZONA 5: SAN RAFAEL (CAÑÓN DEL ATUEL & LOS REYUNOS)
-  // --------------------------------------------------------------------------
-  {
-    id: 'sendero-canon-atuel-valle-grande',
-    name: 'Quebrada del Cañón del Atuel & Mirador El Submarino',
-    zone: 'San Rafael / Cañón del Atuel',
-    regionId: 'san_rafael',
-    type: 'trekking',
-    distanceKm: 16.2,
-    elevationGainM: 280,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#FF9100',
-    coordinates: [
-      { latitude: -34.8110, longitude: -68.4820 },
-      { latitude: -34.8250, longitude: -68.4950 },
-      { latitude: -34.8380, longitude: -68.5040 },
-      { latitude: -34.8450, longitude: -68.5120 },
-      { latitude: -34.8550, longitude: -68.5200 },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.9055,
+        "longitude": -68.895,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.898,
+        "longitude": -68.902,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.879,
+        "longitude": -68.905,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.872,
+        "longitude": -68.912,
+        "description": "Finalización del recorrido"
+      }
     ],
-    elevationProfile: {
-      minElevM: 820,
-      maxElevM: 1100,
-      elevationGainM: 280,
-      points: [820, 890, 970, 1040, 1100],
-    },
-    gpxFileName: 'viatrek_canon_atuel_submarino.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking, MTB & Moto',
-      tagColor: '#FF9100',
-      allowedModes: { trekking: true, bicycle: true, moto: true },
-      priorityRule: 'Huella de cornisa geológica. Vehículos y deportistas comparten trazado.',
-      authority: 'Turismo San Rafael & Vialidad Provincial',
-    },
-  },
-  {
-    id: 'sendero-costero-valle-grande',
-    name: 'Circuito Costero Presa Valle Grande',
-    zone: 'San Rafael / Valle Grande',
-    regionId: 'san_rafael',
-    type: 'sendero_mtb',
-    distanceKm: 7.4,
-    elevationGainM: 130,
-    difficulty: 'Fácil',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E5FF',
-    coordinates: [
-      { latitude: -34.8050, longitude: -68.4750 },
-      { latitude: -34.8110, longitude: -68.4820 },
-      { latitude: -34.8180, longitude: -68.4890 },
-      { latitude: -34.8220, longitude: -68.4920 },
-      { latitude: -34.8050, longitude: -68.4750 },
-    ],
-    elevationProfile: {
-      minElevM: 810,
-      maxElevM: 940,
-      elevationGainM: 130,
-      points: [810, 850, 910, 940, 810],
-    },
-    gpxFileName: 'viatrek_costero_valle_grande.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#00E5FF',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Sendero de ribera de lago. Cuidado con turistas y embarcaderos.',
-      authority: 'Municipio de San Rafael',
-    },
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
   {
-    id: 'sendero-los-reyunos-perilago',
-    name: 'Circuito Presa Los Reyunos & Mirador Cañón del Diamante',
-    zone: 'San Rafael / Presa Los Reyunos',
-    regionId: 'san_rafael',
-    type: 'sendero_mtb',
-    distanceKm: 11.5,
-    elevationGainM: 240,
-    difficulty: 'Moderado',
-    surface: 'Ripio/Tierra',
-    strokeColor: '#00E676',
-    coordinates: [
-      { latitude: -34.5950, longitude: -68.6420 },
-      { latitude: -34.5880, longitude: -68.6490 },
-      { latitude: -34.5820, longitude: -68.6550 },
-      { latitude: -34.5760, longitude: -68.6620 },
-      { latitude: -34.5850, longitude: -68.6500 },
-      { latitude: -34.5950, longitude: -68.6420 },
+    "id": "sendero-divisadero-largo",
+    "name": "Quebrada de Divisadero Largo (Reserva Protegida)",
+    "zone": "Ciudad de Mendoza / Reserva Natural",
+    "regionId": "frias_gloria",
+    "type": "trekking",
+    "distanceKm": 5.2,
+    "elevationGainM": 160,
+    "difficulty": "Fácil",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -32.874,
+        "longitude": -68.928
+      },
+      {
+        "latitude": -32.871,
+        "longitude": -68.934
+      },
+      {
+        "latitude": -32.868,
+        "longitude": -68.941
+      },
+      {
+        "latitude": -32.864,
+        "longitude": -68.947
+      },
+      {
+        "latitude": -32.87,
+        "longitude": -68.937
+      },
+      {
+        "latitude": -32.874,
+        "longitude": -68.928
+      }
     ],
-    elevationProfile: {
-      minElevM: 960,
-      maxElevM: 1200,
-      elevationGainM: 240,
-      points: [960, 1020, 1110, 1200, 1080, 960],
+    "elevationProfile": {
+      "minElevM": 1020,
+      "maxElevM": 1180,
+      "elevationGainM": 160,
+      "points": [
+        1020,
+        1060,
+        1110,
+        1180,
+        1100,
+        1020
+      ]
     },
-    gpxFileName: 'viatrek_los_reyunos_diamante.gpx',
-    legality: {
-      status: 'libre',
-      badgeText: '🌟 Multimodal: Trekking + MTB',
-      tagColor: '#00E676',
-      allowedModes: { trekking: true, bicycle: true, moto: false },
-      priorityRule: 'Sendero perimetral de lago artificial y cañón del río Diamante.',
-      authority: 'Club Náutico Los Reyunos & Municipio de San Rafael',
+    "gpxFileName": "viatrek_divisadero_largo.gpx",
+    "legality": {
+      "status": "prohibido_motor",
+      "badgeText": "🥾 Exclusivo Senderismo Protegido",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Reserva Natural Protegida. Registro en seccional de guardaparques obligatorio.",
+      "legalWarning": "Prohibición estricta de vehículos a combustión y animales domésticos (Ley 6045).",
+      "authority": "Cuerpo de Guardaparques de Mendoza (DRNR)"
     },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.874,
+        "longitude": -68.928,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.871,
+        "longitude": -68.934,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.864,
+        "longitude": -68.947,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
   },
+  {
+    "id": "ciclovia-troncal-central",
+    "name": "Ciclovía Troncal Godoy Cruz - Mendoza Capital",
+    "zone": "Gran Mendoza",
+    "regionId": "frias_gloria",
+    "type": "ciclovia",
+    "distanceKm": 7.2,
+    "elevationGainM": 45,
+    "difficulty": "Fácil",
+    "surface": "Asfalto",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -32.9341,
+        "longitude": -68.8472
+      },
+      {
+        "latitude": -32.9235,
+        "longitude": -68.8465
+      },
+      {
+        "latitude": -32.915,
+        "longitude": -68.845
+      },
+      {
+        "latitude": -32.9032,
+        "longitude": -68.8441
+      },
+      {
+        "latitude": -32.8955,
+        "longitude": -68.843
+      },
+      {
+        "latitude": -32.883,
+        "longitude": -68.8385
+      }
+    ],
+    "elevationProfile": {
+      "minElevM": 740,
+      "maxElevM": 785,
+      "elevationGainM": 45,
+      "points": [
+        740,
+        750,
+        760,
+        770,
+        780,
+        785
+      ]
+    },
+    "gpxFileName": "viatrek_ciclovia_troncal_godoycruz.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🟢 Libre Multimodal Urbano",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Peatones tienen paso prioritario en cruces señalizados. Bicis máx 25 km/h.",
+      "legalWarning": "Prohibida la circulación de motos a combustión en carriles de ciclovía (Ley 9024).",
+      "authority": "Municipios de Godoy Cruz y Ciudad de Mendoza"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.9341,
+        "longitude": -68.8472,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.9235,
+        "longitude": -68.8465,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.9032,
+        "longitude": -68.8441,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.883,
+        "longitude": -68.8385,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
+  },
+  {
+    "id": "ciclovia-parque-general-san-martin",
+    "name": "Circuito Parque General San Martín & El Rosedal",
+    "zone": "Ciudad de Mendoza",
+    "regionId": "frias_gloria",
+    "type": "ciclovia",
+    "distanceKm": 6.5,
+    "elevationGainM": 90,
+    "difficulty": "Fácil",
+    "surface": "Asfalto",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -32.8885,
+        "longitude": -68.862
+      },
+      {
+        "latitude": -32.8892,
+        "longitude": -68.8745
+      },
+      {
+        "latitude": -32.8851,
+        "longitude": -68.879
+      },
+      {
+        "latitude": -32.881,
+        "longitude": -68.8825
+      },
+      {
+        "latitude": -32.886,
+        "longitude": -68.8912
+      }
+    ],
+    "elevationProfile": {
+      "minElevM": 810,
+      "maxElevM": 900,
+      "elevationGainM": 90,
+      "points": [
+        810,
+        830,
+        860,
+        885,
+        900
+      ]
+    },
+    "gpxFileName": "viatrek_parque_san_martin.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🟢 Parque Recreativo Multimodal",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Zona de paseo familiar: prioridad absoluta al peatón y deportistas a pie.",
+      "authority": "Dirección de Parques y Paseos Públicos de Mendoza"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.8885,
+        "longitude": -68.862,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.8892,
+        "longitude": -68.8745,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.881,
+        "longitude": -68.8825,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -32.886,
+        "longitude": -68.8912,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
+  },
+  {
+    "id": "sendero-potrerillos-perilago",
+    "name": "Circuito Perilago Dique Potrerillos & Bahía de los Vientos",
+    "zone": "Luján Alta Montaña / Dique Potrerillos",
+    "regionId": "potrerillos",
+    "type": "sendero_mtb",
+    "distanceKm": 14.8,
+    "elevationGainM": 190,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E5FF",
+    "coordinates": [
+      {
+        "latitude": -32.962,
+        "longitude": -69.198
+      },
+      {
+        "latitude": -32.97,
+        "longitude": -69.208
+      },
+      {
+        "latitude": -32.978,
+        "longitude": -69.215
+      },
+      {
+        "latitude": -32.985,
+        "longitude": -69.222
+      },
+      {
+        "latitude": -32.975,
+        "longitude": -69.231
+      },
+      {
+        "latitude": -32.965,
+        "longitude": -69.22
+      },
+      {
+        "latitude": -32.962,
+        "longitude": -69.198
+      }
+    ],
+    "elevationProfile": {
+      "minElevM": 1380,
+      "maxElevM": 1570,
+      "elevationGainM": 190,
+      "points": [
+        1380,
+        1420,
+        1480,
+        1540,
+        1570,
+        1460,
+        1380
+      ]
+    },
+    "gpxFileName": "viatrek_potrerillos_perilago.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking + MTB + Gravel",
+      "tagColor": "#00E5FF",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Senderos ribereños de embalse. Respetar áreas de avistaje de aves y bañistas.",
+      "authority": "Municipio de Luján de Cuyo & Náutica Mendoza"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -32.962,
+        "longitude": -69.198,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -32.978,
+        "longitude": -69.215,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -32.975,
+        "longitude": -69.231,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
+  },
+  {
+    "id": "sendero-cascada-del-salto",
+    "name": "Quebrada de la Cascada del Salto (Las Vegas)",
+    "zone": "Potrerillos / Valle de Las Vegas",
+    "regionId": "potrerillos",
+    "type": "trekking",
+    "distanceKm": 6.8,
+    "elevationGainM": 310,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -33.005,
+        "longitude": -69.262
+      },
+      {
+        "latitude": -33.009,
+        "longitude": -69.269
+      },
+      {
+        "latitude": -33.0135,
+        "longitude": -69.276
+      },
+      {
+        "latitude": -33.018,
+        "longitude": -69.284
+      },
+      {
+        "latitude": -33.0135,
+        "longitude": -69.276
+      },
+      {
+        "latitude": -33.005,
+        "longitude": -69.262
+      }
+    ],
+    "elevationProfile": {
+      "minElevM": 1850,
+      "maxElevM": 2160,
+      "elevationGainM": 310,
+      "points": [
+        1850,
+        1920,
+        2010,
+        2160,
+        2010,
+        1850
+      ]
+    },
+    "gpxFileName": "viatrek_cascada_del_salto.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🥾 Exclusivo Senderismo Pedestre",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": false,
+        "moto": false
+      },
+      "priorityRule": "Sendero de quebrada por el lecho del arroyo. Calzado con buen agarre.",
+      "authority": "Comunidad Vecinal El Salto & Guardaparques"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.005,
+        "longitude": -69.262,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.009,
+        "longitude": -69.269,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Cascada Natural de Vertiente",
+        "icon": "🌊",
+        "latitude": -33.018,
+        "longitude": -69.284,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
+  },
+  {
+    "id": "sendero-bosque-valle-sol",
+    "name": "Senderos del Bosque Las Carditas & Valle del Sol",
+    "zone": "Potrerillos / El Salto",
+    "regionId": "potrerillos",
+    "type": "trekking",
+    "distanceKm": 5.6,
+    "elevationGainM": 150,
+    "difficulty": "Fácil",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#76FF03",
+    "coordinates": [
+      {
+        "latitude": -33.001,
+        "longitude": -69.245
+      },
+      {
+        "latitude": -33.0045,
+        "longitude": -69.251
+      },
+      {
+        "latitude": -33.008,
+        "longitude": -69.258
+      },
+      {
+        "latitude": -33.005,
+        "longitude": -69.262
+      },
+      {
+        "latitude": -33.001,
+        "longitude": -69.245
+      }
+    ],
+    "elevationProfile": {
+      "minElevM": 1780,
+      "maxElevM": 1930,
+      "elevationGainM": 150,
+      "points": [
+        1780,
+        1830,
+        1890,
+        1930,
+        1780
+      ]
+    },
+    "gpxFileName": "viatrek_bosque_valle_sol.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking & MTB",
+      "tagColor": "#76FF03",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Bosque de pinos de montaña. Prohibición estricta de fuego.",
+      "authority": "Municipio de Luján de Cuyo"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -33.001,
+        "longitude": -69.245,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -33.0045,
+        "longitude": -69.251,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -33.005,
+        "longitude": -69.262,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
+  },
+  {
+    "id": "sendero-canon-atuel-valle-grande",
+    "name": "Quebrada del Cañón del Atuel & Mirador El Submarino",
+    "zone": "San Rafael / Cañón del Atuel",
+    "regionId": "san_rafael",
+    "type": "trekking",
+    "distanceKm": 16.2,
+    "elevationGainM": 280,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF9100",
+    "coordinates": [
+      {
+        "latitude": -34.811,
+        "longitude": -68.482
+      },
+      {
+        "latitude": -34.825,
+        "longitude": -68.495
+      },
+      {
+        "latitude": -34.838,
+        "longitude": -68.504
+      },
+      {
+        "latitude": -34.845,
+        "longitude": -68.512
+      },
+      {
+        "latitude": -34.855,
+        "longitude": -68.52
+      }
+    ],
+    "elevationProfile": {
+      "minElevM": 820,
+      "maxElevM": 1100,
+      "elevationGainM": 280,
+      "points": [
+        820,
+        890,
+        970,
+        1040,
+        1100
+      ]
+    },
+    "gpxFileName": "viatrek_canon_atuel_submarino.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking, MTB & Moto",
+      "tagColor": "#FF9100",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": true
+      },
+      "priorityRule": "Huella de cornisa geológica. Vehículos y deportistas comparten trazado.",
+      "authority": "Turismo San Rafael & Vialidad Provincial"
+    },
+    "isCircular": false,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -34.811,
+        "longitude": -68.482,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -34.825,
+        "longitude": -68.495,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -34.845,
+        "longitude": -68.512,
+        "description": "Hito intermedio característico del sendero"
+      },
+      {
+        "title": "Punto de Llegada / Cumbre",
+        "icon": "🏁",
+        "latitude": -34.855,
+        "longitude": -68.52,
+        "description": "Finalización del recorrido"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
+  },
+  {
+    "id": "sendero-costero-valle-grande",
+    "name": "Circuito Costero Presa Valle Grande",
+    "zone": "San Rafael / Valle Grande",
+    "regionId": "san_rafael",
+    "type": "sendero_mtb",
+    "distanceKm": 7.4,
+    "elevationGainM": 130,
+    "difficulty": "Fácil",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E5FF",
+    "coordinates": [
+      {
+        "latitude": -34.805,
+        "longitude": -68.475
+      },
+      {
+        "latitude": -34.811,
+        "longitude": -68.482
+      },
+      {
+        "latitude": -34.818,
+        "longitude": -68.489
+      },
+      {
+        "latitude": -34.822,
+        "longitude": -68.492
+      },
+      {
+        "latitude": -34.805,
+        "longitude": -68.475
+      }
+    ],
+    "elevationProfile": {
+      "minElevM": 810,
+      "maxElevM": 940,
+      "elevationGainM": 130,
+      "points": [
+        810,
+        850,
+        910,
+        940,
+        810
+      ]
+    },
+    "gpxFileName": "viatrek_costero_valle_grande.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#00E5FF",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Sendero de ribera de lago. Cuidado con turistas y embarcaderos.",
+      "authority": "Municipio de San Rafael"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -34.805,
+        "longitude": -68.475,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -34.811,
+        "longitude": -68.482,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -34.822,
+        "longitude": -68.492,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
+  },
+  {
+    "id": "sendero-los-reyunos-perilago",
+    "name": "Circuito Presa Los Reyunos & Mirador Cañón del Diamante",
+    "zone": "San Rafael / Presa Los Reyunos",
+    "regionId": "san_rafael",
+    "type": "sendero_mtb",
+    "distanceKm": 11.5,
+    "elevationGainM": 240,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      {
+        "latitude": -34.595,
+        "longitude": -68.642
+      },
+      {
+        "latitude": -34.588,
+        "longitude": -68.649
+      },
+      {
+        "latitude": -34.582,
+        "longitude": -68.655
+      },
+      {
+        "latitude": -34.576,
+        "longitude": -68.662
+      },
+      {
+        "latitude": -34.585,
+        "longitude": -68.65
+      },
+      {
+        "latitude": -34.595,
+        "longitude": -68.642
+      }
+    ],
+    "elevationProfile": {
+      "minElevM": 960,
+      "maxElevM": 1200,
+      "elevationGainM": 240,
+      "points": [
+        960,
+        1020,
+        1110,
+        1200,
+        1080,
+        960
+      ]
+    },
+    "gpxFileName": "viatrek_los_reyunos_diamante.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🌟 Multimodal: Trekking + MTB",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Sendero perimetral de lago artificial y cañón del río Diamante.",
+      "authority": "Club Náutico Los Reyunos & Municipio de San Rafael"
+    },
+    "isCircular": true,
+    "waypoints": [
+      {
+        "title": "Punto de Salida & Parking",
+        "icon": "🅿️",
+        "latitude": -34.595,
+        "longitude": -68.642,
+        "description": "Estacionamiento y comienzo del recorrido"
+      },
+      {
+        "title": "Mirador Fotográfico Panorámico",
+        "icon": "📷",
+        "latitude": -34.588,
+        "longitude": -68.649,
+        "description": "Punto panorámico para fotos y descanso"
+      },
+      {
+        "title": "Paso Precordillerano & Vertiente",
+        "icon": "💧",
+        "latitude": -34.576,
+        "longitude": -68.662,
+        "description": "Hito intermedio característico del sendero"
+      }
+    ],
+    "author": {
+      "name": "Maxi Di Natale",
+      "role": "Guía de Montaña • ViaTrek",
+      "applauseCount": 18,
+      "commentsCount": 6
+    }
+  }
 ];
 
 // ============================================================================

@@ -65,6 +65,14 @@ export interface TrailRegion {
   longitudeDelta: number;
 }
 
+export interface RouteWaypoint {
+  title: string;
+  icon: string;
+  latitude: number;
+  longitude: number;
+  description?: string;
+}
+
 export interface RouteItem {
   id: string;
   name: string;
@@ -81,6 +89,14 @@ export interface RouteItem {
   wineInfo?: WineRouteInfo;
   elevationProfile?: ElevationProfileData;
   gpxFileName?: string;
+  isCircular?: boolean;
+  waypoints?: RouteWaypoint[];
+  author?: {
+    name: string;
+    role?: string;
+    applauseCount?: number;
+    commentsCount?: number;
+  };
 }
 
 export interface ProtectedArea {

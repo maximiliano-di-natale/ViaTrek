@@ -138,6 +138,8 @@ export default function MapScreen() {
   // Elementos activos seleccionados
   const [selectedRoute, setSelectedRoute] = useState<RouteItem | null>(null);
   const [selectedPoi, setSelectedPoi] = useState<POIItem | null>(null);
+  const [applauseCount, setApplauseCount] = useState<number>(18);
+  const [hasApplauded, setHasApplauded] = useState<boolean>(false);
 
   // Estados de incidentes comunitarios (Waze de la Montaña)
   const [incidents, setIncidents] = useState<TrailIncident[]>(INITIAL_INCIDENTS);
@@ -923,25 +925,27 @@ export default function MapScreen() {
             />
           ))}
 
-        {/* POLYLINES CON RENDERIZADO DE ALTO CONTRASTE */}
+        {/* POLYLINES CON RENDERIZADO DE ALTO CONTRASTE (DESTACADO WIKILOC) */}
         {visibleRoutes.map((route) => {
           const isSelected = selectedRoute?.id === route.id;
+          const isDimmed = selectedRoute !== null && !isSelected;
+
           return (
             <React.Fragment key={route.id}>
               {/* Capa 1: Borde exterior oscuro de contraste extremo (Casing) */}
               <Polyline
                 coordinates={route.coordinates}
                 strokeColor="#05080E"
-                strokeWidth={isSelected ? 10 : 7}
+                strokeWidth={isSelected ? 12 : (isDimmed ? 3 : 7)}
                 lineCap="round"
                 lineJoin="round"
               />
 
-              {/* Capa 2: Trazado Neón vibrante principal */}
+              {/* Capa 2: Trazado vibrante principal */}
               <Polyline
                 coordinates={route.coordinates}
-                strokeColor={route.strokeColor}
-                strokeWidth={isSelected ? 6 : 4.5}
+                strokeColor={isDimmed ? 'rgba(148, 163, 184, 0.18)' : (isSelected ? '#FF6D00' : route.strokeColor)}
+                strokeWidth={isSelected ? 7.5 : (isDimmed ? 2.5 : 4.5)}
                 lineCap="round"
                 lineJoin="round"
                 tappable={true}
@@ -954,6 +958,63 @@ export default function MapScreen() {
             </React.Fragment>
           );
         })}
+
+        {/* HITOS Y WAYPOINTS DE LA RUTA SELECCIONADA (ESTILO WIKILOC) */}
+        {selectedRoute && selectedRoute.coordinates.length > 0 && (
+          <React.Fragment key="wikiloc-active-trail-markers">
+            {/* Marcador de Salida / Inicio (Verde Wikiloc) */}
+            <Marker
+              key="route-start-pin"
+              coordinate={selectedRoute.coordinates[0]}
+              title={`🟢 Salida: ${selectedRoute.name}`}
+              description="Punto de partida oficial del recorrido"
+            >
+              <View style={styles.wikilocStartMarker}>
+                <View style={styles.wikilocStartInner}>
+                  <Text style={{ fontSize: 13 }}>🟢</Text>
+                </View>
+                <View style={styles.wikilocStartBadge}>
+                  <Text style={styles.wikilocStartBadgeText}>SALIDA</Text>
+                </View>
+              </View>
+            </Marker>
+
+            {/* Waypoints intermedios a lo largo de la traza (Iconos Amarillos Wikiloc) */}
+            {selectedRoute.waypoints?.map((wp, wIdx) => (
+              <Marker
+                key={`route-wp-${wIdx}`}
+                coordinate={{ latitude: wp.latitude, longitude: wp.longitude }}
+                title={wp.title}
+                description={wp.description}
+              >
+                <View style={styles.wikilocWaypointMarker}>
+                  <View style={styles.wikilocWaypointInner}>
+                    <Text style={{ fontSize: 13 }}>{wp.icon}</Text>
+                  </View>
+                </View>
+              </Marker>
+            ))}
+
+            {/* Marcador de Llegada si la ruta no es circular */}
+            {!selectedRoute.isCircular && selectedRoute.coordinates.length > 1 && (
+              <Marker
+                key="route-finish-pin"
+                coordinate={selectedRoute.coordinates[selectedRoute.coordinates.length - 1]}
+                title={`🏁 Meta: ${selectedRoute.name}`}
+                description="Finalización del recorrido"
+              >
+                <View style={styles.wikilocStartMarker}>
+                  <View style={[styles.wikilocStartInner, { backgroundColor: '#FFD700' }]}>
+                    <Text style={{ fontSize: 13 }}>🏁</Text>
+                  </View>
+                  <View style={[styles.wikilocStartBadge, { backgroundColor: '#FFD700' }]}>
+                    <Text style={[styles.wikilocStartBadgeText, { color: '#05080E' }]}>LLEGADA</Text>
+                  </View>
+                </View>
+              </Marker>
+            )}
+          </React.Fragment>
+        )}
 
         {/* PUNTOS DE INTERÉS (POIs) DE ALTO CONTRASTE */}
         {visiblePois.map((poi) => {
@@ -1091,8 +1152,32 @@ export default function MapScreen() {
         })}
       </MapView>
 
+      {/* BANNER FLOTANTE DE RECORRIDO ENFOCADO (ESTILO WIKILOC) */}
+      {selectedRoute && (
+        <View style={[styles.routeFocusBanner, { top: insets.top + 8 }]}>
+          <View style={styles.routeFocusBannerLeft}>
+            <View style={styles.routeFocusDot} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.routeFocusTitle} numberOfLines={1}>
+                📍 Recorrido: {selectedRoute.name}
+              </Text>
+              <Text style={styles.routeFocusSub}>
+                {selectedRoute.distanceKm} km • +{selectedRoute.elevationGainM}m • {selectedRoute.isCircular ? 'Circular 🔄' : 'Solo ida ➡️'}
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.routeFocusCloseBtn}
+            onPress={() => setSelectedRoute(null)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.routeFocusCloseText}>✕ Ver todas</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* HEADER SUPERIOR: FILTRO DE RUTAS */}
-      <View style={[styles.headerContainer, { top: insets.top + 8 }]}>
+      <View style={[styles.headerContainer, { top: insets.top + 8, display: selectedRoute ? 'none' : 'flex' }]}>
         <View style={styles.filterPillsWrapper}>
           <TouchableOpacity
             style={[
@@ -1632,6 +1717,91 @@ export default function MapScreen() {
             <View style={styles.metricItem}>
               <Text style={styles.metricLabel}>SUPERFICIE</Text>
               <Text style={styles.metricValue}>{selectedRoute.surface}</Text>
+            </View>
+          </View>
+
+          {/* BOTÓN PROMINENTE WIKILOC: ENVÍA RUTA AL GPS (GPX) */}
+          <TouchableOpacity
+            style={styles.wikilocGpsButton}
+            onPress={() => handleExportGpx(selectedRoute)}
+            activeOpacity={0.85}
+          >
+            <Download size={18} color="#05080E" strokeWidth={2.8} />
+            <Text style={styles.wikilocGpsButtonText}>Envía ruta al GPS (Descargar GPX)</Text>
+          </TouchableOpacity>
+
+          {/* AUTOR & SOCIAL WIKILOC */}
+          <View style={styles.wikilocAuthorCard}>
+            <View style={styles.wikilocAuthorAvatar}>
+              <Text style={styles.wikilocAuthorAvatarText}>MD</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.wikilocAuthorName}>
+                {selectedRoute.author?.name || 'Maxi Di Natale'}
+              </Text>
+              <Text style={styles.wikilocAuthorRole}>
+                {selectedRoute.author?.role || 'Comunidad ViaTrek'} • Verificado
+              </Text>
+            </View>
+            <View style={styles.wikilocAuthorActions}>
+              <TouchableOpacity
+                style={[styles.wikilocSocialPill, hasApplauded && styles.wikilocSocialPillActive]}
+                onPress={() => {
+                  setApplauseCount((c) => (hasApplauded ? c - 1 : c + 1));
+                  setHasApplauded((v) => !v);
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.wikilocSocialText}>👏 {applauseCount}</Text>
+              </TouchableOpacity>
+              <View style={styles.wikilocSocialPill}>
+                <Text style={styles.wikilocSocialText}>💬 6</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* TABLA DE ESTADÍSTICAS TÉCNICAS (ESTILO WIKILOC) */}
+          <View style={styles.wikilocStatsCard}>
+            <Text style={styles.wikilocStatsTitle}>ESTADÍSTICAS DE LA RUTA</Text>
+            <View style={styles.wikilocStatsRow}>
+              <View style={styles.wikilocStatsItem}>
+                <Text style={styles.wikilocStatsLabel}>Distancia</Text>
+                <Text style={styles.wikilocStatsValue}>{selectedRoute.distanceKm} km</Text>
+              </View>
+              <View style={styles.wikilocStatsItem}>
+                <Text style={styles.wikilocStatsLabel}>Tipo de ruta</Text>
+                <Text style={styles.wikilocStatsValue}>
+                  {selectedRoute.isCircular ? 'Circular 🔄' : 'Solo ida ➡️'}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.wikilocStatsRow}>
+              <View style={styles.wikilocStatsItem}>
+                <Text style={styles.wikilocStatsLabel}>Desnivel positivo</Text>
+                <Text style={[styles.wikilocStatsValue, { color: '#00E676' }]}>
+                  +{selectedRoute.elevationGainM} m
+                </Text>
+              </View>
+              <View style={styles.wikilocStatsItem}>
+                <Text style={styles.wikilocStatsLabel}>Desnivel negativo</Text>
+                <Text style={[styles.wikilocStatsValue, { color: '#FFB300' }]}>
+                  -{selectedRoute.elevationGainM} m
+                </Text>
+              </View>
+            </View>
+            <View style={styles.wikilocStatsRow}>
+              <View style={styles.wikilocStatsItem}>
+                <Text style={styles.wikilocStatsLabel}>Altitud máxima</Text>
+                <Text style={styles.wikilocStatsValue}>
+                  {selectedRoute.elevationProfile?.maxElevM || '--'} m
+                </Text>
+              </View>
+              <View style={styles.wikilocStatsItem}>
+                <Text style={styles.wikilocStatsLabel}>Altitud mínima</Text>
+                <Text style={styles.wikilocStatsValue}>
+                  {selectedRoute.elevationProfile?.minElevM || '--'} m
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -5320,4 +5490,236 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
+  // ESTILOS WIKILOC ROUTE DISPLAY
+  wikilocStartMarker: {
+    alignItems: 'center',
+  },
+  wikilocStartInner: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#00E676',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  wikilocStartText: {
+    fontSize: 12,
+  },
+  wikilocStartBadge: {
+    backgroundColor: '#00E676',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 4,
+    marginTop: 2,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+  },
+  wikilocStartBadgeText: {
+    color: '#05080E',
+    fontSize: 9,
+    fontWeight: '900',
+  },
+  wikilocWaypointMarker: {
+    alignItems: 'center',
+  },
+  wikilocWaypointInner: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#FFD600',
+    borderWidth: 2,
+    borderColor: '#05080E',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+
+  // TOP ROUTE FOCUS BANNER
+  routeFocusBanner: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    backgroundColor: 'rgba(15, 23, 42, 0.94)',
+    borderWidth: 1.5,
+    borderColor: '#FF6D00',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 999,
+    shadowColor: '#FF6D00',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  routeFocusBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  routeFocusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#FF6D00',
+  },
+  routeFocusTitle: {
+    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  routeFocusSub: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 1,
+  },
+  routeFocusCloseBtn: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    marginLeft: 8,
+  },
+  routeFocusCloseText: {
+    color: '#F8FAFC',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+
+  // BOTÓN PROMINENTE ENVÍA RUTA AL GPS
+  wikilocGpsButton: {
+    backgroundColor: '#00E676',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 13,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    gap: 8,
+    marginTop: 12,
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  wikilocGpsButtonText: {
+    color: '#05080E',
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 0.3,
+  },
+
+  // AUTOR & SOCIAL WIKILOC
+  wikilocAuthorCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1E293B',
+    borderRadius: 14,
+    padding: 10,
+    marginTop: 10,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  wikilocAuthorAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FF6D00',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  wikilocAuthorAvatarText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  wikilocAuthorName: {
+    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  wikilocAuthorRole: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  wikilocAuthorActions: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  wikilocSocialPill: {
+    backgroundColor: '#0F172A',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  wikilocSocialPillActive: {
+    borderColor: '#00E676',
+    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+  },
+  wikilocSocialText: {
+    color: '#F8FAFC',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+
+  // TABLA ESTADÍSTICAS TÉCNICAS WIKILOC
+  wikilocStatsCard: {
+    backgroundColor: '#0F172A',
+    borderRadius: 14,
+    padding: 12,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  wikilocStatsTitle: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+    marginBottom: 8,
+  },
+  wikilocStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  wikilocStatsItem: {
+    flex: 1,
+  },
+  wikilocStatsLabel: {
+    color: '#64748B',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  wikilocStatsValue: {
+    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '800',
+    marginTop: 1,
+  },
 });
