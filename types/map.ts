@@ -47,10 +47,29 @@ export interface ZondaWeatherInfo {
   updatedAt: string;
 }
 
+export interface ElevationProfileData {
+  minElevM: number;
+  maxElevM: number;
+  elevationGainM: number;
+  points: number[];
+}
+
+export interface TrailRegion {
+  id: string;
+  name: string;
+  icon: string;
+  province: string;
+  description: string;
+  center: Coordinate;
+  latitudeDelta: number;
+  longitudeDelta: number;
+}
+
 export interface RouteItem {
   id: string;
   name: string;
   zone: string;
+  regionId?: string;
   type: RouteType;
   distanceKm: number;
   elevationGainM: number;
@@ -60,6 +79,8 @@ export interface RouteItem {
   coordinates: Coordinate[];
   legality: TrailLegality;
   wineInfo?: WineRouteInfo;
+  elevationProfile?: ElevationProfileData;
+  gpxFileName?: string;
 }
 
 export interface ProtectedArea {

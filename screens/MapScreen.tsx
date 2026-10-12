@@ -64,6 +64,7 @@ import {
   Award,
   Flag,
   Medal,
+  Download,
 } from 'lucide-react-native';
 
 import {
@@ -87,6 +88,7 @@ import {
   SummitItem,
   SummitCheckIn,
   SummitBadge,
+  TrailRegion,
 } from '../types/map';
 import {
   INITIAL_MENDOZA_REGION,
@@ -103,6 +105,7 @@ import {
   MENDOZA_SUMMITS,
   INITIAL_SUMMIT_CHECKINS,
   INITIAL_SUMMIT_BADGES,
+  MENDOZA_REGIONS,
 } from '../data/routesAndPois';
 
 type FilterTab = 'todas' | RouteType;
@@ -111,8 +114,9 @@ export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView | null>(null);
 
-  // Estados de interfaz y filtrado
+  // Estados de interfaz, regiones y filtrado
   const [selectedFilter, setSelectedFilter] = useState<FilterTab>('todas');
+  const [selectedRegionId, setSelectedRegionId] = useState<string>('todas');
   const [mapStyleOption, setMapStyleOption] = useState<MapTypeOption>('high_contrast');
   const [showLayerMenu, setShowLayerMenu] = useState<boolean>(false);
   const [userLocation, setUserLocation] = useState<Coordinate | null>(null);
@@ -488,11 +492,39 @@ export default function MapScreen() {
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Rutas filtradas
+  const handleSelectRegion = (region: TrailRegion) => {
+    setSelectedRegionId(region.id);
+    setSelectedRoute(null);
+    mapRef.current?.animateToRegion(
+      {
+        latitude: region.center.latitude,
+        longitude: region.center.longitude,
+        latitudeDelta: region.latitudeDelta,
+        longitudeDelta: region.longitudeDelta,
+      },
+      800
+    );
+  };
+
+  const handleExportGpx = (route: RouteItem) => {
+    Alert.alert(
+      '📥 Descarga de Track GPX (Wikiloc)',
+      `Archivo: ${route.gpxFileName || route.id + '.gpx'}\n\nListo para exportar y sincronizar con relojes Garmin, Suunto, Wahoo y apps de navegación GPS outdoor.`,
+      [{ text: 'Listo', style: 'default' }]
+    );
+  };
+
+  // Rutas filtradas por región geográfica y modalidad
   const visibleRoutes = useMemo(() => {
-    if (selectedFilter === 'todas') return MENDOZA_ROUTES;
-    return MENDOZA_ROUTES.filter((route) => route.type === selectedFilter);
-  }, [selectedFilter]);
+    let routes = MENDOZA_ROUTES;
+    if (selectedRegionId !== 'todas') {
+      routes = routes.filter((r) => r.regionId === selectedRegionId);
+    }
+    if (selectedFilter !== 'todas') {
+      routes = routes.filter((route) => route.type === selectedFilter);
+    }
+    return routes;
+  }, [selectedFilter, selectedRegionId]);
 
   // Incidentes filtrados según el modo seleccionado
   const visibleIncidents = useMemo(() => {
@@ -1148,6 +1180,36 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* SELECTOR DE REGIONES / ZONAS ESTILO WIKILOC */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.regionSelectorScroll}
+          style={styles.regionSelectorWrapper}
+        >
+          {MENDOZA_REGIONS.map((region) => {
+            const isSelected = selectedRegionId === region.id;
+            return (
+              <TouchableOpacity
+                key={region.id}
+                style={[styles.regionChip, isSelected && styles.regionChipActive]}
+                onPress={() => handleSelectRegion(region)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.regionChipIcon}>{region.icon}</Text>
+                <Text
+                  style={[
+                    styles.regionChipText,
+                    isSelected && styles.regionChipTextActive,
+                  ]}
+                >
+                  {region.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
         {/* Badge contador de rutas activas e incidentes en vivo */}
         <View style={styles.statsBadge}>
           <Text style={styles.statsBadgeText}>
@@ -1610,6 +1672,44 @@ export default function MapScreen() {
             </View>
           )}
 
+          {/* PERFIL ALTIMÉTRICO ESTILO WIKILOC */}
+          {selectedRoute.elevationProfile && (
+            <View style={styles.elevationProfileCard}>
+              <View style={styles.elevationProfileHeader}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <TrendingUp size={14} color="#00E676" />
+                  <Text style={styles.elevationProfileTitle}>PERFIL ALTIMÉTRICO WIKILOC</Text>
+                </View>
+                <Text style={styles.elevationProfileRangeText}>
+                  {selectedRoute.elevationProfile.minElevM}m ➔ {selectedRoute.elevationProfile.maxElevM}m
+                </Text>
+              </View>
+
+              <View style={styles.elevationBarsContainer}>
+                {selectedRoute.elevationProfile.points.map((elev, idx) => {
+                  const minE = selectedRoute.elevationProfile!.minElevM;
+                  const maxE = selectedRoute.elevationProfile!.maxElevM;
+                  const heightPct = Math.max(18, Math.min(100, ((elev - minE) / (maxE - minE || 1)) * 100));
+                  const isMax = elev === maxE;
+                  return (
+                    <View key={idx} style={styles.elevationBarColumn}>
+                      <View
+                        style={[
+                          styles.elevationBarFill,
+                          {
+                            height: `${heightPct}%`,
+                            backgroundColor: isMax ? '#FFD600' : '#00E676',
+                          },
+                        ]}
+                      />
+                      <Text style={styles.elevationBarValue}>{elev}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+
           {/* Botones de acción de ruta */}
           <View style={styles.actionButtonsRow}>
             <TouchableOpacity
@@ -1618,7 +1718,16 @@ export default function MapScreen() {
               activeOpacity={0.85}
             >
               <Compass size={16} color="#00E676" />
-              <Text style={styles.focusRouteButtonText}>Enfocar Trazado</Text>
+              <Text style={styles.focusRouteButtonText}>Enfocar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.gpxDownloadButton}
+              onPress={() => handleExportGpx(selectedRoute)}
+              activeOpacity={0.85}
+            >
+              <Download size={15} color="#00E5FF" />
+              <Text style={styles.gpxDownloadButtonText}>GPX</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -5026,6 +5135,113 @@ const styles = StyleSheet.create({
     color: '#05080E',
     fontSize: 13,
     fontWeight: '900',
+  },
+
+  // REGION SELECTOR BAR (ESTILO WIKILOC)
+  regionSelectorWrapper: {
+    width: '100%',
+    maxWidth: 480,
+    marginTop: 6,
+  },
+  regionSelectorScroll: {
+    gap: 6,
+    paddingHorizontal: 4,
+  },
+  regionChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.92)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    gap: 5,
+  },
+  regionChipActive: {
+    backgroundColor: '#1E293B',
+    borderColor: '#00E676',
+  },
+  regionChipIcon: {
+    fontSize: 13,
+  },
+  regionChipText: {
+    color: '#94A3B8',
+    fontSize: 11.5,
+    fontWeight: '600',
+  },
+  regionChipTextActive: {
+    color: '#00E676',
+    fontWeight: '800',
+  },
+
+  // PERFIL ALTIMÉTRICO WIKILOC
+  elevationProfileCard: {
+    backgroundColor: '#080C14',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  elevationProfileHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  elevationProfileTitle: {
+    color: '#00E676',
+    fontSize: 10.5,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  elevationProfileRangeText: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  elevationBarsContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    height: 48,
+    gap: 4,
+    paddingTop: 4,
+  },
+  elevationBarColumn: {
+    flex: 1,
+    height: '100%',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  elevationBarFill: {
+    width: '100%',
+    borderRadius: 3,
+    minHeight: 6,
+  },
+  elevationBarValue: {
+    color: '#64748B',
+    fontSize: 8,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  gpxDownloadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 229, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: '#00E5FF',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    gap: 5,
+  },
+  gpxDownloadButtonText: {
+    color: '#00E5FF',
+    fontSize: 12,
+    fontWeight: '800',
   },
 
 });

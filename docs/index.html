@@ -1279,6 +1279,108 @@
       opacity: 0.55;
       filter: grayscale(80%);
     }
+
+    /* SELECTOR DE REGIONES / ZONAS ESTILO WIKILOC */
+    .region-selector-wrapper {
+      pointer-events: auto;
+      display: flex;
+      overflow-x: auto;
+      width: 100%;
+      max-width: 480px;
+      gap: 5px;
+      margin-top: 6px;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .region-selector-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+    .region-chip {
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 5px 10px;
+      color: #94A3B8;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .region-chip:hover {
+      color: #F8FAFC;
+    }
+    .region-chip.active {
+      background: #1E293B;
+      color: #00E676;
+      border-color: #00E676;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(0, 230, 118, 0.25);
+    }
+
+    /* PERFIL ALTIMÉTRICO WIKILOC */
+    .elevation-profile-box {
+      background: #080C14;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    .elevation-profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .elevation-bars-row {
+      display: flex;
+      align-items: flex-end;
+      height: 48px;
+      gap: 4px;
+      padding-top: 4px;
+    }
+    .elev-bar-col {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .elev-bar-fill {
+      width: 100%;
+      border-radius: 3px;
+      background: #00E676;
+      min-height: 4px;
+      transition: height 0.3s ease;
+    }
+    .elev-bar-fill.max {
+      background: #FFD600;
+    }
+    .elev-bar-num {
+      color: #64748B;
+      font-size: 8px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .btn-gpx {
+      flex: 1;
+      padding: 11px 8px;
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid #00E5FF;
+      color: #00E5FF;
+      font-weight: 800;
+      font-size: 11px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .btn-gpx:hover {
+      background: rgba(0, 229, 255, 0.25);
+    }
   </style>
 </head>
 <body>
@@ -1302,6 +1404,17 @@
         🍷 Wine & Trail
       </button>
     </div>
+
+    <!-- SELECTOR DE REGIONES / ZONAS ESTILO WIKILOC -->
+    <div class="region-selector-wrapper">
+      <button class="region-chip active" id="chip-reg-todas" onclick="selectRegionWeb('todas')">✨ Todo Mendoza</button>
+      <button class="region-chip" id="chip-reg-chacras" onclick="selectRegionWeb('chacras')">🌵 Chacras</button>
+      <button class="region-chip" id="chip-reg-challao_arco" onclick="selectRegionWeb('challao_arco')">⛰️ Arco & Challao</button>
+      <button class="region-chip" id="chip-reg-frias_gloria" onclick="selectRegionWeb('frias_gloria')">🌳 Gloria & Frías</button>
+      <button class="region-chip" id="chip-reg-potrerillos" onclick="selectRegionWeb('potrerillos')">🌊 Potrerillos</button>
+      <button class="region-chip" id="chip-reg-san_rafael" onclick="selectRegionWeb('san_rafael')">🧗 San Rafael</button>
+    </div>
+
     <div class="stats-badge" id="stats-badge">
       Mendoza • 7 rutas • 8 POIs • ⚠️ 5 alertas en vivo
     </div>
@@ -1378,6 +1491,9 @@
       <button class="map-type-option" id="opt-streets" onclick="changeMapLayer('streets')">
         🗺️ Callejero Claro
       </button>
+      <button class="map-type-option" id="opt-outdoor-trails" onclick="toggleOutdoorTrailsLayer()" style="color: #00E5FF; border-top: 1px solid rgba(255,255,255,0.08);">
+        🏔️ Senderos Reales (Waymarked Trails)
+      </button>
     </div>
 
     <button class="fab-btn" onclick="resetMendozaView()" title="Centrar Mendoza">
@@ -1447,8 +1563,22 @@
       <div class="wine-tasting-text" id="route-tasting-text"></div>
     </div>
 
+    <!-- PERFIL ALTIMÉTRICO WIKILOC -->
+    <div class="elevation-profile-box" id="route-elevation-box" style="display: none;">
+      <div class="elevation-profile-header">
+        <div style="display: flex; align-items: center; gap: 5px; color: #00E676; font-size: 11px; font-weight: 900;">
+          📈 PERFIL ALTIMÉTRICO WIKILOC
+        </div>
+        <div style="font-size: 11px; color: #94A3B8; font-weight: 700;" id="route-elev-range">
+          -- m ➔ -- m
+        </div>
+      </div>
+      <div class="elevation-bars-row" id="route-elevation-bars"></div>
+    </div>
+
     <div class="action-row">
-      <button class="btn-focus" onclick="focusActiveRoute()">Enfocar Trazado</button>
+      <button class="btn-focus" onclick="focusActiveRoute()">Enfocar</button>
+      <button class="btn-gpx" onclick="downloadActiveRouteGpx()">📥 GPX</button>
       <a class="btn-nav" id="route-nav-link" href="#" target="_blank">Ir al Inicio</a>
     </div>
   </div>
@@ -1951,462 +2081,1410 @@
 
   <script>
     // DATASET REAL DE MENDOZA
+    const MENDOZA_REGIONS = [
+  {
+    "id": "todas",
+    "name": "Todo Mendoza",
+    "icon": "✨",
+    "province": "Mendoza",
+    "description": "Vista panorámica general de la provincia",
+    "center": [
+      -32.8895,
+      -68.865
+    ],
+    "zoom": 12
+  },
+  {
+    "id": "chacras",
+    "name": "Chacras de Coria",
+    "icon": "🌵",
+    "province": "Luján de Cuyo",
+    "description": "Laberinto de senderos MTB, Teletubbies, El Álamo y singletracks",
+    "center": [
+      -33.0035,
+      -68.898
+    ],
+    "zoom": 14
+  },
+  {
+    "id": "challao_arco",
+    "name": "El Challao & Arco",
+    "icon": "⛰️",
+    "province": "Las Heras",
+    "description": "Ascenso al Cerro Arco, filo Santo Tomás y Quebrada de San Isidro",
+    "center": [
+      -32.835,
+      -68.945
+    ],
+    "zoom": 14
+  },
+  {
+    "id": "frias_gloria",
+    "name": "Gloria & Dique Frías",
+    "icon": "🌳",
+    "province": "Capital / Godoy Cruz",
+    "description": "Monumento Cerro de la Gloria, Parque San Martín y cañadón del Frías",
+    "center": [
+      -32.887,
+      -68.885
+    ],
+    "zoom": 14
+  },
+  {
+    "id": "potrerillos",
+    "name": "Potrerillos & El Salto",
+    "icon": "🌊",
+    "province": "Luján Alta Montaña",
+    "description": "Perilago Dique Potrerillos, Cascada del Salto y Cordón del Plata",
+    "center": [
+      -32.965,
+      -69.215
+    ],
+    "zoom": 13
+  },
+  {
+    "id": "san_rafael",
+    "name": "San Rafael & Atuel",
+    "icon": "🧗",
+    "province": "San Rafael",
+    "description": "Cañón del Atuel, Valle Grande y circuitos de Los Reyunos",
+    "center": [
+      -34.78,
+      -68.45
+    ],
+    "zoom": 11
+  }
+];
+
+    let selectedRegionId = 'todas';
+
     const MENDOZA_ROUTES = [
-      {
-        id: 'ciclovia-troncal-central',
-        name: 'Ciclovía Troncal Godoy Cruz - Mendoza Capital',
-        zone: 'Gran Mendoza',
-        type: 'ciclovia',
-        distanceKm: 7.2,
-        elevationGainM: 45,
-        difficulty: 'Fácil',
-        surface: 'Asfalto',
-        strokeColor: '#00E676',
-        coordinates: [
-          [-32.9341, -68.8472],
-          [-32.9235, -68.8465],
-          [-32.9150, -68.8450],
-          [-32.9032, -68.8441],
-          [-32.8955, -68.8430],
-          [-32.8830, -68.8385]
-        ],
-        legality: {
-          status: 'libre',
-          badgeText: '🟢 Libre Multimodal',
-          tagColor: '#00E676',
-          allowedModes: { trekking: true, bicycle: true, moto: false },
-          priorityRule: 'Peatones tienen paso prioritario en cruces señalizados. Bicis máx 25 km/h.',
-          legalWarning: 'Prohibida la circulación de motos a combustión en carriles de ciclovía (Ley 9024).',
-          authority: 'Municipios de Godoy Cruz y Ciudad de Mendoza'
-        }
+  {
+    "id": "ciclovia-troncal-central",
+    "name": "Ciclovía Troncal Godoy Cruz - Mendoza Capital",
+    "zone": "Gran Mendoza",
+    "regionId": "frias_gloria",
+    "type": "ciclovia",
+    "distanceKm": 7.2,
+    "elevationGainM": 45,
+    "difficulty": "Fácil",
+    "surface": "Asfalto",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      [
+        -32.9341,
+        -68.8472
+      ],
+      [
+        -32.9235,
+        -68.8465
+      ],
+      [
+        -32.915,
+        -68.845
+      ],
+      [
+        -32.9032,
+        -68.8441
+      ],
+      [
+        -32.8955,
+        -68.843
+      ],
+      [
+        -32.883,
+        -68.8385
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 740,
+      "maxElevM": 785,
+      "elevationGainM": 45,
+      "points": [
+        740,
+        750,
+        760,
+        770,
+        780,
+        785
+      ]
+    },
+    "gpxFileName": "ciclovia_troncal_mendoza.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🟢 Libre Multimodal",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'ciclovia-parque-general-san-martin',
-        name: 'Circuito Parque General San Martín & El Rosedal',
-        zone: 'Ciudad de Mendoza',
-        type: 'ciclovia',
-        distanceKm: 6.5,
-        elevationGainM: 90,
-        difficulty: 'Fácil',
-        surface: 'Asfalto',
-        strokeColor: '#00E676',
-        coordinates: [
-          [-32.8885, -68.8620],
-          [-32.8892, -68.8745],
-          [-32.8851, -68.8790],
-          [-32.8810, -68.8825],
-          [-32.8860, -68.8912]
-        ],
-        legality: {
-          status: 'libre',
-          badgeText: '🟢 Parque Recreativo',
-          tagColor: '#00E676',
-          allowedModes: { trekking: true, bicycle: true, moto: false },
-          priorityRule: 'Zona de paseo familiar: prioridad absoluta al peatón y deportistas a pie.',
-          authority: 'Dirección de Parques y Paseos Públicos de Mendoza'
-        }
+      "priorityRule": "Peatones tienen paso prioritario en cruces señalizados. Bicis máx 25 km/h.",
+      "legalWarning": "Prohibida la circulación de motos a combustión en carriles de ciclovía (Ley 9024).",
+      "authority": "Municipios de Godoy Cruz y Ciudad de Mendoza"
+    }
+  },
+  {
+    "id": "ciclovia-parque-general-san-martin",
+    "name": "Circuito Parque General San Martín & El Rosedal",
+    "zone": "Ciudad de Mendoza",
+    "regionId": "frias_gloria",
+    "type": "ciclovia",
+    "distanceKm": 6.5,
+    "elevationGainM": 90,
+    "difficulty": "Fácil",
+    "surface": "Asfalto",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      [
+        -32.8885,
+        -68.862
+      ],
+      [
+        -32.8892,
+        -68.8745
+      ],
+      [
+        -32.8851,
+        -68.879
+      ],
+      [
+        -32.881,
+        -68.8825
+      ],
+      [
+        -32.886,
+        -68.8912
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 780,
+      "maxElevM": 870,
+      "elevationGainM": 90,
+      "points": [
+        780,
+        795,
+        820,
+        850,
+        870
+      ]
+    },
+    "gpxFileName": "parque_san_martin_rosedal.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🟢 Parque Recreativo",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'sendero-chacras-dique-frias',
-        name: 'Huellas de Chacras & Cruce Dique Frías (MTB / Trekking)',
-        zone: 'Luján de Cuyo / Godoy Cruz Precordillera',
-        type: 'sendero_mtb',
-        distanceKm: 12.4,
-        elevationGainM: 380,
-        difficulty: 'Moderado',
-        surface: 'Ripio/Tierra',
-        strokeColor: '#FF6D00',
-        coordinates: [
-          [-33.0035, -68.8920],
-          [-32.9920, -68.9055],
-          [-32.9810, -68.9180],
-          [-32.9730, -68.9240],
-          [-32.9610, -68.9120],
-          [-32.9520, -68.8990]
-        ],
-        legality: {
-          status: 'compartido_precaucion',
-          badgeText: '🟡 Mixto: Peatón Prioritario',
-          tagColor: '#FFD600',
-          allowedModes: { trekking: true, bicycle: true, moto: false },
-          priorityRule: 'Senderos angostos: la bicicleta debe descender velocidad a paso de hombre.',
-          legalWarning: 'Prohibido ingreso de motos de enduro para evitar la erosión de cañadones secos.',
-          authority: 'Municipio de Luján de Cuyo & Comunidad de Senderistas'
-        }
+      "priorityRule": "Zona de paseo familiar: prioridad absoluta al peatón y deportistas a pie en Rosedal y Lago.",
+      "authority": "Dirección de Parques y Paseos Públicos de Mendoza"
+    }
+  },
+  {
+    "id": "sendero-cerro-gloria-ecoparque",
+    "name": "Circuito Monumento Cerro de la Gloria & Ecoparque",
+    "zone": "Ciudad / Parque San Martín",
+    "regionId": "frias_gloria",
+    "type": "sendero_mtb",
+    "distanceKm": 5.4,
+    "elevationGainM": 180,
+    "difficulty": "Moderado",
+    "surface": "Mixto",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      [
+        -32.886,
+        -68.888
+      ],
+      [
+        -32.8875,
+        -68.8905
+      ],
+      [
+        -32.889,
+        -68.8925
+      ],
+      [
+        -32.8868,
+        -68.893
+      ],
+      [
+        -32.8845,
+        -68.8915
+      ],
+      [
+        -32.8855,
+        -68.8885
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 820,
+      "maxElevM": 980,
+      "elevationGainM": 180,
+      "points": [
+        820,
+        850,
+        890,
+        940,
+        980,
+        930,
+        870,
+        820
+      ]
+    },
+    "gpxFileName": "cerro_de_la_gloria_circuito.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🟢 Monumento Histórico",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'sendero-cerro-arco-antenas',
-        name: 'Ascenso al Cerro Arco (1.680 msnm) & Filo Precordillerano',
-        zone: 'El Challao / Las Heras',
-        type: 'moto_trail',
-        distanceKm: 14.8,
-        elevationGainM: 780,
-        difficulty: 'Técnico',
-        surface: 'Ripio/Tierra',
-        strokeColor: '#2979FF',
-        coordinates: [
-          [-32.8420, -68.9240],
-          [-32.8395, -68.9320],
-          [-32.8360, -68.9410],
-          [-32.8340, -68.9485],
-          [-32.8280, -68.9560]
-        ],
-        legality: {
-          status: 'compartido_precaucion',
-          badgeText: '🟡 Camino de Servicio Mixto',
-          tagColor: '#FFD600',
-          allowedModes: { trekking: true, bicycle: true, moto: true },
-          priorityRule: 'Camino de mantenimiento: velocidad máx 20 km/h para vehículos. Prohibido salir de la huella.',
-          legalWarning: 'Prioridad constante al senderista que sube a pie.',
-          authority: 'Municipalidad de Las Heras'
-        }
+      "priorityRule": "Prioridad peatonal en miradores y escalinatas del Monumento al Ejército de Los Andes.",
+      "authority": "Dirección de Parques y Paseos Públicos de Mendoza"
+    }
+  },
+  {
+    "id": "sendero-dique-frias-papagayos",
+    "name": "Cañadón Dique Frías & Quebrada de Papagayos",
+    "zone": "Godoy Cruz / Capital Precordillera",
+    "regionId": "frias_gloria",
+    "type": "sendero_mtb",
+    "distanceKm": 6.8,
+    "elevationGainM": 220,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -32.908,
+        -68.882
+      ],
+      [
+        -32.901,
+        -68.891
+      ],
+      [
+        -32.894,
+        -68.902
+      ],
+      [
+        -32.888,
+        -68.911
+      ],
+      [
+        -32.882,
+        -68.905
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 880,
+      "maxElevM": 1100,
+      "elevationGainM": 220,
+      "points": [
+        880,
+        920,
+        970,
+        1030,
+        1100,
+        1040
+      ]
+    },
+    "gpxFileName": "dique_frias_papagayos.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Cañadón Aluvional",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'sendero-divisadero-largo',
-        name: 'Quebrada de Divisadero Largo (Reserva Protegida)',
-        zone: 'Las Heras / Ciudad',
-        type: 'sendero_mtb',
-        distanceKm: 5.6,
-        elevationGainM: 260,
-        difficulty: 'Moderado',
-        surface: 'Ripio/Tierra',
-        strokeColor: '#FF1744',
-        coordinates: [
-          [-32.8760, -68.9020],
-          [-32.8730, -68.9110],
-          [-32.8705, -68.9190],
-          [-32.8680, -68.9270],
-          [-32.8650, -68.9340]
-        ],
-        legality: {
-          status: 'prohibido_motor',
-          badgeText: '🔴 Reserva Ecológica - Prohibido Motor',
-          tagColor: '#FF1744',
-          allowedModes: { trekking: true, bicycle: true, moto: false },
-          priorityRule: 'Área Natural Protegida. Registro obligatorio en puesto de Guardaparques. Prohibido salir del sendero.',
-          legalWarning: 'Ley Provincial 6045: Totalmente prohibido el acceso a motos, cuatriciclos y vehículos a combustión. Multas severas y secuestro vehicular.',
-          authority: 'Cuerpo de Guardaparques de Mendoza (DRNR)'
-        }
+      "priorityRule": "Atención con bajadas de agua tras tormentas de verano.",
+      "authority": "Dirección de Hidráulica & Guardaparques"
+    }
+  },
+  {
+    "id": "sendero-divisadero-largo",
+    "name": "Quebrada de Divisadero Largo (Reserva Protegida)",
+    "zone": "Las Heras / Ciudad",
+    "regionId": "frias_gloria",
+    "type": "sendero_mtb",
+    "distanceKm": 5.6,
+    "elevationGainM": 260,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF1744",
+    "coordinates": [
+      [
+        -32.876,
+        -68.902
+      ],
+      [
+        -32.873,
+        -68.911
+      ],
+      [
+        -32.8705,
+        -68.919
+      ],
+      [
+        -32.868,
+        -68.927
+      ],
+      [
+        -32.865,
+        -68.934
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 950,
+      "maxElevM": 1210,
+      "elevationGainM": 260,
+      "points": [
+        950,
+        1010,
+        1080,
+        1150,
+        1210
+      ]
+    },
+    "gpxFileName": "divisadero_largo_reserva.gpx",
+    "legality": {
+      "status": "prohibido_motor",
+      "badgeText": "🔴 Reserva Natural Protegida",
+      "tagColor": "#FF1744",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'circuito-enduro-el-challao',
-        name: 'Circuito Enduro & Huellas El Challao / Puesto El Chulengo',
-        zone: 'Las Heras Precordillera',
-        type: 'moto_trail',
-        distanceKm: 14.5,
-        elevationGainM: 410,
-        difficulty: 'Técnico',
-        surface: 'Ripio/Tierra',
-        strokeColor: '#2979FF',
-        coordinates: [
-          [-32.8360, -68.9260],
-          [-32.8290, -68.9340],
-          [-32.8210, -68.9400],
-          [-32.8140, -68.9460],
-          [-32.8080, -68.9540],
-          [-32.8010, -68.9610]
-        ],
-        legality: {
-          status: 'circuito_enduro',
-          badgeText: '🔵 Circuito Enduro Habilitado',
-          tagColor: '#2979FF',
-          allowedModes: { trekking: false, bicycle: true, moto: true },
-          priorityRule: 'Circuito tradicional para entrenamiento de motociclismo. Bicis y peatones circular con extrema precaución.',
-          legalWarning: 'Obligatorio uso de casco integral homologado y escape reglamentario.',
-          authority: 'Comunidad Enduro Mendoza / Las Heras'
-        }
+      "priorityRule": "Solo tránsito pedestre y bicicletas autorizadas en senderos interpretativos.",
+      "legalWarning": "Prohibición estricta de motos y cuatriciclos (Ley 6045). Multas severas por erosión fósil.",
+      "authority": "Cuerpo de Guardaparques de Mendoza (DRNR)"
+    }
+  },
+  {
+    "id": "sendero-chacras-teletubbies",
+    "name": "Senderos de Chacras: Los Teletubbies & Puesto El Manzano",
+    "zone": "Chacras de Coria / Luján de Cuyo",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 9.8,
+    "elevationGainM": 310,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -33.0035,
+        -68.892
+      ],
+      [
+        -33.001,
+        -68.899
+      ],
+      [
+        -32.9975,
+        -68.906
+      ],
+      [
+        -32.993,
+        -68.912
+      ],
+      [
+        -32.988,
+        -68.917
+      ],
+      [
+        -32.994,
+        -68.911
+      ],
+      [
+        -32.999,
+        -68.902
+      ],
+      [
+        -33.0035,
+        -68.892
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 980,
+      "maxElevM": 1280,
+      "elevationGainM": 310,
+      "points": [
+        980,
+        1020,
+        1080,
+        1160,
+        1280,
+        1210,
+        1120,
+        1040,
+        980
+      ]
+    },
+    "gpxFileName": "chacras_teletubbies_manzano.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Circuito Clásico MTB",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'sendero-quebrada-san-isidro',
-        name: 'Travesía Quebrada de San Isidro & Puesto La Crucesita',
-        zone: 'Precordillera Central',
-        type: 'moto_trail',
-        distanceKm: 18.2,
-        elevationGainM: 620,
-        difficulty: 'Técnico',
-        surface: 'Mixto',
-        strokeColor: '#2979FF',
-        coordinates: [
-          [-32.8550, -68.9350],
-          [-32.8680, -68.9480],
-          [-32.8850, -68.9610],
-          [-32.9120, -68.9720],
-          [-32.9645, -68.9790]
-        ],
-        legality: {
-          status: 'circuito_enduro',
-          badgeText: '🔵 Ruta Vehicular de Ripio',
-          tagColor: '#2979FF',
-          allowedModes: { trekking: true, bicycle: true, moto: true },
-          priorityRule: 'Ripio precordillerano. Prioridad a peatones en cruces de vertientes.',
-          authority: 'Vialidad Provincial & Comunidad de Puestos'
-        }
+      "priorityRule": "Singletrack angosto: dar paso en subidas y respetar a corredores de trail.",
+      "legalWarning": "Prohibido el ingreso de motos de enduro para evitar la degradación de peraltes.",
+      "authority": "Municipio de Luján de Cuyo & Comunidad de Ciclistas"
+    }
+  },
+  {
+    "id": "sendero-chacras-alamo-cuyanita",
+    "name": "Travesía La Cuyanita, Quebrada del Álamo & Filos de Chacras",
+    "zone": "Precordillera de Luján de Cuyo",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 14.5,
+    "elevationGainM": 460,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -33.0035,
+        -68.892
+      ],
+      [
+        -33.008,
+        -68.904
+      ],
+      [
+        -33.012,
+        -68.915
+      ],
+      [
+        -33.007,
+        -68.924
+      ],
+      [
+        -32.998,
+        -68.928
+      ],
+      [
+        -32.989,
+        -68.921
+      ],
+      [
+        -32.996,
+        -68.908
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 980,
+      "maxElevM": 1440,
+      "elevationGainM": 460,
+      "points": [
+        980,
+        1050,
+        1160,
+        1290,
+        1440,
+        1340,
+        1180,
+        1020
+      ]
+    },
+    "gpxFileName": "chacras_cuyanita_alamo.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Travesía de Montaña",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'ruta-wine-chacras-vistalba',
-        name: 'Circuito Wine & Trail Chacras de Coria - Vistalba (Gravel)',
-        zone: 'Luján de Cuyo / Primera Zona',
-        type: 'wine_trail',
-        distanceKm: 16.5,
-        elevationGainM: 110,
-        difficulty: 'Fácil',
-        surface: 'Mixto',
-        strokeColor: '#E91E63',
-        coordinates: [
-          [-32.9980, -68.8780],
-          [-33.0060, -68.8820],
-          [-33.0130, -68.8890],
-          [-33.0240, -68.8950],
-          [-33.0310, -68.9020],
-          [-33.0380, -68.9090]
-        ],
-        legality: {
-          status: 'libre',
-          badgeText: '🍷 Ruta Enológica Habilitada',
-          tagColor: '#E91E63',
-          allowedModes: { trekking: true, bicycle: true, moto: false },
-          priorityRule: 'Tránsito compartido con caminos vecinales y callejones vitivinícolas.',
-          legalWarning: 'Cuidar acequias y no ingresar a hileras de viñedos privados sin autorización de visita.',
-          authority: 'Municipio de Luján de Cuyo & Bodegas de Vistalba'
-        },
-        wineInfo: {
-          wineries: ['Nieto Senetiner', 'Kaiken', 'Vistalba', 'Carmelo Patti'],
-          gravelType: 'Asfalto y Ripio Suave',
-          recommendedBike: 'Gravel / MTB / Urbana Paseo',
-          tastingPoints: ['Almacén de Chacras', 'Plaza de Chacras', 'Callejón de la Palmera'],
-          bikeFriendly: true
-        }
+      "priorityRule": "Llevar doble cámara o líquido tubeless por abundancia de espinas (rosetas).",
+      "authority": "Comunidad de Senderos de Chacras"
+    }
+  },
+  {
+    "id": "sendero-chacras-dique-frias",
+    "name": "Cruce Precordillerano Chacras a Dique Frías (MTB / Trekking)",
+    "zone": "Luján de Cuyo / Godoy Cruz",
+    "regionId": "chacras",
+    "type": "sendero_mtb",
+    "distanceKm": 12.4,
+    "elevationGainM": 380,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -33.0035,
+        -68.892
+      ],
+      [
+        -32.992,
+        -68.9055
+      ],
+      [
+        -32.978,
+        -68.915
+      ],
+      [
+        -32.955,
+        -68.908
+      ],
+      [
+        -32.921,
+        -68.889
+      ],
+      [
+        -32.908,
+        -68.882
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 980,
+      "maxElevM": 1360,
+      "elevationGainM": 380,
+      "points": [
+        980,
+        1110,
+        1260,
+        1360,
+        1140,
+        890
+      ]
+    },
+    "gpxFileName": "cruce_chacras_frias.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Travesía Interdepartamental",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'ruta-wine-maipu-caminos',
-        name: 'Caminos del Vino Histórico Maipú & Estación Gutiérrez',
-        zone: 'Maipú / Cuna del Vino',
-        type: 'wine_trail',
-        distanceKm: 14.2,
-        elevationGainM: 70,
-        difficulty: 'Fácil',
-        surface: 'Asfalto',
-        strokeColor: '#E91E63',
-        coordinates: [
-          [-32.9780, -68.7900],
-          [-32.9830, -68.7840],
-          [-32.9920, -68.7760],
-          [-33.0010, -68.7690],
-          [-33.0100, -68.7610]
-        ],
-        legality: {
-          status: 'libre',
-          badgeText: '🍷 Ciclovía Enoturística',
-          tagColor: '#E91E63',
-          allowedModes: { trekking: true, bicycle: true, moto: false },
-          priorityRule: 'Ciclovía urbana y rural señalizada entre olivares y bodegas centenarias.',
-          authority: 'Municipio de Maipú & Asociación Enoturismo'
-        },
-        wineInfo: {
-          wineries: ['Trapiche', 'Bodega Giol (Museo)', 'López', 'Casa del Visitante'],
-          gravelType: 'Caminos Rurales y Alamedas',
-          recommendedBike: 'Gravel / MTB / Urbana Paseo',
-          tastingPoints: ['Estación Metrotranvía Gutiérrez', 'Museo Nacional del Vino'],
-          bikeFriendly: true
-        }
-      }
-    ];
-
-    const MENDOZA_PROTECTED_AREAS = [
-      {
-        id: 'reserva-divisadero-largo',
-        name: 'Reserva Natural Divisadero Largo',
-        shortName: 'Reserva Divisadero',
-        category: 'reserva_natural',
-        status: 'prohibido_motor',
-        authority: 'Cuerpo de Guardaparques de Mendoza (DRNR)',
-        contactRanger: '2614257065',
-        description: 'Área natural protegida de alto valor geológico y botánico. Fósiles de más de 200 millones de años.',
-        rules: [
-          '🚫 Terminantemente prohibido el ingreso de motos de enduro y quads (Ley 6045).',
-          '🥾 Registro obligatorio en seccional de Guardaparques antes de iniciar el sendero.',
-          '🗑️ Prohibido arrojar residuos o restos orgánicos.',
-          '🔥 Prohibido encender fuego en toda la reserva.'
-        ],
-        allowedModes: { trekking: true, bicycle: true, moto: false },
-        fillColor: '#FF1744',
-        strokeColor: '#FF1744',
-        coordinates: [
-          [-32.8620, -68.9480],
-          [-32.8610, -68.8980],
-          [-32.8800, -68.8940],
-          [-32.8840, -68.9450]
-        ]
+      "priorityRule": "Filo expuesto al viento. Llevar cortavientos e hidratación suficiente.",
+      "authority": "Municipios de Luján y Godoy Cruz"
+    }
+  },
+  {
+    "id": "ruta-wine-chacras-vistalba",
+    "name": "Circuito Wine & Trail: Viñedos de Chacras & Vistalba",
+    "zone": "Luján de Cuyo (Tierra del Malbec)",
+    "regionId": "chacras",
+    "type": "wine_trail",
+    "distanceKm": 16.8,
+    "elevationGainM": 110,
+    "difficulty": "Fácil",
+    "surface": "Mixto",
+    "strokeColor": "#E91E63",
+    "coordinates": [
+      [
+        -33.001,
+        -68.887
+      ],
+      [
+        -33.012,
+        -68.881
+      ],
+      [
+        -33.024,
+        -68.875
+      ],
+      [
+        -33.036,
+        -68.868
+      ],
+      [
+        -33.048,
+        -68.862
+      ],
+      [
+        -33.055,
+        -68.855
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 930,
+      "maxElevM": 1040,
+      "elevationGainM": 110,
+      "points": [
+        930,
+        950,
+        980,
+        1010,
+        1040
+      ]
+    },
+    "gpxFileName": "wine_trail_chacras_vistalba.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🍷 Ruta Enoturística Abierta",
+      "tagColor": "#E91E63",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'parque-san-martin',
-        name: 'Parque General San Martín (Zona Recreativa)',
-        shortName: 'Parque San Martín',
-        category: 'parque_provincial',
-        status: 'libre',
-        authority: 'Dirección de Parques y Paseos Públicos de Mendoza',
-        contactRanger: '2614495555',
-        description: 'Principal pulmón verde urbano del Gran Mendoza con más de 17 km de ciclovías y paseos peatonales.',
-        rules: [
-          '🚴 Ciclovías exclusivas para bicicletas y monopatines no motorizados.',
-          '🥾 Prioridad de paso peatonal en todos los cruces.',
-          '🚫 Motos prohibidas en senderos internos y ciclovías.',
-          '🗑️ Utilizar los puntos limpios y clasificadores.'
-        ],
-        allowedModes: { trekking: true, bicycle: true, moto: false },
-        fillColor: '#00E676',
-        strokeColor: '#00E676',
-        coordinates: [
-          [-32.8780, -68.8600],
-          [-32.8790, -68.8950],
-          [-32.8940, -68.8950],
-          [-32.8930, -68.8600]
-        ]
+      "priorityRule": "Cicloturismo y caminatas rurales entre viñedos.",
+      "authority": "Municipalidad de Luján de Cuyo & Bodegas de Mendoza"
+    },
+    "wineInfo": {
+      "wineries": [
+        "Bodega Nieto Senetiner",
+        "Bodega Kaiken",
+        "Finca Las Compuertas",
+        "Pulmary Orgánica"
+      ],
+      "gravelType": "Caminos Rurales y Alamedas",
+      "recommendedBike": "Gravel / MTB / Urbana Paseo",
+      "tastingPoints": [
+        "Espacio Kaiken Wine Garden",
+        "Almacén de Chacras"
+      ],
+      "bikeFriendly": true
+    }
+  },
+  {
+    "id": "sendero-cerro-arco-cumbre",
+    "name": "Ascenso Clásico Cerro Arco (Puerta de la Quebrada a Antenas)",
+    "zone": "El Challao / Las Heras",
+    "regionId": "challao_arco",
+    "type": "sendero_mtb",
+    "distanceKm": 4.8,
+    "elevationGainM": 520,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -32.842,
+        -68.924
+      ],
+      [
+        -32.8445,
+        -68.931
+      ],
+      [
+        -32.8465,
+        -68.9375
+      ],
+      [
+        -32.8482,
+        -68.944
+      ],
+      [
+        -32.836,
+        -68.951
+      ],
+      [
+        -32.828,
+        -68.956
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 1160,
+      "maxElevM": 1680,
+      "elevationGainM": 520,
+      "points": [
+        1160,
+        1240,
+        1330,
+        1420,
+        1530,
+        1620,
+        1680
+      ]
+    },
+    "gpxFileName": "ascenso_cerro_arco.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Camino de Servicio Mixto",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": true
       },
-      {
-        id: 'circuito-enduro-challao',
-        name: 'Sector de Huellas y Enduro El Challao / Puesto El Chulengo',
-        shortName: 'Enduro El Challao',
-        category: 'circuito_enduro',
-        status: 'circuito_enduro',
-        authority: 'Comunidad Enduro Mendoza / Las Heras',
-        contactRanger: '2614815460',
-        description: 'Circuito tradicional sobre lechos secos y huellas precordilleranas autorizadas para motociclismo.',
-        rules: [
-          '🏍️ Tránsito motorizado autorizado únicamente sobre huellas abiertas.',
-          '🚫 No abrir huellas nuevas que erosionen laderas vírgenes.',
-          '🛡️ Uso obligatorio de casco homologado y botas de protección.',
-          '🥾 Reducir la velocidad al cruzarse con senderistas.'
-        ],
-        allowedModes: { trekking: false, bicycle: true, moto: true },
-        fillColor: '#2979FF',
-        strokeColor: '#2979FF',
-        coordinates: [
-          [-32.7980, -68.9680],
-          [-32.8020, -68.9200],
-          [-32.8380, -68.9180],
-          [-32.8360, -68.9680]
-        ]
-      }
-    ];
-
-    const MENDOZA_CONVIVENCIA_RULES = [
-      {
-        id: 'r1',
-        icon: '🥾',
-        title: '1. El Peatón Siempre Tiene Paso Prioritario',
-        description: 'En senderos de montaña compartidos, la persona a pie o corriendo tiene derecho de paso sobre la bicicleta y la moto. En pasos angostos, la bicicleta debe descender o frenar a paso de hombre.'
+      "priorityRule": "Camino de mantenimiento: máx 20 km/h para motos/4x4. Prohibido salirse de la huella.",
+      "legalWarning": "Prioridad constante al senderista que sube a pie.",
+      "authority": "Municipalidad de Las Heras"
+    }
+  },
+  {
+    "id": "sendero-arco-filo-santo-tomas",
+    "name": "Travesía de Filo: Cerro Arco a Cerro Santo Tomás (1.820 m)",
+    "zone": "Precordillera Profunda / Las Heras",
+    "regionId": "challao_arco",
+    "type": "sendero_mtb",
+    "distanceKm": 8.6,
+    "elevationGainM": 690,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -32.828,
+        -68.956
+      ],
+      [
+        -32.826,
+        -68.961
+      ],
+      [
+        -32.824,
+        -68.966
+      ],
+      [
+        -32.821,
+        -68.972
+      ],
+      [
+        -32.823,
+        -68.977
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 1560,
+      "maxElevM": 1820,
+      "elevationGainM": 690,
+      "points": [
+        1680,
+        1590,
+        1640,
+        1730,
+        1820
+      ]
+    },
+    "gpxFileName": "travesia_arco_santo_tomas.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Filo de Alta Exigencia",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'r2',
-        icon: '🚫',
-        title: '2. Prohibido Abrir Atajos y Huellas Clandestinas',
-        description: 'Cortar las "zetas" de los cerros destruye la jarilla y provoca cárcavas aluvionales en tormentas de verano.',
-        penaltyNote: 'Ley Provincial 6045: multas económicas y sanciones ambientales por degradación del suelo.'
+      "priorityRule": "Sendero de filo muy expuesto al viento Zonda. Prohibido acampar con fuego.",
+      "authority": "Municipalidad de Las Heras & Guardaparques"
+    }
+  },
+  {
+    "id": "sendero-quebrada-san-isidro-aspero",
+    "name": "Circuito Quebrada de San Isidro & Cerro Áspero",
+    "zone": "El Challao / Las Heras",
+    "regionId": "challao_arco",
+    "type": "sendero_mtb",
+    "distanceKm": 11.2,
+    "elevationGainM": 490,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -32.842,
+        -68.924
+      ],
+      [
+        -32.845,
+        -68.933
+      ],
+      [
+        -32.848,
+        -68.941
+      ],
+      [
+        -32.852,
+        -68.948
+      ],
+      [
+        -32.859,
+        -68.939
+      ],
+      [
+        -32.851,
+        -68.928
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 1150,
+      "maxElevM": 1450,
+      "elevationGainM": 490,
+      "points": [
+        1150,
+        1260,
+        1390,
+        1450,
+        1320,
+        1210,
+        1150
+      ]
+    },
+    "gpxFileName": "san_isidro_cerro_aspero.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Terreno Técnico",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
       },
-      {
-        id: 'r3',
-        icon: '🏍️',
-        title: '3. Motos Solo en Circuitos y Huellas Autorizadas',
-        description: 'El motocross y enduro están estrictamente prohibidos en Reservas Naturales (Divisadero Largo, Villavicencio) y senderos pedestres de Chacras. Utilizar circuitos habilitados como El Challao.',
-        penaltyNote: 'Policía Rural y Guardaparques proceden al secuestro del rodado.'
+      "priorityRule": "Acarreo de piedras sueltas: calzado con buen grip obligatorio.",
+      "authority": "Comunidad de Montaña Las Heras"
+    }
+  },
+  {
+    "id": "sendero-circuito-chapadmalal-enduro",
+    "name": "Pistas de Enduro & Huellas El Challao",
+    "zone": "El Challao Circuito",
+    "regionId": "challao_arco",
+    "type": "moto_trail",
+    "distanceKm": 18.5,
+    "elevationGainM": 620,
+    "difficulty": "Técnico",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#2979FF",
+    "coordinates": [
+      [
+        -32.838,
+        -68.915
+      ],
+      [
+        -32.831,
+        -68.927
+      ],
+      [
+        -32.825,
+        -68.938
+      ],
+      [
+        -32.819,
+        -68.949
+      ],
+      [
+        -32.812,
+        -68.958
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 1080,
+      "maxElevM": 1540,
+      "elevationGainM": 620,
+      "points": [
+        1080,
+        1190,
+        1310,
+        1440,
+        1540
+      ]
+    },
+    "gpxFileName": "enduro_challao_circuito.gpx",
+    "legality": {
+      "status": "circuito_enduro",
+      "badgeText": "🔵 Circuito Enduro Habilitado",
+      "tagColor": "#2979FF",
+      "allowedModes": {
+        "trekking": false,
+        "bicycle": true,
+        "moto": true
       },
-      {
-        id: 'r4',
-        icon: '🎒',
-        title: '4. Filosofía "No Dejes Rastro" (Basura Cero)',
-        description: 'Todo lo que sube a la montaña, baja con vos. Envoltorios de geles, cámaras pinchadas y botellas deben regresar en tu mochila.'
+      "priorityRule": "Circuito tradicional para entrenamiento de motociclismo.",
+      "legalWarning": "Obligatorio uso de casco integral homologado y escape reglamentario.",
+      "authority": "Comunidad Enduro Mendoza / Las Heras"
+    }
+  },
+  {
+    "id": "ruta-moto-villavicencio-caracoles",
+    "name": "Ruta Histórica Caracoles de Villavicencio (RP 52)",
+    "zone": "Las Heras / Precordillera Alta",
+    "regionId": "challao_arco",
+    "type": "moto_trail",
+    "distanceKm": 28,
+    "elevationGainM": 1100,
+    "difficulty": "Moderado",
+    "surface": "Mixto",
+    "strokeColor": "#2979FF",
+    "coordinates": [
+      [
+        -32.531,
+        -69.018
+      ],
+      [
+        -32.522,
+        -69.035
+      ],
+      [
+        -32.511,
+        -69.052
+      ],
+      [
+        -32.498,
+        -69.073
+      ],
+      [
+        -32.482,
+        -69.098
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 1750,
+      "maxElevM": 2850,
+      "elevationGainM": 1100,
+      "points": [
+        1750,
+        1980,
+        2240,
+        2560,
+        2850
+      ]
+    },
+    "gpxFileName": "caracoles_villavicencio_rp52.gpx",
+    "legality": {
+      "status": "circuito_enduro",
+      "badgeText": "🔵 Ruta Vehicular RP 52",
+      "tagColor": "#2979FF",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": true
       },
-      {
-        id: 'r5',
-        icon: '🐕',
-        title: '5. Mascotas Controladas con Correa',
-        description: 'En la precordillera habitan zorros grises, águilas moras y yararás. Llevar a los perros atados evita peleas con fauna autóctona y accidentes.'
-      }
-    ];
+      "priorityRule": "Ruta provincial de ripio. Vehículos en ascenso tienen prioridad.",
+      "authority": "Dirección Provincial de Vialidad & Reserva Villavicencio"
+    }
+  },
+  {
+    "id": "sendero-potrerillos-perilago",
+    "name": "Circuito Perilago Dique Potrerillos & Bahía de los Vientos",
+    "zone": "Potrerillos / Luján de Cuyo",
+    "regionId": "potrerillos",
+    "type": "sendero_mtb",
+    "distanceKm": 16.5,
+    "elevationGainM": 280,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -32.964,
+        -69.178
+      ],
+      [
+        -32.973,
+        -69.189
+      ],
+      [
+        -32.982,
+        -69.201
+      ],
+      [
+        -32.991,
+        -69.215
+      ],
+      [
+        -32.998,
+        -69.231
+      ],
+      [
+        -32.985,
+        -69.219
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 1380,
+      "maxElevM": 1520,
+      "elevationGainM": 280,
+      "points": [
+        1380,
+        1410,
+        1450,
+        1490,
+        1520,
+        1470,
+        1410
+      ]
+    },
+    "gpxFileName": "potrerillos_perilago_circuito.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Costanera de Lago",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Miradores panorámicos: cuidado con ráfagas de viento del oeste.",
+      "authority": "Municipio de Luján de Cuyo & Náutica Mendoza"
+    }
+  },
+  {
+    "id": "sendero-cascada-del-salto",
+    "name": "Quebrada de la Cascada del Salto & Valle del Sol",
+    "zone": "El Salto / Las Vegas (Potrerillos)",
+    "regionId": "potrerillos",
+    "type": "sendero_mtb",
+    "distanceKm": 7.4,
+    "elevationGainM": 340,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#00E676",
+    "coordinates": [
+      [
+        -32.995,
+        -69.255
+      ],
+      [
+        -32.999,
+        -69.264
+      ],
+      [
+        -33.003,
+        -69.273
+      ],
+      [
+        -33.007,
+        -69.282
+      ],
+      [
+        -33.011,
+        -69.289
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 1550,
+      "maxElevM": 1890,
+      "elevationGainM": 340,
+      "points": [
+        1550,
+        1610,
+        1690,
+        1780,
+        1890
+      ]
+    },
+    "gpxFileName": "cascada_del_salto_potrerillos.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🟢 Sendero de Arroyo",
+      "tagColor": "#00E676",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Prohibido dejar residuos en el curso de agua pura de deshielo.",
+      "authority": "Comunidad de Vecinos de El Salto & Guardaparques"
+    }
+  },
+  {
+    "id": "sendero-canon-atuel-valle-grande",
+    "name": "Quebrada del Cañón del Atuel & Perilago Valle Grande",
+    "zone": "San Rafael (Cañón del Atuel)",
+    "regionId": "san_rafael",
+    "type": "sendero_mtb",
+    "distanceKm": 18.2,
+    "elevationGainM": 310,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -34.821,
+        -68.489
+      ],
+      [
+        -34.832,
+        -68.498
+      ],
+      [
+        -34.845,
+        -68.511
+      ],
+      [
+        -34.862,
+        -68.525
+      ],
+      [
+        -34.881,
+        -68.542
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 780,
+      "maxElevM": 990,
+      "elevationGainM": 310,
+      "points": [
+        780,
+        820,
+        870,
+        930,
+        990,
+        940,
+        890
+      ]
+    },
+    "gpxFileName": "canon_del_atuel_valle_grande.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Cañón Geológico",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": true
+      },
+      "priorityRule": "Camino de ripio sinuoso. Vehículos circular a paso de hombre en curvas ciegas.",
+      "authority": "Municipalidad de San Rafael & Recursos Naturales"
+    }
+  },
+  {
+    "id": "sendero-los-reyunos-perilago",
+    "name": "Circuito Presa Los Reyunos & Mirador Cañón del Diamante",
+    "zone": "San Rafael (Los Reyunos)",
+    "regionId": "san_rafael",
+    "type": "sendero_mtb",
+    "distanceKm": 12.6,
+    "elevationGainM": 260,
+    "difficulty": "Moderado",
+    "surface": "Ripio/Tierra",
+    "strokeColor": "#FF6D00",
+    "coordinates": [
+      [
+        -34.595,
+        -68.625
+      ],
+      [
+        -34.588,
+        -68.636
+      ],
+      [
+        -34.579,
+        -68.647
+      ],
+      [
+        -34.571,
+        -68.658
+      ],
+      [
+        -34.583,
+        -68.642
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 950,
+      "maxElevM": 1140,
+      "elevationGainM": 260,
+      "points": [
+        950,
+        1010,
+        1080,
+        1140,
+        1090,
+        980
+      ]
+    },
+    "gpxFileName": "los_reyunos_canon_diamante.gpx",
+    "legality": {
+      "status": "compartido_precaucion",
+      "badgeText": "🟡 Perilago de Montaña",
+      "tagColor": "#FFD600",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Senderos agrestes: respetar boyados y zonas de desove del lago.",
+      "authority": "Club Náutico Los Reyunos & Municipio de San Rafael"
+    }
+  },
+  {
+    "id": "ruta-wine-maipu-caminos",
+    "name": "Caminos del Vino de Maipú: Olivos & Bodegas Centenarias",
+    "zone": "Maipú Primera Zona Vitivinícola",
+    "regionId": "todas",
+    "type": "wine_trail",
+    "distanceKm": 14.2,
+    "elevationGainM": 40,
+    "difficulty": "Fácil",
+    "surface": "Asfalto",
+    "strokeColor": "#E91E63",
+    "coordinates": [
+      [
+        -32.978,
+        -68.785
+      ],
+      [
+        -32.986,
+        -68.775
+      ],
+      [
+        -32.999,
+        -68.761
+      ],
+      [
+        -33.011,
+        -68.752
+      ],
+      [
+        -33.022,
+        -68.745
+      ]
+    ],
+    "elevationProfile": {
+      "minElevM": 710,
+      "maxElevM": 750,
+      "elevationGainM": 40,
+      "points": [
+        710,
+        720,
+        735,
+        745,
+        750
+      ]
+    },
+    "gpxFileName": "caminos_del_vino_maipu.gpx",
+    "legality": {
+      "status": "libre",
+      "badgeText": "🍷 Ciclovía del Vino Maipú",
+      "tagColor": "#E91E63",
+      "allowedModes": {
+        "trekking": true,
+        "bicycle": true,
+        "moto": false
+      },
+      "priorityRule": "Ciclovía turística y calzada compartida.",
+      "authority": "Municipalidad de Maipú"
+    },
+    "wineInfo": {
+      "wineries": [
+        "Bodega Trapiche",
+        "Bodega Giol Histórica",
+        "Familia Cecchin",
+        "Olivícola Pasrai"
+      ],
+      "gravelType": "Asfalto y Ripio Suave",
+      "recommendedBike": "Gravel / MTB / Urbana Paseo",
+      "tastingPoints": [
+        "Trapiche Wine Bar",
+        "Jardín de Olivos Pasrai"
+      ],
+      "bikeFriendly": true
+    }
+  }
+];
 
     const MENDOZA_POIS = [
-      {
-        id: 'poi-estacion-benegas',
-        name: 'Estación Benegas (Trailhead & Punto Seguro)',
-        category: 'taller',
-        icon: '🔧',
-        color: '#FFD600',
-        latitude: -32.9341,
-        longitude: -68.8472,
-        description: 'Punto de hidratación, estación de inflado y encuentro de ciclovía.'
-      },
-      {
-        id: 'poi-portones-parque',
-        name: 'Portones del Parque San Martín',
-        category: 'trailhead',
-        icon: '🏁',
-        color: '#00E5FF',
-        latitude: -32.8885,
-        longitude: -68.8620,
-        description: 'Acceso principal al circuito de ciclovías y subida al Cerro de la Gloria.'
-      },
-      {
-        id: 'poi-puerta-quebrada',
-        name: 'Base Cerro Arco (Puerta de la Quebrada)',
-        category: 'trailhead',
-        icon: '🏁',
-        color: '#00E5FF',
-        latitude: -32.8420,
-        longitude: -68.9240,
-        description: 'Estacionamiento, puesto de hidratación y punto de inicio para Cerro Arco.'
-      },
-      {
-        id: 'poi-chacras-entrada',
-        name: 'Entrada Senderos de Chacras',
-        category: 'trailhead',
-        icon: '🏁',
-        color: '#00E5FF',
-        latitude: -33.0035,
-        longitude: -68.8920,
-        description: 'Punto de partida tradicional para circuitos de mountain bike y trail running.'
-      },
-      {
-        id: 'poi-mirador-cerro-gloria',
-        name: 'Mirador Monumento Cerro de la Gloria',
-        category: 'mirador',
-        icon: '👁️',
-        color: '#E040FB',
-        latitude: -32.8868,
-        longitude: -68.8930,
-        description: 'Mirador panorámico con vista a la Ciudad de Mendoza y Parque San Martín.'
-      },
-      {
-        id: 'poi-bodega-kaiken',
-        name: 'Bodega Kaikén (Parada Wine & Trail)',
-        category: 'bodega_wine',
-        icon: '🍷',
-        color: '#E91E63',
-        latitude: -33.0240,
-        longitude: -68.8950,
-        description: 'Bodega con jardines biodinámicos, degustación al paso y punto de recarga de agua para ciclistas.'
-      },
-      {
-        id: 'poi-bodega-trapiche',
-        name: 'Bodega Trapiche & Espacio Trapiche',
-        category: 'bodega_wine',
-        icon: '🍷',
-        color: '#E91E63',
-        latitude: -32.9830,
-        longitude: -68.7840,
-        description: 'Edificio patrimonial de 1912 estilo florentino. Estacionamiento seguro para bicicletas.'
-      },
-      {
-        id: 'poi-almacen-chacras',
-        name: 'Almacén de Campo & Pulpería Chacras',
-        category: 'refugio_almacen',
-        icon: '🥪',
-        color: '#FF9100',
-        latitude: -33.0060,
-        longitude: -68.8820,
-        description: 'Punto de descanso para gravel y trekking: sándwiches de jamón crudo, frutos secos e hidratación fresca.'
-      }
-    ];
+  {
+    "id": "poi-estacion-benegas",
+    "name": "Estación Benegas (Punto Seguro & Servicios)",
+    "category": "taller",
+    "latitude": -32.9341,
+    "longitude": -68.8472,
+    "description": "Punto de hidratación, estación de inflado y encuentro de ciclovía."
+  },
+  {
+    "id": "poi-portones-parque",
+    "name": "Portones del Parque San Martín",
+    "category": "trailhead",
+    "latitude": -32.8885,
+    "longitude": -68.862,
+    "description": "Acceso principal al circuito de ciclovías y subida al Cerro de la Gloria."
+  },
+  {
+    "id": "poi-puerta-quebrada",
+    "name": "Base Cerro Arco (Puerta de la Quebrada)",
+    "category": "trailhead",
+    "latitude": -32.842,
+    "longitude": -68.924,
+    "description": "Estacionamiento, puesto de hidratación y punto de inicio para Cerro Arco y Santo Tomás."
+  },
+  {
+    "id": "poi-chacras-entrada",
+    "name": "Entrada Senderos de Chacras",
+    "category": "trailhead",
+    "latitude": -33.0035,
+    "longitude": -68.892,
+    "description": "Punto de partida tradicional para circuitos de mountain bike y trail running."
+  },
+  {
+    "id": "poi-mirador-cerro-gloria",
+    "name": "Mirador Monumento Cerro de la Gloria",
+    "category": "mirador",
+    "latitude": -32.8868,
+    "longitude": -68.893,
+    "description": "Mirador panorámico con vista a la Ciudad de Mendoza y Parque San Martín."
+  },
+  {
+    "id": "poi-bodega-kaiken",
+    "name": "Bodega Kaiken (Bicicletero & Jardín Enoturístico)",
+    "category": "bodega_wine",
+    "latitude": -33.036,
+    "longitude": -68.868,
+    "description": "Estación de recarga de agua para ciclistas, bicicleteros seguros, copas al paso y vista a la Cordillera de los Andes."
+  },
+  {
+    "id": "poi-bodega-trapiche",
+    "name": "Bodega Trapiche (Edificio Histórico 1912 & Wine Bar)",
+    "category": "bodega_wine",
+    "latitude": -32.999,
+    "longitude": -68.761,
+    "description": "Parada clásica de cicloturismo en Maipú. Arquitectura florentina, estación de inflado y jardines con olivos."
+  },
+  {
+    "id": "poi-almacen-chacras",
+    "name": "Pulpería & Almacén de Montaña El Puesto",
+    "category": "refugio_almacen",
+    "latitude": -33.002,
+    "longitude": -68.889,
+    "description": "Abastecimiento de frutas secas, empanadas mendocinas, agua mineral y bebidas isotónicas para deportistas."
+  },
+  {
+    "id": "poi-potrerillos-bahia",
+    "name": "Bahía de los Vientos & Embarcadero Potrerillos",
+    "category": "trailhead",
+    "latitude": -32.991,
+    "longitude": -68.215,
+    "description": "Punto de partida para el circuito perilago y deportes acuáticos en el Dique Potrerillos."
+  },
+  {
+    "id": "poi-el-salto-parador",
+    "name": "Parador Quebrada del Salto (Las Vegas)",
+    "category": "refugio_almacen",
+    "latitude": -32.995,
+    "longitude": -69.255,
+    "description": "Punto de encuentro de montañistas hacia la Cascada del Salto y el Cordón del Plata."
+  },
+  {
+    "id": "poi-valle-grande-canon",
+    "name": "Mirador Submarino Cañón del Atuel",
+    "category": "mirador",
+    "latitude": -34.832,
+    "longitude": -68.498,
+    "description": "Mirador panorámico de las geoformas de arenisca roja en el Cañón del Atuel, San Rafael."
+  },
+  {
+    "id": "poi-reyunos-club",
+    "name": "Club Náutico Los Reyunos & Presa Diamante",
+    "category": "trailhead",
+    "latitude": -34.595,
+    "longitude": -68.625,
+    "description": "Acceso a los senderos costeros y mirador del paredón de la represa Los Reyunos."
+  }
+];
 
     // ESTACIÓN METEOROLÓGICA Y ALERTA VIENTO ZONDA (FASE 4)
     const INITIAL_ZONDA_WEATHER = {
@@ -2685,8 +3763,48 @@
       document.getElementById('map-type-menu').classList.toggle('open');
     }
 
+    function selectRegionWeb(regionId) {
+      selectedRegionId = regionId;
+      document.querySelectorAll('.region-chip').forEach(c => c.classList.remove('active'));
+      const activeChip = document.getElementById('chip-reg-' + regionId);
+      if (activeChip) activeChip.classList.add('active');
+
+      const region = MENDOZA_REGIONS.find(r => r.id === regionId);
+      if (region && region.center) {
+        map.flyTo(region.center, region.zoom, { duration: 1.2 });
+      }
+      closeCards();
+      renderMapElements();
+    }
+
+    let outdoorTrailsLayer = null;
+    let isOutdoorTrailsActive = false;
+
+    function toggleOutdoorTrailsLayer() {
+      const btn = document.getElementById('opt-outdoor-trails');
+      if (!isOutdoorTrailsActive) {
+        if (!outdoorTrailsLayer) {
+          outdoorTrailsLayer = L.tileLayer('https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            opacity: 0.85,
+            attribution: '© Waymarked Trails / OpenStreetMap contributors'
+          });
+        }
+        outdoorTrailsLayer.addTo(map);
+        isOutdoorTrailsActive = true;
+        if (btn) btn.classList.add('active');
+      } else {
+        if (outdoorTrailsLayer) {
+          map.removeLayer(outdoorTrailsLayer);
+        }
+        isOutdoorTrailsActive = false;
+        if (btn) btn.classList.remove('active');
+      }
+      document.getElementById('map-type-menu').classList.remove('open');
+    }
+
     function resetMendozaView() {
-      map.flyTo(initialCoords, 12, { duration: 1.2 });
+      selectRegionWeb('todas');
     }
 
     let currentFilter = 'todas';
@@ -2734,9 +3852,13 @@
       summitLayers.forEach(s => map.removeLayer(s));
       summitLayers = [];
 
-      const filteredRoutes = currentFilter === 'todas'
+      let filteredRoutes = currentFilter === 'todas'
         ? MENDOZA_ROUTES
         : MENDOZA_ROUTES.filter(r => r.type === currentFilter);
+
+      if (selectedRegionId !== 'todas') {
+        filteredRoutes = filteredRoutes.filter(r => r.regionId === selectedRegionId);
+      }
 
       const filteredIncidents = currentFilter === 'todas'
         ? MENDOZA_INCIDENTS
@@ -2751,7 +3873,9 @@
         filteredPois = MENDOZA_POIS.filter(p => p.category === 'trailhead' || p.category === 'mirador');
       }
 
-      document.getElementById('stats-badge').innerText = `Mendoza • ${filteredRoutes.length} rutas • ${filteredPois.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
+      const curRegion = MENDOZA_REGIONS.find(r => r.id === selectedRegionId);
+      const regName = curRegion && curRegion.id !== 'todas' ? curRegion.name : 'Mendoza';
+      document.getElementById('stats-badge').innerText = `${regName} • ${filteredRoutes.length} rutas • ${filteredPois.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
       document.getElementById('fab-badge-count').innerText = filteredIncidents.length;
 
       // Áreas Protegidas (Fase 3: Semáforo de Legalidad)
@@ -2888,6 +4012,25 @@
       document.getElementById('route-dist').innerText = `${route.distanceKm} km`;
       document.getElementById('route-elev').innerText = `+${route.elevationGainM} m`;
       document.getElementById('route-surface').innerText = route.surface;
+
+      // Perfil Altimétrico estilo Wikiloc
+      const elevBox = document.getElementById('route-elevation-box');
+      const elevBars = document.getElementById('route-elevation-bars');
+      const elevRange = document.getElementById('route-elev-range');
+      if (route.elevationProfile && route.elevationProfile.points && route.elevationProfile.points.length > 0) {
+        elevBox.style.display = 'block';
+        const minE = route.elevationProfile.minElevM;
+        const maxE = route.elevationProfile.maxElevM;
+        const range = maxE - minE || 1;
+        elevRange.innerText = `${minE} m ➔ ${maxE} m (▲ +${route.elevationGainM} m)`;
+        
+        elevBars.innerHTML = route.elevationProfile.points.map((alt, idx) => {
+          const heightPercent = Math.max(15, Math.round(((alt - minE) / range) * 100));
+          return `<div class="elev-bar" style="height: ${heightPercent}%;" title="${alt} m (Punto ${idx + 1})"></div>`;
+        }).join('');
+      } else {
+        elevBox.style.display = 'none';
+      }
 
       // Semáforo de Legalidad (Fase 3)
       if (route.legality) {
@@ -3349,6 +4492,42 @@
           </div>
         `;
       }
+    }
+
+    function downloadActiveRouteGpx() {
+      if (!currentActiveRoute) return;
+      const r = currentActiveRoute;
+      const gpxName = r.gpxFileName || (r.id + '.gpx');
+      
+      const trkpts = r.coordinates.map(coord => 
+        '      <trkpt lat="' + coord[0] + '" lon="' + coord[1] + '"><ele>0</ele></trkpt>'
+      ).join('\n');
+
+      const gpxContent = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+'<gpx version="1.1" creator="ViaTrek Mendoza - Red Oficial de Senderos" xmlns="http://www.topografix.com/GPX/1/1">\n' +
+'  <metadata>\n' +
+'    <name>' + r.name.replace(/&/g, '&amp;') + '</name>\n' +
+'    <desc>Ruta ViaTrek: ' + r.zone + '. Dificultad: ' + r.difficulty + '. Desnivel: +' + r.elevationGainM + 'm. Distancia: ' + r.distanceKm + 'km</desc>\n' +
+'    <author><name>ViaTrek Mendoza</name></author>\n' +
+'  </metadata>\n' +
+'  <trk>\n' +
+'    <name>' + r.name.replace(/&/g, '&amp;') + '</name>\n' +
+'    <type>' + r.type + '</type>\n' +
+'    <trkseg>\n' +
+trkpts + '\n' +
+'    </trkseg>\n' +
+'  </trk>\n' +
+'</gpx>';
+
+      const blob = new Blob([gpxContent], { type: 'application/gpx+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = gpxName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function focusActiveRoute() {
