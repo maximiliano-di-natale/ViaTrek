@@ -123,6 +123,13 @@
       font-weight: 800;
       border: 1px solid rgba(233, 30, 99, 0.5);
     }
+    .filter-pill.active-comunidad {
+      background: rgba(255, 215, 0, 0.18);
+      color: #FFD700;
+      font-weight: 800;
+      border: 1px solid rgba(255, 215, 0, 0.6);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+    }
     .stats-badge {
       pointer-events: auto;
       margin-top: 7px;
@@ -135,6 +142,258 @@
       font-weight: 600;
       border: 1px solid rgba(255, 255, 255, 0.08);
       letter-spacing: 0.3px;
+    }
+
+    /* ESTILOS CROWDSOURCING & FOTOS WIKILOC */
+    .community-pill {
+      background: rgba(255, 215, 0, 0.18);
+      color: #FFD700;
+      border: 1px solid #FFD700;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .photos-gallery-box {
+      margin-top: 10px;
+      margin-bottom: 8px;
+    }
+    .photos-gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 900;
+      color: #00E5FF;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .photos-count-label {
+      color: #94A3B8;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .photos-gallery-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .photos-gallery-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .photo-thumb-card {
+      width: 110px;
+      height: 75px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #1E293B;
+      transition: transform 0.2s ease;
+    }
+    .photo-thumb-card:hover {
+      transform: scale(1.04);
+      border-color: #00E5FF;
+    }
+    .photo-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .photo-zoom-icon {
+      position: absolute;
+      bottom: 3px;
+      right: 3px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 2px 5px;
+      border-radius: 5px;
+      font-size: 10px;
+      color: #FFF;
+    }
+    .route-desc-card {
+      background: #0F172A;
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-top: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .route-desc-title {
+      font-size: 10px;
+      font-weight: 900;
+      color: #94A3B8;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .route-desc-text {
+      font-size: 12px;
+      color: #F8FAFC;
+      line-height: 1.4;
+    }
+    .route-tips-card {
+      background: rgba(16, 185, 129, 0.08);
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-top: 8px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .route-tips-title {
+      font-size: 10px;
+      font-weight: 900;
+      color: #00E676;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .route-tips-text {
+      font-size: 11px;
+      color: #94A3B8;
+      line-height: 1.4;
+    }
+    .poi-tips-box {
+      background: rgba(255, 215, 0, 0.08);
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-top: 6px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 215, 0, 0.25);
+      font-size: 11px;
+      color: #CBD5E1;
+      line-height: 1.4;
+    }
+    .crowd-tab-row {
+      display: flex;
+      background: #1E293B;
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+    .crowd-tab-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: #94A3B8;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .crowd-tab-btn.active {
+      background: #00E676;
+      color: #05080E;
+      font-weight: 900;
+    }
+    .crowd-presets-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 6px;
+      scrollbar-width: none;
+    }
+    .crowd-presets-row::-webkit-scrollbar {
+      display: none;
+    }
+    .preset-btn {
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #E2E8F0;
+      padding: 5px 10px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .preset-btn:hover {
+      background: #334155;
+      color: #00E676;
+    }
+    .btn-add-photo {
+      background: #00E5FF;
+      color: #05080E;
+      font-weight: 800;
+      font-size: 12px;
+      border: none;
+      border-radius: 8px;
+      padding: 0 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .crowd-thumbs-preview {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+    .crowd-thumb-item {
+      position: relative;
+      width: 75px;
+      height: 55px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .crowd-thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .crowd-thumb-del {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: #FF1744;
+      color: #FFF;
+      border: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .btn-submit-crowd {
+      width: 100%;
+      padding: 13px;
+      background: #00E676;
+      color: #05080E;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 14px;
+      box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-submit-crowd:hover {
+      background: #00C853;
+      transform: translateY(-1px);
+    }
+    .btn-gps-capture {
+      background: rgba(0, 230, 118, 0.15);
+      border: 1px solid rgba(0, 230, 118, 0.4);
+      color: #00E676;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     /* BARRA FLOTANTE ALERTA VIENTO ZONDA EN VIVO (FASE 4) */
@@ -1656,6 +1915,9 @@
       <button class="filter-pill" id="pill-wine_trail" onclick="setFilter('wine_trail')">
         🍷 Wine & Trail
       </button>
+      <button class="filter-pill" id="pill-comunidad" onclick="setFilter('comunidad')">
+        🌟 Comunidad
+      </button>
     </div>
 
     <!-- SELECTOR DE REGIONES / ZONAS ESTILO WIKILOC -->
@@ -1708,6 +1970,12 @@
     <!-- Botón Seguridad & SOS (Fase 2) -->
     <button class="fab-btn safety-btn" id="fab-safety-btn" onclick="openSafetyModal()" title="Suite de Seguridad & SOS">
       🛡️
+    </button>
+
+    <!-- Botón Crowdsourcing: Añadir Ruta o Lugar a la Comunidad (Wikiloc) -->
+    <button class="fab-btn crowdsource-btn" id="fab-crowdsource-btn" onclick="openCrowdsourceModal()" title="Añadir a la Comunidad (Wikiloc Crowdsourcing)" style="border-color: #00E676; background: #00E676; color: #05080E; font-size: 16px;">
+      ➕
+      <div class="fab-badge" style="background: #FFD700; color: #05080E; font-weight: 900;">★</div>
     </button>
 
     <!-- Botón Waze de la Montaña: Reportar Alerta -->
@@ -1766,6 +2034,7 @@
     <div class="card-header">
       <div>
         <div class="card-title-row">
+          <span class="community-pill" id="route-community-badge" style="display: none;">🌟 COMUNIDAD</span>
           <div class="color-dot" id="route-color-dot"></div>
           <span class="zone-badge" id="route-zone">Gran Mendoza</span>
           <span class="diff-pill" id="route-diff-pill">Fácil</span>
@@ -1773,6 +2042,27 @@
         <div class="card-title" id="route-title">Nombre de la Ruta</div>
       </div>
       <button class="close-btn" onclick="closeCards()">✕</button>
+    </div>
+
+    <!-- FOTOS COMUNITARIAS DE LA RUTA -->
+    <div class="photos-gallery-box" id="route-photos-box" style="display: none;">
+      <div class="photos-gallery-header">
+        <span>📷 FOTOS DE LA AVENTURA</span>
+        <span class="photos-count-label" id="route-photos-count">0 fotos</span>
+      </div>
+      <div class="photos-gallery-scroll" id="route-photos-scroll"></div>
+    </div>
+
+    <!-- DESCRIPCIÓN DE LA RUTA -->
+    <div class="route-desc-card" id="route-desc-box" style="display: none;">
+      <div class="route-desc-title">📖 DESCRIPCIÓN & HUELLA</div>
+      <div class="route-desc-text" id="route-desc-text"></div>
+    </div>
+
+    <!-- CONSEJOS Y EQUIPO -->
+    <div class="route-tips-card" id="route-tips-box" style="display: none;">
+      <div class="route-tips-title">💡 CONSEJOS DE MONTAÑA</div>
+      <div class="route-tips-text" id="route-tips-text"></div>
     </div>
 
     <div class="metrics-container">
@@ -1918,6 +2208,7 @@
     <div class="card-header">
       <div>
         <div class="card-title-row">
+          <span class="community-pill" id="poi-community-badge" style="display: none;">🌟 COMUNIDAD</span>
           <div class="color-dot" id="poi-color-dot"></div>
           <span class="zone-badge" id="poi-cat-badge">Punto de Interés</span>
         </div>
@@ -1926,7 +2217,35 @@
       <button class="close-btn" onclick="closeCards()">✕</button>
     </div>
 
+    <!-- FOTOS DEL POI -->
+    <div class="photos-gallery-box" id="poi-photos-box" style="display: none;">
+      <div class="photos-gallery-header">
+        <span>📷 FOTOS DEL LUGAR</span>
+        <span class="photos-count-label" id="poi-photos-count">0 fotos</span>
+      </div>
+      <div class="photos-gallery-scroll" id="poi-photos-scroll"></div>
+    </div>
+
     <p class="card-description" id="poi-desc"></p>
+
+    <!-- TIPS POI -->
+    <div class="poi-tips-box" id="poi-tips-box" style="display: none;">
+      💡 <strong style="color: #F8FAFC;">Recomendación:</strong> <span id="poi-tips-text"></span>
+    </div>
+
+    <!-- AUTOR POI -->
+    <div class="wikiloc-author-box" id="poi-author-box" style="display: none; margin-bottom: 12px;">
+      <div class="wikiloc-author-avatar" id="poi-author-avatar">VT</div>
+      <div class="wikiloc-author-info">
+        <div class="wikiloc-author-name" id="poi-author-name">Comunidad ViaTrek</div>
+        <div class="wikiloc-author-sub" id="poi-author-sub">Aporte verificado</div>
+      </div>
+      <div class="wikiloc-author-actions">
+        <button class="wikiloc-social-pill" onclick="handlePoiApplauseWeb()" id="poi-applause-btn">
+          ❤️ <span id="poi-applause-count">14</span>
+        </button>
+      </div>
+    </div>
 
     <a class="btn-nav" id="poi-nav-link" href="#" target="_blank" style="width: 100%; box-sizing: border-box;">
       Cómo llegar con Google Maps
@@ -2015,6 +2334,141 @@
       <a class="btn-nav" id="summit-nav-link" href="#" target="_blank" style="display: block; width: 100%; box-sizing: border-box;">
         Cómo llegar a la Base y Cumbre (Google Maps)
       </a>
+    </div>
+  </div>
+
+  <!-- MODAL: CROWDSOURCING - APORTAR RUTA O LUGAR A LA COMUNIDAD (WIKILOC) -->
+  <div class="modal-overlay" id="crowdsource-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">✨ Añadir a la Comunidad (Wikiloc)</div>
+        <button class="close-btn" onclick="closeCrowdsourceModal()">✕</button>
+      </div>
+      <p class="modal-subtitle">
+        Comparte senderos, miradores, cascadas o puestos para que todas las personas puedan visitarlos e informarse.
+      </p>
+
+      <!-- Selector de Tipo: POI vs RUTA -->
+      <div class="crowd-tab-row">
+        <button class="crowd-tab-btn active" id="crowd-tab-poi" onclick="switchCrowdTab('poi')">
+          📍 Lugar / POI
+        </button>
+        <button class="crowd-tab-btn" id="crowd-tab-route" onclick="switchCrowdTab('route')">
+          🗺️ Sendero / Ruta
+        </button>
+      </div>
+
+      <!-- Nombre -->
+      <label class="input-label">NOMBRE DEL LUGAR O SENDERO *</label>
+      <input type="text" class="form-input" id="crowd-name-input" placeholder="Ej. Cascada Secreta de El Salto">
+
+      <!-- Sección POI -->
+      <div id="crowd-poi-section">
+        <label class="input-label">CATEGORÍA DEL LUGAR</label>
+        <div class="type-grid" id="crowd-cat-grid">
+          <button class="type-btn active" onclick="selectCrowdCat('mirador', this)">👁️ Mirador</button>
+          <button class="type-btn" onclick="selectCrowdCat('cascada', this)">🌊 Cascada</button>
+          <button class="type-btn" onclick="selectCrowdCat('vertiente', this)">💧 Vertiente</button>
+          <button class="type-btn" onclick="selectCrowdCat('refugio_almacen', this)">🏡 Refugio</button>
+          <button class="type-btn" onclick="selectCrowdCat('cumbre', this)">⛰️ Cumbre</button>
+          <button class="type-btn" onclick="selectCrowdCat('trailhead', this)">🏁 Inicio</button>
+          <button class="type-btn" onclick="selectCrowdCat('camping', this)">⛺ Camping</button>
+          <button class="type-btn" onclick="selectCrowdCat('foto_spot', this)">📸 Foto Spot</button>
+        </div>
+
+        <label class="input-label">ALTITUD ESTIMADA (msnm)</label>
+        <input type="number" class="form-input" id="crowd-alt-input" placeholder="Ej. 1650">
+      </div>
+
+      <!-- Sección Ruta -->
+      <div id="crowd-route-section" style="display: none;">
+        <label class="input-label">MODALIDAD DEPORTIVA</label>
+        <div class="type-grid" id="crowd-route-type-grid">
+          <button class="type-btn active" onclick="selectCrowdRouteType('trekking', this)">🥾 Trekking</button>
+          <button class="type-btn" onclick="selectCrowdRouteType('sendero_mtb', this)">⛰️ MTB / Cerro</button>
+          <button class="type-btn" onclick="selectCrowdRouteType('ciclovia', this)">🚲 Ciclovía</button>
+          <button class="type-btn" onclick="selectCrowdRouteType('moto_trail', this)">🏍️ Moto Trail</button>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <div style="flex: 1;">
+            <label class="input-label">DISTANCIA (km)</label>
+            <input type="number" step="0.1" class="form-input" id="crowd-dist-input" placeholder="Ej. 6.5">
+          </div>
+          <div style="flex: 1;">
+            <label class="input-label">DESNIVEL (+m)</label>
+            <input type="number" class="form-input" id="crowd-elev-input" placeholder="Ej. 380">
+          </div>
+        </div>
+
+        <label class="input-label">DIFICULTAD TÉCNICA</label>
+        <div class="severity-row" id="crowd-diff-row">
+          <button class="sev-btn" onclick="selectCrowdDiff('Fácil', this)">Fácil</button>
+          <button class="sev-btn active-media" onclick="selectCrowdDiff('Moderado', this)">Moderado</button>
+          <button class="sev-btn" onclick="selectCrowdDiff('Técnico', this)">Técnico</button>
+        </div>
+
+        <label class="input-label">TIPO DE RECORRIDO</label>
+        <div class="severity-row">
+          <button class="sev-btn active-media" id="crowd-circ-yes" onclick="setCrowdCircular(true)">Circular 🔄</button>
+          <button class="sev-btn" id="crowd-circ-no" onclick="setCrowdCircular(false)">Solo ida ➡️</button>
+        </div>
+      </div>
+
+      <!-- Zona y Coordenadas -->
+      <label class="input-label">ZONA EN MENDOZA</label>
+      <input type="text" class="form-input" id="crowd-zone-input" placeholder="Ej. Potrerillos / El Salto / Quebrada de San Isidro">
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+        <label class="input-label" style="margin-bottom: 0;">COORDENADAS (LAT / LNG)</label>
+        <button type="button" class="btn-gps-capture" onclick="captureCurrentGpxWeb()">📍 Usar Mi Ubicación</button>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <input type="text" class="form-input" id="crowd-lat-input" placeholder="Latitud ej: -32.9650">
+        <input type="text" class="form-input" id="crowd-lng-input" placeholder="Longitud ej: -69.2150">
+      </div>
+
+      <!-- Descripción -->
+      <label class="input-label">DESCRIPCIÓN DETALLADA *</label>
+      <textarea class="form-input" id="crowd-desc-input" rows="3" placeholder="Describe la experiencia: huella, cómo llegar, atractivos, sombras, agua o vistas panorámicas..."></textarea>
+
+      <!-- Consejos -->
+      <label class="input-label">CONSEJOS & RECOMENDACIONES</label>
+      <input type="text" class="form-input" id="crowd-tips-input" placeholder="Ej. Llevar 2L de agua, calzado de trekking, precaución con viento en la tarde...">
+
+      <!-- Fotos -->
+      <label class="input-label">FOTOS DE LA AVENTURA</label>
+      <div style="font-size: 11px; color: #94A3B8; margin-bottom: 6px;">Selección rápida de fotos reales o pega un enlace web:</div>
+      <div class="crowd-presets-row">
+        <button type="button" class="preset-btn" onclick="addPhotoPresetWeb('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80')">🏔️ Cordón del Plata</button>
+        <button type="button" class="preset-btn" onclick="addPhotoPresetWeb('https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=1200&q=80')">🌊 Cascada</button>
+        <button type="button" class="preset-btn" onclick="addPhotoPresetWeb('https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80')">🥾 Sendero</button>
+        <button type="button" class="preset-btn" onclick="addPhotoPresetWeb('https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80')">🚵 Flow MTB</button>
+        <button type="button" class="preset-btn" onclick="addPhotoPresetWeb('https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1200&q=80')">🏡 Puesto Andino</button>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <input type="text" class="form-input" id="crowd-photo-url-input" placeholder="Pegar URL de foto https://...">
+        <button type="button" class="btn-add-photo" onclick="addCustomPhotoWeb()">+ Añadir</button>
+      </div>
+      <div class="crowd-thumbs-preview" id="crowd-thumbs-preview"></div>
+
+      <!-- Autor -->
+      <label class="input-label">TU NOMBRE / ALIAS</label>
+      <input type="text" class="form-input" id="crowd-author-input" placeholder="Ej. Valentina Rossi (Andinista)">
+
+      <!-- Botón Enviar -->
+      <button class="btn-submit-crowd" onclick="submitCrowdsourceWeb()">
+        Publicar en la Comunidad (Wikiloc) 🚀
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: VISOR DE FOTOS LIGHTBOX -->
+  <div class="modal-overlay" id="photo-lightbox-modal" style="background: rgba(5, 8, 14, 0.96);" onclick="closePhotoLightbox()">
+    <div style="position: relative; width: 94%; max-width: 800px; display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
+      <button class="close-btn" style="position: absolute; top: -45px; right: 0; font-size: 24px; color: #FFF;" onclick="closePhotoLightbox()">✕</button>
+      <img id="lightbox-img" src="" alt="Foto sendero" style="width: 100%; max-height: 70vh; object-fit: contain; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+      <div id="lightbox-caption" style="color: #F8FAFC; margin-top: 14px; font-size: 14px; font-weight: 600; text-align: center; background: rgba(15,23,42,0.8); padding: 8px 16px; border-radius: 20px;"></div>
     </div>
   </div>
 
@@ -2462,7 +2916,7 @@
 
     let selectedRegionId = 'todas';
 
-    const MENDOZA_ROUTES = [
+    let MENDOZA_ROUTES = [
   {
     "id": "sendero-chacras-teletubbies",
     "name": "Sendero Los Teletubbies",
@@ -5202,7 +5656,7 @@
   }
 ];
 
-    const MENDOZA_POIS = [
+    let MENDOZA_POIS = [
   {
     "id": "poi-chacras-entrada",
     "name": "Entrada Principal Senderos de Chacras (Calle Chiara Yacopini)",
@@ -5534,6 +5988,299 @@
     "description": "Vista panorámica impresionante a las aguas esmeralda y los paredones de basalto."
   }
 ];
+
+    // RUTAS APORTADAS POR LA COMUNIDAD (WIKILOC CROWDSOURCING)
+    const INITIAL_COMMUNITY_ROUTES = [
+      {
+        id: 'route-comunidad-filo-condores',
+        name: 'Filo de los Cóndores & Vistas Potrerillos',
+        zone: 'Potrerillos & El Salto',
+        regionId: 'potrerillos',
+        type: 'trekking',
+        distanceKm: 6.8,
+        elevationGainM: 420,
+        difficulty: 'Moderado',
+        surface: 'Ripio/Tierra',
+        strokeColor: '#00E676',
+        isCircular: true,
+        isCommunityCreated: true,
+        createdAt: 'Ayer',
+        description: 'Sendero panorámico descubierto y documentado por senderistas de Mendoza. Remonta el filo pedemontano con vistas de 360° al espejo de agua de Potrerillos y al imponente Cordón del Plata nevado. Terreno de acarreo suave con avistaje frecuente de cóndores andinos.',
+        recommendedSeason: 'Todo el año (en verano salir temprano antes de las 9:00 AM)',
+        equipmentTips: 'Llevar mínimo 2 litros de agua, bastones de trekking recomendados para el descenso y protección solar completa.',
+        photos: [
+          'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80'
+        ],
+        coordinates: [
+          [-32.9680, -69.2180],
+          [-32.9730, -69.2240],
+          [-32.9790, -69.2290],
+          [-32.9840, -69.2330],
+          [-32.9780, -69.2260],
+          [-32.9680, -69.2180]
+        ],
+        elevationProfile: {
+          minElevM: 1450,
+          maxElevM: 1870,
+          elevationGainM: 420,
+          points: [1450, 1540, 1680, 1870, 1620, 1450]
+        },
+        gpxFileName: 'viatrek_comunidad_filo_condores.gpx',
+        legality: {
+          status: 'libre',
+          badgeText: '🌟 Multimodal: Trekking Pedestre',
+          tagColor: '#00E676',
+          allowedModes: {
+            trekking: true,
+            bicycle: false,
+            moto: false
+          },
+          priorityRule: 'Sendero de altura sobre filo. Tránsito exclusivamente a pie.',
+          authority: 'Comunidad Senderista de Potrerillos'
+        },
+        waypoints: [
+          {
+            title: 'Inicio Mirador del Dique',
+            icon: '🅿️',
+            latitude: -32.9680,
+            longitude: -69.2180,
+            description: 'Punto de estacionamiento frente a la bahía'
+          },
+          {
+            title: 'Hito Filo de los Cóndores',
+            icon: '🦅',
+            latitude: -32.9840,
+            longitude: -69.2330,
+            description: 'Punto más alto con vista panorámica 360°'
+          }
+        ],
+        author: {
+          name: 'Valentina Rossi (Andinista)',
+          role: 'Comunidad ViaTrek Mendoza',
+          applauseCount: 42,
+          commentsCount: 9,
+          avatar: 'VR'
+        }
+      },
+      {
+        id: 'route-comunidad-quebrada-san-isidro-cascadas',
+        name: 'Quebrada de San Isidro & Cascadas Ocultas',
+        zone: 'El Challao / Las Heras',
+        regionId: 'challao_arco',
+        type: 'trekking',
+        distanceKm: 9.2,
+        elevationGainM: 350,
+        difficulty: 'Moderado',
+        surface: 'Ripio/Tierra',
+        strokeColor: '#00E5FF',
+        isCircular: false,
+        isCommunityCreated: true,
+        createdAt: 'Hace 3 días',
+        description: 'Hermosa travesía que remonta el lecho del arroyo temporario de San Isidro. Se atraviesan gargantas de roca colorada, pequeños saltos de agua y vegas verdes inesperadas en medio del pedemonte.',
+        recommendedSeason: 'Otoño y Primavera (ideal en días frescos)',
+        equipmentTips: 'Calzado que pueda mojarse o con buen agarre en piedra húmeda. Llevar frutas secas y gorra.',
+        photos: [
+          'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80'
+        ],
+        coordinates: [
+          [-32.8350, -68.9320],
+          [-32.8310, -68.9390],
+          [-32.8270, -68.9460],
+          [-32.8220, -68.9510],
+          [-32.8180, -68.9580]
+        ],
+        elevationProfile: {
+          minElevM: 1220,
+          maxElevM: 1570,
+          elevationGainM: 350,
+          points: [1220, 1310, 1400, 1490, 1570]
+        },
+        gpxFileName: 'viatrek_comunidad_quebrada_san_isidro.gpx',
+        legality: {
+          status: 'libre',
+          badgeText: '🌟 Multimodal: Trekking Pedestre',
+          tagColor: '#00E5FF',
+          allowedModes: {
+            trekking: true,
+            bicycle: false,
+            moto: false
+          },
+          priorityRule: 'Lecho de quebrada y arroyo natural. Respetar flora nativa.',
+          authority: 'Comunidad Vecinos del Challao'
+        },
+        waypoints: [
+          {
+            title: 'Entrada Puesto San Isidro',
+            icon: '🏡',
+            latitude: -32.8350,
+            longitude: -68.9320,
+            description: 'Inicio de la huella peatonal'
+          },
+          {
+            title: 'Primer Salto de Agua',
+            icon: '🌊',
+            latitude: -32.8220,
+            longitude: -68.9510,
+            description: 'Cascada de deshielo entre farallones'
+          }
+        ],
+        author: {
+          name: 'Lucas Benítez (Guía Local)',
+          role: 'Comunidad ViaTrek',
+          applauseCount: 35,
+          commentsCount: 7,
+          avatar: 'LB'
+        }
+      },
+      {
+        id: 'route-comunidad-singletrack-alamo-flow',
+        name: 'Singletrack Flow del Álamo & Cañadón MTB',
+        zone: 'Chacras de Coria / Pedemonte',
+        regionId: 'chacras',
+        type: 'sendero_mtb',
+        distanceKm: 8.4,
+        elevationGainM: 210,
+        difficulty: 'Moderado',
+        surface: 'Ripio/Tierra',
+        strokeColor: '#FF6D00',
+        isCircular: true,
+        isCommunityCreated: true,
+        createdAt: 'Esta semana',
+        description: 'Circuito dinámico y fluido ideal para bicicletas de montaña intermedias y avanzadas. Conecta los peraltes naturales del puesto El Álamo con curvas rápidas sobre suelo arcilloso compacto.',
+        recommendedSeason: 'Todo el año',
+        equipmentTips: 'Líquido sellador tubeless obligatorio por espinas y cadillos. Casco y guantes indispensables.',
+        photos: [
+          'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80'
+        ],
+        coordinates: [
+          [-33.0040, -68.9020],
+          [-33.0010, -68.9090],
+          [-32.9970, -68.9160],
+          [-32.9930, -68.9220],
+          [-32.9900, -68.9280],
+          [-32.9960, -68.9190],
+          [-33.0040, -68.9020]
+        ],
+        elevationProfile: {
+          minElevM: 1040,
+          maxElevM: 1250,
+          elevationGainM: 210,
+          points: [1040, 1110, 1180, 1250, 1160, 1040]
+        },
+        gpxFileName: 'viatrek_comunidad_alamo_flow_mtb.gpx',
+        legality: {
+          status: 'libre',
+          badgeText: '🌟 Multimodal: Trekking & MTB',
+          tagColor: '#FF6D00',
+          allowedModes: {
+            trekking: true,
+            bicycle: true,
+            moto: false
+          },
+          priorityRule: 'Singletrack con curvas ciegas. Ceder el paso a peatones en subida.',
+          authority: 'Asociación Ciclistas Chacras MTB'
+        },
+        waypoints: [
+          {
+            title: 'Bajada de los Peraltes',
+            icon: '🚵',
+            latitude: -32.9970,
+            longitude: -68.9160,
+            description: 'Sector con peraltes naturales rápidos'
+          }
+        ],
+        author: {
+          name: 'Matías Godoy (MTB Mendoza)',
+          role: 'Rider Comunitario',
+          applauseCount: 51,
+          commentsCount: 12,
+          avatar: 'MG'
+        }
+      }
+    ];
+
+    // LUGARES Y POIs APORTADOS POR LA COMUNIDAD (WIKILOC CROWDSOURCING)
+    const INITIAL_COMMUNITY_POIS = [
+      {
+        id: 'poi-comunidad-cascada-el-salto',
+        name: 'Cascada Secreta de la Angostura (El Salto)',
+        category: 'cascada',
+        icon: '🌊',
+        color: '#00E5FF',
+        latitude: -32.9980,
+        longitude: -69.2550,
+        altitudeM: 1850,
+        isCommunityCreated: true,
+        createdAt: 'Hace 2 días',
+        description: 'Hermosa caída de agua de deshielo pura oculta entre los farallones de la quebrada alta de El Salto. Ideal para refrescarse y tomar fotografías del valle.',
+        tips: 'El acceso final requiere pisar rocas húmedas. Llevar calzado con suela antideslizante y respetar el caudal.',
+        photos: [
+          'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'
+        ],
+        author: {
+          name: 'Camila P. (Trekking Mendoza)',
+          role: 'Comunidad ViaTrek',
+          applauseCount: 29,
+          avatar: 'CP'
+        }
+      },
+      {
+        id: 'poi-comunidad-mirador-cerro-negro',
+        name: 'Mirador Ojo del Cóndor (Filo Challao)',
+        category: 'mirador',
+        icon: '👁️',
+        color: '#FFD700',
+        latitude: -32.8190,
+        longitude: -68.9650,
+        altitudeM: 1720,
+        isCommunityCreated: true,
+        createdAt: 'Hace 4 días',
+        description: 'Punto panorámico sobre un peñasco sobresaliente. Permite observar el anidamiento de rapaces y cóndores, con una vista espectacular hacia la quebrada de San Isidro.',
+        tips: 'Zona muy expuesta a ráfagas de viento Zonda. Evitar asomarse al borde con vientos fuertes.',
+        photos: [
+          'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80'
+        ],
+        author: {
+          name: 'Gonzalo Silva',
+          role: 'Explorador Precordillerano',
+          applauseCount: 38,
+          avatar: 'GS'
+        }
+      },
+      {
+        id: 'poi-comunidad-vertiente-sauce',
+        name: 'Vertiente Puesto El Sauce (Agua Dulce)',
+        category: 'vertiente',
+        icon: '💧',
+        color: '#00E676',
+        latitude: -33.0080,
+        longitude: -68.9180,
+        altitudeM: 1120,
+        isCommunityCreated: true,
+        createdAt: 'Hace 1 semana',
+        description: 'Nacedero natural de agua dulce rodeado de sauces criollos añosos. Sombra tupida perfecta para descanso, recarga de caramañolas y merienda.',
+        tips: 'El agua es cristalina de vertiente pedemontana; se recomienda filtrar o pastilla potabilizadora por precaución.',
+        photos: [
+          'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1200&q=80'
+        ],
+        author: {
+          name: 'Florencia & Diego',
+          role: 'Comunidad MTB Luján',
+          applauseCount: 22,
+          avatar: 'FD'
+        }
+      }
+    ];
+
+    // Sembrar datos iniciales de comunidad
+    MENDOZA_ROUTES.unshift(...INITIAL_COMMUNITY_ROUTES);
+    MENDOZA_POIS.unshift(...INITIAL_COMMUNITY_POIS);
 
     // ESTACIÓN METEOROLÓGICA Y ALERTA VIENTO ZONDA (FASE 4)
     const INITIAL_ZONDA_WEATHER = {
@@ -5903,34 +6650,38 @@
 
       let filteredRoutes = currentFilter === 'todas'
         ? MENDOZA_ROUTES
-        : MENDOZA_ROUTES.filter(r => {
-            if (currentFilter === 'trekking') {
-              return r.type === 'trekking' || (r.legality && r.legality.allowedModes && r.legality.allowedModes.trekking);
-            }
-            if (currentFilter === 'sendero_mtb') {
-              return r.type === 'sendero_mtb' || (r.legality && r.legality.allowedModes && r.legality.allowedModes.bicycle);
-            }
-            if (currentFilter === 'moto_trail') {
-              return r.type === 'moto_trail' || (r.legality && r.legality.allowedModes && r.legality.allowedModes.moto);
-            }
-            return r.type === currentFilter;
-          });
+        : currentFilter === 'comunidad'
+          ? MENDOZA_ROUTES.filter(r => r.isCommunityCreated)
+          : MENDOZA_ROUTES.filter(r => {
+              if (currentFilter === 'trekking') {
+                return r.type === 'trekking' || (r.legality && r.legality.allowedModes && r.legality.allowedModes.trekking);
+              }
+              if (currentFilter === 'sendero_mtb') {
+                return r.type === 'sendero_mtb' || (r.legality && r.legality.allowedModes && r.legality.allowedModes.bicycle);
+              }
+              if (currentFilter === 'moto_trail') {
+                return r.type === 'moto_trail' || (r.legality && r.legality.allowedModes && r.legality.allowedModes.moto);
+              }
+              return r.type === currentFilter;
+            });
 
       if (selectedRegionId !== 'todas') {
         filteredRoutes = filteredRoutes.filter(r => r.regionId === selectedRegionId);
       }
 
-      const filteredIncidents = currentFilter === 'todas'
+      const filteredIncidents = currentFilter === 'todas' || currentFilter === 'comunidad'
         ? MENDOZA_INCIDENTS
         : MENDOZA_INCIDENTS.filter(i => i.affectedModes.includes(currentFilter));
 
       let filteredPois = MENDOZA_POIS;
-      if (currentFilter === 'trekking') {
-        filteredPois = MENDOZA_POIS.filter(p => ['trailhead', 'mirador', 'cumbre', 'vertiente', 'refugio_almacen'].includes(p.category));
+      if (currentFilter === 'comunidad') {
+        filteredPois = MENDOZA_POIS.filter(p => p.isCommunityCreated);
+      } else if (currentFilter === 'trekking') {
+        filteredPois = MENDOZA_POIS.filter(p => ['trailhead', 'mirador', 'cumbre', 'vertiente', 'refugio_almacen', 'cascada', 'camping', 'foto_spot'].includes(p.category));
       } else if (currentFilter === 'sendero_mtb') {
-        filteredPois = MENDOZA_POIS.filter(p => ['trailhead', 'mirador', 'hidratacion', 'taller', 'refugio_almacen'].includes(p.category));
+        filteredPois = MENDOZA_POIS.filter(p => ['trailhead', 'mirador', 'hidratacion', 'taller', 'refugio_almacen', 'camping'].includes(p.category));
       } else if (currentFilter === 'moto_trail') {
-        filteredPois = MENDOZA_POIS.filter(p => ['trailhead', 'mirador', 'refugio_almacen'].includes(p.category));
+        filteredPois = MENDOZA_POIS.filter(p => ['trailhead', 'mirador', 'refugio_almacen', 'camping'].includes(p.category));
       } else if (currentFilter === 'ciclovia') {
         filteredPois = MENDOZA_POIS.filter(p => ['taller', 'trailhead', 'mirador'].includes(p.category));
       } else if (currentFilter === 'wine_trail') {
@@ -6066,6 +6817,52 @@
       // Resaltar la ruta activa y atenuar las demás
       renderRouteFocusMode(route);
 
+      const comBadge = document.getElementById('route-community-badge');
+      if (comBadge) {
+        comBadge.style.display = route.isCommunityCreated ? 'inline-block' : 'none';
+      }
+
+      // Fotos de la ruta
+      const rPhotoBox = document.getElementById('route-photos-box');
+      const rPhotoScroll = document.getElementById('route-photos-scroll');
+      const rPhotoCount = document.getElementById('route-photos-count');
+      if (route.photos && route.photos.length > 0) {
+        rPhotoBox.style.display = 'block';
+        rPhotoCount.innerText = `${route.photos.length} fotos`;
+        rPhotoScroll.innerHTML = route.photos.map((url, idx) => `
+          <div class="photo-thumb-card" onclick="openPhotoLightbox('${url}', '${route.name.replace(/'/g, "\\'")} - Foto ${idx + 1}')">
+            <img class="photo-thumb-img" src="${url}" alt="Foto ${idx + 1}">
+            <div class="photo-thumb-badge">📷 ${idx + 1}/${route.photos.length}</div>
+          </div>
+        `).join('');
+      } else {
+        rPhotoBox.style.display = 'none';
+      }
+
+      // Descripción detallada
+      const rDescBox = document.getElementById('route-desc-box');
+      const rDescText = document.getElementById('route-desc-text');
+      if (route.description) {
+        rDescBox.style.display = 'block';
+        rDescText.innerText = route.description;
+      } else {
+        rDescBox.style.display = 'none';
+      }
+
+      // Consejos y recomendaciones
+      const rTipsBox = document.getElementById('route-tips-box');
+      const rTipsText = document.getElementById('route-tips-text');
+      const tipsArr = [];
+      if (route.recommendedSeason) tipsArr.push(`🗓️ Temporada recomendada: ${route.recommendedSeason}`);
+      if (route.equipmentTips) tipsArr.push(`🎒 Equipamiento: ${route.equipmentTips}`);
+      if (route.tips) tipsArr.push(`💡 Consejos: ${route.tips}`);
+      if (tipsArr.length > 0) {
+        rTipsBox.style.display = 'block';
+        rTipsText.innerHTML = tipsArr.map(t => `<div style="margin-bottom: 3px;">• ${t}</div>`).join('');
+      } else {
+        rTipsBox.style.display = 'none';
+      }
+
       document.getElementById('route-color-dot').style.backgroundColor = route.strokeColor;
       document.getElementById('route-title').innerText = route.name;
       document.getElementById('route-zone').innerText = route.zone;
@@ -6097,8 +6894,12 @@
 
       if (route.author) {
         document.getElementById('route-author-name').innerText = route.author.name;
-        document.getElementById('route-author-role').innerText = route.author.role || 'Guía de Montaña';
+        document.getElementById('route-author-role').innerText = route.author.role || (route.isCommunityCreated ? 'Comunidad ViaTrek' : 'Guía de Montaña');
         document.getElementById('route-applause-count').innerText = route.author.applauseCount || 18;
+        const rAvatar = document.querySelector('#route-card .wikiloc-author-avatar');
+        if (rAvatar) {
+          rAvatar.innerText = route.author.avatar || route.author.name.slice(0, 2).toUpperCase();
+        }
       }
 
       // Perfil Altimétrico estilo Wikiloc
@@ -6184,6 +6985,54 @@
 
     function showPoiCard(poi) {
       closeCards();
+
+      const comBadge = document.getElementById('poi-community-badge');
+      if (comBadge) {
+        comBadge.style.display = poi.isCommunityCreated ? 'inline-block' : 'none';
+      }
+
+      // Fotos del POI
+      const pPhotoBox = document.getElementById('poi-photos-box');
+      const pPhotoScroll = document.getElementById('poi-photos-scroll');
+      const pPhotoCount = document.getElementById('poi-photos-count');
+      if (poi.photos && poi.photos.length > 0) {
+        pPhotoBox.style.display = 'block';
+        pPhotoCount.innerText = `${poi.photos.length} fotos`;
+        pPhotoScroll.innerHTML = poi.photos.map((url, idx) => `
+          <div class="photo-thumb-card" onclick="openPhotoLightbox('${url}', '${poi.name.replace(/'/g, "\\'")} - Foto ${idx + 1}')">
+            <img class="photo-thumb-img" src="${url}" alt="Foto ${idx + 1}">
+            <div class="photo-thumb-badge">📷 ${idx + 1}/${poi.photos.length}</div>
+          </div>
+        `).join('');
+      } else {
+        pPhotoBox.style.display = 'none';
+      }
+
+      // Consejos POI
+      const pTipsBox = document.getElementById('poi-tips-box');
+      const pTipsText = document.getElementById('poi-tips-text');
+      if (poi.tips) {
+        pTipsBox.style.display = 'block';
+        pTipsText.innerText = poi.tips;
+      } else {
+        pTipsBox.style.display = 'none';
+      }
+
+      // Autor POI
+      const pAuthorBox = document.getElementById('poi-author-box');
+      if (poi.author) {
+        pAuthorBox.style.display = 'flex';
+        document.getElementById('poi-author-name').innerText = poi.author.name;
+        document.getElementById('poi-author-sub').innerText = poi.author.role || (poi.isCommunityCreated ? 'Aporte de la Comunidad' : 'Verificado ViaTrek');
+        document.getElementById('poi-applause-count').innerText = poi.author.applauseCount || 14;
+        const pAvatar = document.getElementById('poi-author-avatar');
+        if (pAvatar) {
+          pAvatar.innerText = poi.author.avatar || poi.author.name.slice(0, 2).toUpperCase();
+        }
+      } else {
+        pAuthorBox.style.display = 'none';
+      }
+
       document.getElementById('poi-color-dot').style.backgroundColor = poi.color;
       document.getElementById('poi-title').innerText = poi.name;
       const altStr = poi.altitudeM ? ` • ${poi.altitudeM} msnm` : '';
@@ -7024,7 +7873,365 @@ trkpts + '\n' +
       updateZondaUI();
     }
 
+    // =========================================================================
+    // CROWDSOURCING & COMUNIDAD ESTILO WIKILOC
+    // =========================================================================
+    let poiApplauded = false;
+    function handlePoiApplauseWeb() {
+      const el = document.getElementById('poi-applause-count');
+      if (!el) return;
+      let count = parseInt(el.innerText, 10) || 14;
+      if (!poiApplauded) {
+        count += 1;
+        poiApplauded = true;
+        document.getElementById('poi-applause-btn').style.borderColor = '#00E676';
+        document.getElementById('poi-applause-btn').style.color = '#00E676';
+      } else {
+        count -= 1;
+        poiApplauded = false;
+        document.getElementById('poi-applause-btn').style.borderColor = '';
+        document.getElementById('poi-applause-btn').style.color = '';
+      }
+      el.innerText = count;
+    }
+
+    // Lightbox modal para fotos
+    function openPhotoLightbox(url, caption) {
+      document.getElementById('lightbox-img').src = url;
+      document.getElementById('lightbox-caption').innerText = caption || 'Foto de la aventura';
+      document.getElementById('photo-lightbox-modal').classList.add('open');
+    }
+
+    function closePhotoLightbox() {
+      document.getElementById('photo-lightbox-modal').classList.remove('open');
+    }
+
+    // Modal de crowdsourcing
+    let crowdSelectedType = 'poi';
+    let crowdSelectedCat = 'mirador';
+    let crowdSelectedRouteType = 'trekking';
+    let crowdSelectedDiff = 'Moderado';
+    let crowdIsCircular = true;
+    let crowdPhotos = [];
+
+    function openCrowdsourceModal() {
+      document.getElementById('crowd-lat-input').value = currentUserCoords[0].toFixed(5);
+      document.getElementById('crowd-lng-input').value = currentUserCoords[1].toFixed(5);
+      document.getElementById('crowd-thumbs-preview').innerHTML = '';
+      crowdPhotos = [];
+      document.getElementById('crowdsource-modal').classList.add('open');
+    }
+
+    function closeCrowdsourceModal() {
+      document.getElementById('crowdsource-modal').classList.remove('open');
+    }
+
+    function switchCrowdTab(type) {
+      crowdSelectedType = type;
+      const tabPoi = document.getElementById('crowd-tab-poi');
+      const tabRoute = document.getElementById('crowd-tab-route');
+      const secPoi = document.getElementById('crowd-poi-section');
+      const secRoute = document.getElementById('crowd-route-section');
+      if (type === 'poi') {
+        tabPoi.classList.add('active');
+        tabRoute.classList.remove('active');
+        secPoi.style.display = 'block';
+        secRoute.style.display = 'none';
+      } else {
+        tabRoute.classList.add('active');
+        tabPoi.classList.remove('active');
+        secRoute.style.display = 'block';
+        secPoi.style.display = 'none';
+      }
+    }
+
+    function selectCrowdCat(cat, btn) {
+      crowdSelectedCat = cat;
+      document.querySelectorAll('#crowd-cat-grid .type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function selectCrowdRouteType(type, btn) {
+      crowdSelectedRouteType = type;
+      document.querySelectorAll('#crowd-route-type-grid .type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function selectCrowdDiff(diff, btn) {
+      crowdSelectedDiff = diff;
+      document.querySelectorAll('#crowd-diff-row .sev-btn').forEach(b => b.className = 'sev-btn');
+      btn.classList.add('active-media');
+    }
+
+    function setCrowdCircular(isCirc) {
+      crowdIsCircular = isCirc;
+      const yesBtn = document.getElementById('crowd-circ-yes');
+      const noBtn = document.getElementById('crowd-circ-no');
+      if (isCirc) {
+        yesBtn.className = 'sev-btn active-media';
+        noBtn.className = 'sev-btn';
+      } else {
+        yesBtn.className = 'sev-btn';
+        noBtn.className = 'sev-btn active-media';
+      }
+    }
+
+    function renderCrowdThumbsPreview() {
+      const container = document.getElementById('crowd-thumbs-preview');
+      if (crowdPhotos.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = crowdPhotos.map((url, idx) => `
+        <div class="crowd-thumb-item">
+          <img src="${url}" alt="Foto ${idx + 1}">
+          <button type="button" class="thumb-remove-btn" onclick="removePhotoWeb(${idx})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function addPhotoPresetWeb(url) {
+      if (crowdPhotos.length >= 6) {
+        alert('Puedes añadir hasta 6 fotos.');
+        return;
+      }
+      crowdPhotos.push(url);
+      renderCrowdThumbsPreview();
+    }
+
+    function addCustomPhotoWeb() {
+      const input = document.getElementById('crowd-photo-url-input');
+      const url = input.value.trim();
+      if (!url) return;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        alert('Por favor ingresa una URL válida (ej: https://...)');
+        return;
+      }
+      if (crowdPhotos.length >= 6) {
+        alert('Puedes añadir hasta 6 fotos.');
+        return;
+      }
+      crowdPhotos.push(url);
+      input.value = '';
+      renderCrowdThumbsPreview();
+    }
+
+    function removePhotoWeb(idx) {
+      crowdPhotos.splice(idx, 1);
+      renderCrowdThumbsPreview();
+    }
+
+    function captureCurrentGpxWeb() {
+      if (!navigator.geolocation) {
+        alert('Geolocalización no disponible en el navegador.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          document.getElementById('crowd-lat-input').value = lat.toFixed(5);
+          document.getElementById('crowd-lng-input').value = lng.toFixed(5);
+          currentUserCoords = [lat, lng];
+          alert(`📍 Ubicación GPS obtenida: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+        },
+        () => alert('No se pudo acceder al GPS.')
+      );
+    }
+
+    function submitCrowdsourceWeb() {
+      const name = document.getElementById('crowd-name-input').value.trim();
+      const desc = document.getElementById('crowd-desc-input').value.trim();
+      const zone = document.getElementById('crowd-zone-input').value.trim() || 'Mendoza / Precordillera';
+      const tips = document.getElementById('crowd-tips-input').value.trim();
+      const authorName = document.getElementById('crowd-author-input').value.trim() || 'Senderista ViaTrek';
+      
+      if (!name) {
+        alert('Por favor escribe el nombre del lugar o sendero.');
+        return;
+      }
+      if (!desc) {
+        alert('Por favor agrega una descripción detallada para la comunidad.');
+        return;
+      }
+
+      let lat = parseFloat(document.getElementById('crowd-lat-input').value);
+      let lng = parseFloat(document.getElementById('crowd-lng-input').value);
+      if (isNaN(lat) || isNaN(lng)) {
+        lat = currentUserCoords[0];
+        lng = currentUserCoords[1];
+      }
+
+      const photosToSave = crowdPhotos.length > 0 
+        ? [...crowdPhotos]
+        : ['https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80'];
+
+      const authorObj = {
+        name: authorName,
+        role: 'Comunidad ViaTrek (Wikiloc)',
+        applauseCount: 1,
+        avatar: authorName.slice(0, 2).toUpperCase()
+      };
+
+      if (crowdSelectedType === 'poi') {
+        const alt = parseInt(document.getElementById('crowd-alt-input').value, 10) || 1200;
+        let icon = '📍';
+        let color = '#00E5FF';
+        if (crowdSelectedCat === 'mirador') { icon = '👁️'; color = '#FFD700'; }
+        else if (crowdSelectedCat === 'cascada') { icon = '🌊'; color = '#00E5FF'; }
+        else if (crowdSelectedCat === 'vertiente') { icon = '💧'; color = '#00E676'; }
+        else if (crowdSelectedCat === 'refugio_almacen') { icon = '🏡'; color = '#FF9100'; }
+        else if (crowdSelectedCat === 'cumbre') { icon = '⛰️'; color = '#FF1744'; }
+        else if (crowdSelectedCat === 'trailhead') { icon = '🏁'; color = '#00E5FF'; }
+        else if (crowdSelectedCat === 'camping') { icon = '⛺'; color = '#00E676'; }
+        else if (crowdSelectedCat === 'foto_spot') { icon = '📸'; color = '#E040FB'; }
+
+        const newPoi = {
+          id: 'poi-crowd-' + Date.now(),
+          name: name,
+          category: crowdSelectedCat,
+          icon: icon,
+          color: color,
+          latitude: lat,
+          longitude: lng,
+          altitudeM: alt,
+          description: desc,
+          tips: tips || undefined,
+          photos: photosToSave,
+          isCommunityCreated: true,
+          createdAt: 'Recién',
+          author: authorObj
+        };
+
+        MENDOZA_POIS.unshift(newPoi);
+        saveCommunityItemToLocalStorage('poi', newPoi);
+
+        closeCrowdsourceModal();
+        renderMapElements();
+        map.flyTo([lat, lng], 14, { duration: 1.2 });
+        showPoiCard(newPoi);
+
+        alert(`🎉 ¡Lugar añadido a la comunidad con éxito!\n"${name}" ya es visible en el mapa.`);
+      } else {
+        const dist = parseFloat(document.getElementById('crowd-dist-input').value) || 5.0;
+        const elev = parseInt(document.getElementById('crowd-elev-input').value, 10) || 250;
+        const isCirc = crowdIsCircular;
+
+        let strokeColor = '#00E676';
+        if (crowdSelectedRouteType === 'sendero_mtb') strokeColor = '#FF6D00';
+        else if (crowdSelectedRouteType === 'ciclovia') strokeColor = '#00E5FF';
+        else if (crowdSelectedRouteType === 'moto_trail') strokeColor = '#2979FF';
+
+        const coords = [];
+        const numPoints = 6;
+        for (let i = 0; i < numPoints; i++) {
+          const angle = (i / (numPoints - 1)) * (isCirc ? 2 * Math.PI : Math.PI);
+          const r = (dist / 111.0) * 0.35;
+          const ptLat = lat + Math.sin(angle) * r;
+          const ptLng = lng + Math.cos(angle) * r * 1.2;
+          coords.push([parseFloat(ptLat.toFixed(5)), parseFloat(ptLng.toFixed(5))]);
+        }
+        if (isCirc) {
+          coords.push([...coords[0]]);
+        }
+
+        const newRoute = {
+          id: 'route-crowd-' + Date.now(),
+          name: name,
+          zone: zone,
+          regionId: selectedRegionId !== 'todas' ? selectedRegionId : 'potrerillos',
+          type: crowdSelectedRouteType,
+          distanceKm: dist,
+          elevationGainM: elev,
+          difficulty: crowdSelectedDiff,
+          surface: 'Ripio/Tierra',
+          strokeColor: strokeColor,
+          coordinates: coords,
+          elevationProfile: {
+            minElevM: 1100,
+            maxElevM: 1100 + elev,
+            elevationGainM: elev,
+            points: [1100, 1100 + Math.round(elev * 0.4), 1100 + Math.round(elev * 0.8), 1100 + elev, 1100 + Math.round(elev * 0.5), isCirc ? 1100 : 1100 + elev]
+          },
+          gpxFileName: `viatrek_crowd_${Date.now()}.gpx`,
+          isCircular: isCirc,
+          description: desc,
+          recommendedSeason: 'Todo el año',
+          equipmentTips: tips || 'Calzado adecuado y buena hidratación.',
+          photos: photosToSave,
+          isCommunityCreated: true,
+          createdAt: 'Recién',
+          legality: {
+            status: 'libre',
+            badgeText: '🌟 Aporte de la Comunidad',
+            tagColor: strokeColor,
+            allowedModes: {
+              trekking: crowdSelectedRouteType === 'trekking' || crowdSelectedRouteType === 'sendero_mtb',
+              bicycle: crowdSelectedRouteType === 'sendero_mtb' || crowdSelectedRouteType === 'ciclovia',
+              moto: crowdSelectedRouteType === 'moto_trail'
+            },
+            priorityRule: 'Sendero comunitario. Disfrutar con respeto a la naturaleza y a otros senderistas.',
+            authority: 'Comunidad ViaTrek Mendoza'
+          },
+          author: authorObj
+        };
+
+        MENDOZA_ROUTES.unshift(newRoute);
+        saveCommunityItemToLocalStorage('route', newRoute);
+
+        closeCrowdsourceModal();
+        renderMapElements();
+        map.flyTo([lat, lng], 14, { duration: 1.2 });
+        showRouteCard(newRoute);
+
+        alert(`🎉 ¡Sendero publicado en la comunidad con éxito!\n"${name}" ya está trazado y disponible para descargar en GPX.`);
+      }
+
+      document.getElementById('crowd-name-input').value = '';
+      document.getElementById('crowd-desc-input').value = '';
+      document.getElementById('crowd-tips-input').value = '';
+      document.getElementById('crowd-photo-url-input').value = '';
+      crowdPhotos = [];
+      renderCrowdThumbsPreview();
+    }
+
+    function saveCommunityItemToLocalStorage(type, item) {
+      try {
+        const key = type === 'poi' ? 'viatrek_community_pois' : 'viatrek_community_routes';
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        existing.unshift(item);
+        localStorage.setItem(key, JSON.stringify(existing));
+      } catch (e) {
+        console.error('Error saving to localStorage:', e);
+      }
+    }
+
+    function loadCommunityFromLocalStorage() {
+      try {
+        const storedRoutes = JSON.parse(localStorage.getItem('viatrek_community_routes') || '[]');
+        if (Array.isArray(storedRoutes) && storedRoutes.length > 0) {
+          storedRoutes.forEach(r => {
+            if (!MENDOZA_ROUTES.some(ex => ex.id === r.id)) {
+              MENDOZA_ROUTES.unshift(r);
+            }
+          });
+        }
+
+        const storedPois = JSON.parse(localStorage.getItem('viatrek_community_pois') || '[]');
+        if (Array.isArray(storedPois) && storedPois.length > 0) {
+          storedPois.forEach(p => {
+            if (!MENDOZA_POIS.some(ex => ex.id === p.id)) {
+              MENDOZA_POIS.unshift(p);
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Error loading community items from localStorage:', e);
+      }
+    }
+
     // Inicializar mapa y datos
+    loadCommunityFromLocalStorage();
     updateSosLinks(initialCoords[0], initialCoords[1]);
     initConvivenciaModalContent();
     updateZondaUI();

@@ -91,11 +91,18 @@ export interface RouteItem {
   gpxFileName?: string;
   isCircular?: boolean;
   waypoints?: RouteWaypoint[];
+  description?: string;
+  photos?: string[];
+  isCommunityCreated?: boolean;
+  createdAt?: string;
+  recommendedSeason?: string;
+  equipmentTips?: string;
   author?: {
     name: string;
     role?: string;
     applauseCount?: number;
     commentsCount?: number;
+    avatar?: string;
   };
 }
 
@@ -136,7 +143,11 @@ export type POICategory =
   | 'refugio_almacen'
   | 'cumbre'
   | 'parapente'
-  | 'vertiente';
+  | 'vertiente'
+  | 'cascada'
+  | 'camping'
+  | 'foto_spot'
+  | 'precaucion_lugar';
 
 export interface POIItem {
   id: string;
@@ -148,6 +159,41 @@ export interface POIItem {
   altitudeM?: number;
   icon?: string;
   color?: string;
+  photos?: string[];
+  isCommunityCreated?: boolean;
+  createdAt?: string;
+  tips?: string;
+  author?: {
+    name: string;
+    role?: string;
+    applauseCount?: number;
+    avatar?: string;
+  };
+}
+
+export type CrowdsourceType = 'poi' | 'route';
+
+export interface CrowdsourceSubmission {
+  contributionType: CrowdsourceType;
+  name: string;
+  zone: string;
+  regionId?: string;
+  description: string;
+  tips?: string;
+  photos: string[];
+  authorName: string;
+  authorRole?: string;
+  category?: POICategory;
+  latitude?: number;
+  longitude?: number;
+  altitudeM?: number;
+  routeType?: RouteType;
+  difficulty?: 'Fácil' | 'Moderado' | 'Técnico';
+  distanceKm?: number;
+  elevationGainM?: number;
+  isCircular?: boolean;
+  surface?: 'Asfalto' | 'Ripio/Tierra' | 'Mixto';
+  coordinates?: Coordinate[];
 }
 
 // Alias compatible

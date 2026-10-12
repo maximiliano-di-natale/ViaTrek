@@ -12,6 +12,7 @@ import {
   Modal,
   TextInput,
   ScrollView,
+  Image,
 } from 'react-native';
 import MapView, {
   Polyline,
@@ -66,6 +67,12 @@ import {
   Medal,
   Download,
   Footprints,
+  Camera,
+  Share2,
+  Heart,
+  Upload,
+  Star,
+  PlusCircle,
 } from 'lucide-react-native';
 
 import {
@@ -90,11 +97,15 @@ import {
   SummitCheckIn,
   SummitBadge,
   TrailRegion,
+  CrowdsourceType,
+  CrowdsourceSubmission,
 } from '../types/map';
 import {
   INITIAL_MENDOZA_REGION,
   MENDOZA_ROUTES,
   MENDOZA_POIS,
+  INITIAL_COMMUNITY_ROUTES,
+  INITIAL_COMMUNITY_POIS,
   INITIAL_INCIDENTS,
   HIGH_CONTRAST_MAP_STYLE,
   MENDOZA_EMERGENCY_NUMBERS,
@@ -109,11 +120,21 @@ import {
   MENDOZA_REGIONS,
 } from '../data/routesAndPois';
 
-type FilterTab = 'todas' | RouteType;
+type FilterTab = 'todas' | RouteType | 'comunidad';
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView | null>(null);
+
+  // Estados de Rutas y POIs (con aportes dinámicos de Crowdsourcing)
+  const [allRoutes, setAllRoutes] = useState<RouteItem[]>([
+    ...MENDOZA_ROUTES,
+    ...INITIAL_COMMUNITY_ROUTES,
+  ]);
+  const [allPois, setAllPois] = useState<POIItem[]>([
+    ...MENDOZA_POIS,
+    ...INITIAL_COMMUNITY_POIS,
+  ]);
 
   // Estados de interfaz, regiones y filtrado
   const [selectedFilter, setSelectedFilter] = useState<FilterTab>('todas');
@@ -140,6 +161,36 @@ export default function MapScreen() {
   const [selectedPoi, setSelectedPoi] = useState<POIItem | null>(null);
   const [applauseCount, setApplauseCount] = useState<number>(18);
   const [hasApplauded, setHasApplauded] = useState<boolean>(false);
+  const [poiApplauded, setPoiApplauded] = useState<boolean>(false);
+
+  // Estados de Crowdsourcing (Creación comunitaria estilo Wikiloc)
+  const [isCrowdsourceModalVisible, setIsCrowdsourceModalVisible] = useState<boolean>(false);
+  const [crowdType, setCrowdType] = useState<CrowdsourceType>('poi');
+  const [crowdName, setCrowdName] = useState<string>('');
+  const [crowdCategory, setCrowdCategory] = useState<POICategory>('mirador');
+  const [crowdRouteType, setCrowdRouteType] = useState<RouteType>('trekking');
+  const [crowdZone, setCrowdZone] = useState<string>('Potrerillos & El Salto');
+  const [crowdRegionId, setCrowdRegionId] = useState<string>('potrerillos');
+  const [crowdDifficulty, setCrowdDifficulty] = useState<'Fácil' | 'Moderado' | 'Técnico'>('Moderado');
+  const [crowdDistanceKm, setCrowdDistanceKm] = useState<string>('5.2');
+  const [crowdElevationGainM, setCrowdElevationGainM] = useState<string>('320');
+  const [crowdIsCircular, setCrowdIsCircular] = useState<boolean>(true);
+  const [crowdDescription, setCrowdDescription] = useState<string>('');
+  const [crowdTips, setCrowdTips] = useState<string>('');
+  const [crowdAuthorName, setCrowdAuthorName] = useState<string>('Senderista Mendoza');
+  const [crowdAuthorRole, setCrowdAuthorRole] = useState<string>('Comunidad Wikiloc');
+  const [crowdPhotos, setCrowdPhotos] = useState<string[]>([
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
+  ]);
+  const [crowdPhotoInput, setCrowdPhotoInput] = useState<string>('');
+  const [crowdLat, setCrowdLat] = useState<string>('-32.9650');
+  const [crowdLng, setCrowdLng] = useState<string>('-69.2150');
+  const [crowdAltitudeM, setCrowdAltitudeM] = useState<string>('1650');
+
+  // Visor de fotos a pantalla completa (Lightbox)
+  const [isPhotoViewerVisible, setIsPhotoViewerVisible] = useState<boolean>(false);
+  const [activePhotoUrl, setActivePhotoUrl] = useState<string>('');
+  const [activePhotoCaption, setActivePhotoCaption] = useState<string>('');
 
   // Estados de incidentes comunitarios (Waze de la Montaña)
   const [incidents, setIncidents] = useState<TrailIncident[]>(INITIAL_INCIDENTS);
@@ -517,13 +568,243 @@ export default function MapScreen() {
     );
   };
 
-  // Rutas filtradas por región geográfica y modalidad (soporte inteligente para rutas multimodales)
+  // Abrir visor de fotos ampliado
+  const handleOpenPhotoViewer = (url: string, caption: string = '') => {
+    setActivePhotoUrl(url);
+    setActivePhotoCaption(caption);
+    setIsPhotoViewerVisible(true);
+  };
+
+  // Aplaudir / Recomendar ruta comunitaria (+1)
+  const handleApplaudRoute = (route: RouteItem) => {
+    if (hasApplauded) return;
+    setHasApplauded(true);
+    setApplauseCount((prev) => prev + 1);
+    setAllRoutes((prev) =>
+      prev.map((r) =>
+        r.id === route.id
+          ? {
+              ...r,
+              author: {
+                ...r.author,
+                name: r.author?.name || 'Comunidad ViaTrek',
+                applauseCount: (r.author?.applauseCount || 18) + 1,
+              },
+            }
+          : r
+      )
+    );
+    Alert.alert('👏 ¡Aporte agradecido!', 'Tu aplauso apoya a los miembros de la comunidad que comparten y mantienen los senderos.');
+  };
+
+  // Aplaudir / Dar like a lugar / POI comunitario (+1)
+  const handleApplaudPoi = (poi: POIItem) => {
+    if (poiApplauded) return;
+    setPoiApplauded(true);
+    setAllPois((prev) =>
+      prev.map((p) =>
+        p.id === poi.id
+          ? {
+              ...p,
+              author: p.author
+                ? { ...p.author, applauseCount: (p.author.applauseCount || 10) + 1 }
+                : { name: 'Comunidad ViaTrek', applauseCount: 11 },
+            }
+          : p
+      )
+    );
+    Alert.alert('❤️ ¡Lugar valorado!', 'Has indicado que este punto de interés es útil para la comunidad.');
+  };
+
+  // Obtener GPS actual para formulario de Crowdsourcing
+  const handleUseCurrentLocationForCrowd = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso denegado', 'Habilita el acceso a la ubicación para usar tu posición actual.');
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      setCrowdLat(loc.coords.latitude.toFixed(5));
+      setCrowdLng(loc.coords.longitude.toFixed(5));
+      Alert.alert('📍 Ubicación capturada', `Coordenadas: ${loc.coords.latitude.toFixed(5)}, ${loc.coords.longitude.toFixed(5)}`);
+    } catch {
+      Alert.alert('Error GPS', 'No se pudo obtener la posición actual.');
+    }
+  };
+
+  // Agregar foto rápida preestablecida de alta calidad
+  const handleQuickAddPhoto = (url: string) => {
+    if (crowdPhotos.includes(url)) return;
+    setCrowdPhotos((prev) => [...prev, url]);
+  };
+
+  // Agregar foto por URL personalizada
+  const handleAddCustomPhoto = () => {
+    if (!crowdPhotoInput.trim()) return;
+    setCrowdPhotos((prev) => [...prev, crowdPhotoInput.trim()]);
+    setCrowdPhotoInput('');
+  };
+
+  // Quitar foto del aporte
+  const handleRemovePhoto = (index: number) => {
+    setCrowdPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Publicar nuevo aporte comunitario (Wikiloc Crowdsourcing)
+  const handlePublishCrowdsource = () => {
+    if (!crowdName.trim()) {
+      Alert.alert('Nombre requerido', 'Por favor ingresa un nombre para el lugar o sendero.');
+      return;
+    }
+
+    if (crowdType === 'poi') {
+      const lat = parseFloat(crowdLat) || -32.8895;
+      const lng = parseFloat(crowdLng) || -68.8650;
+      const alt = parseInt(crowdAltitudeM, 10) || 1200;
+
+      const newPoi: POIItem = {
+        id: `poi-crowd-${Date.now()}`,
+        name: crowdName.trim(),
+        category: crowdCategory,
+        latitude: lat,
+        longitude: lng,
+        altitudeM: alt,
+        description: crowdDescription.trim() || 'Punto aportado y relevado por la comunidad senderista de Mendoza.',
+        tips: crowdTips.trim() || 'Verificado por usuarios de la comunidad ViaTrek.',
+        photos: crowdPhotos.length > 0 ? [...crowdPhotos] : [
+          'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
+        ],
+        author: {
+          name: crowdAuthorName.trim() || 'Montañista ViaTrek',
+          role: crowdAuthorRole.trim() || 'Comunidad Mendoza',
+          applauseCount: 1,
+          avatar: (crowdAuthorName.trim() || 'MV').slice(0, 2).toUpperCase(),
+        },
+        isCommunityCreated: true,
+        createdAt: 'Recién',
+      };
+
+      setAllPois((prev) => [newPoi, ...prev]);
+      setSelectedPoi(newPoi);
+      setSelectedRoute(null);
+      setIsCrowdsourceModalVisible(false);
+
+      mapRef.current?.animateToRegion({
+        latitude: lat,
+        longitude: lng,
+        latitudeDelta: 0.03,
+        longitudeDelta: 0.03,
+      }, 900);
+
+      Alert.alert(
+        '🌟 ¡Lugar publicado con éxito!',
+        `"${newPoi.name}" ya está visible en el mapa para que toda la comunidad pueda visitarlo e informarse.`
+      );
+    } else {
+      // Sendero / Ruta
+      const dist = parseFloat(crowdDistanceKm) || 4.8;
+      const elev = parseInt(crowdElevationGainM, 10) || 310;
+      const baseLat = parseFloat(crowdLat) || -32.9650;
+      const baseLng = parseFloat(crowdLng) || -69.2150;
+
+      const generatedCoords: Coordinate[] = [
+        { latitude: baseLat, longitude: baseLng },
+        { latitude: baseLat + 0.003, longitude: baseLng - 0.004 },
+        { latitude: baseLat + 0.007, longitude: baseLng - 0.009 },
+        { latitude: baseLat + 0.012, longitude: baseLng - 0.013 },
+        { latitude: baseLat + 0.016, longitude: baseLng - 0.018 },
+        ...(crowdIsCircular
+          ? [
+              { latitude: baseLat + 0.011, longitude: baseLng - 0.022 },
+              { latitude: baseLat + 0.005, longitude: baseLng - 0.014 },
+              { latitude: baseLat, longitude: baseLng },
+            ]
+          : [
+              { latitude: baseLat + 0.020, longitude: baseLng - 0.022 },
+              { latitude: baseLat + 0.024, longitude: baseLng - 0.027 },
+            ]),
+      ];
+
+      const stroke = crowdRouteType === 'trekking' ? '#00E676' : crowdRouteType === 'sendero_mtb' ? '#FF6D00' : crowdRouteType === 'ciclovia' ? '#00E5FF' : '#2979FF';
+
+      const newRoute: RouteItem = {
+        id: `route-crowd-${Date.now()}`,
+        name: crowdName.trim(),
+        zone: crowdZone || 'Potrerillos & Precordillera',
+        regionId: crowdRegionId,
+        type: crowdRouteType,
+        distanceKm: dist,
+        elevationGainM: elev,
+        difficulty: crowdDifficulty,
+        surface: 'Ripio/Tierra',
+        strokeColor: stroke,
+        coordinates: generatedCoords,
+        isCircular: crowdIsCircular,
+        isCommunityCreated: true,
+        createdAt: 'Recién',
+        description: crowdDescription.trim() || 'Sendero relevado y compartido por la comunidad Wikiloc.',
+        equipmentTips: crowdTips.trim() || 'Llevar hidratación adecuada, calzado de montaña y protección solar.',
+        recommendedSeason: 'Todo el año',
+        photos: crowdPhotos.length > 0 ? [...crowdPhotos] : [
+          'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80',
+        ],
+        author: {
+          name: crowdAuthorName.trim() || 'Explorador Mendocino',
+          role: crowdAuthorRole.trim() || 'Comunidad Wikiloc',
+          applauseCount: 1,
+          commentsCount: 0,
+          avatar: (crowdAuthorName.trim() || 'EM').slice(0, 2).toUpperCase(),
+        },
+        legality: {
+          status: 'libre',
+          badgeText: '🟢 Sendero Libre Comunitario',
+          tagColor: '#00E676',
+          allowedModes: {
+            trekking: crowdRouteType === 'trekking' || crowdRouteType === 'sendero_mtb',
+            bicycle: crowdRouteType === 'sendero_mtb' || crowdRouteType === 'ciclovia',
+            moto: crowdRouteType === 'moto_trail',
+          },
+          priorityRule: 'Peatón prioritario',
+          authority: 'Comunidad ViaTrek',
+        },
+        elevationProfile: {
+          minElevM: 1200,
+          maxElevM: 1200 + elev,
+          elevationGainM: elev,
+          points: [1200, 1200 + Math.round(elev * 0.3), 1200 + Math.round(elev * 0.7), 1200 + elev, 1200 + Math.round(elev * 0.5), crowdIsCircular ? 1200 : 1200 + elev],
+        },
+      };
+
+      setAllRoutes((prev) => [newRoute, ...prev]);
+      setSelectedRoute(newRoute);
+      setSelectedPoi(null);
+      setIsCrowdsourceModalVisible(false);
+
+      mapRef.current?.animateToRegion({
+        latitude: generatedCoords[0].latitude,
+        longitude: generatedCoords[0].longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      }, 900);
+
+      Alert.alert(
+        '🌟 ¡Sendero publicado con éxito!',
+        `"${newRoute.name}" ya está visible y trazado en el mapa para que todas las personas puedan recorrerlo.`
+      );
+    }
+  };
+
+  // Rutas filtradas por región geográfica y modalidad (soporte inteligente para rutas multimodales y comunidad)
   const visibleRoutes = useMemo(() => {
-    let routes = MENDOZA_ROUTES;
+    let routes = allRoutes;
     if (selectedRegionId !== 'todas') {
       routes = routes.filter((r) => r.regionId === selectedRegionId);
     }
     if (selectedFilter !== 'todas') {
+      if (selectedFilter === 'comunidad') {
+        return routes.filter((r) => r.isCommunityCreated);
+      }
       routes = routes.filter((route) => {
         if (selectedFilter === 'trekking') {
           return route.type === 'trekking' || route.legality?.allowedModes?.trekking;
@@ -538,12 +819,12 @@ export default function MapScreen() {
       });
     }
     return routes;
-  }, [selectedFilter, selectedRegionId]);
+  }, [selectedFilter, selectedRegionId, allRoutes]);
 
   // Incidentes filtrados según el modo seleccionado
   const visibleIncidents = useMemo(() => {
-    if (selectedFilter === 'todas') return incidents;
-    return incidents.filter((inc) => inc.affectedModes.includes(selectedFilter));
+    if (selectedFilter === 'todas' || selectedFilter === 'comunidad') return incidents;
+    return incidents.filter((inc) => inc.affectedModes.includes(selectedFilter as RouteType));
   }, [selectedFilter, incidents]);
 
   // Voto: Sigue ahí (+1)
@@ -598,9 +879,9 @@ export default function MapScreen() {
       longitude: coordinate.longitude,
       reportedAt: 'Recién',
       affectedModes:
-        selectedFilter === 'todas'
+        selectedFilter === 'todas' || selectedFilter === 'comunidad'
           ? ['ciclovia', 'sendero_mtb', 'moto_trail']
-          : [selectedFilter],
+          : [selectedFilter as RouteType],
       upvotes: 1,
       resolvedVotes: 0,
       author: 'Tú (Explorador ViaTrek)',
@@ -659,36 +940,41 @@ export default function MapScreen() {
     }
   };
 
-  // POIs filtrados (visibles según relevancia de la categoría o si están en 'todas')
+  // POIs filtrados (visibles según relevancia de la categoría o si están en 'todas' o 'comunidad')
   const visiblePois = useMemo(() => {
-    if (selectedFilter === 'todas') return MENDOZA_POIS;
+    if (selectedFilter === 'todas') return allPois;
+    if (selectedFilter === 'comunidad') {
+      return allPois.filter((p) => p.isCommunityCreated);
+    }
     if (selectedFilter === 'trekking') {
-      return MENDOZA_POIS.filter(
+      return allPois.filter(
         (p) =>
           p.category === 'trailhead' ||
           p.category === 'mirador' ||
           p.category === 'cumbre' ||
           p.category === 'vertiente' ||
+          p.category === 'cascada' ||
           p.category === 'refugio_almacen'
       );
     }
     if (selectedFilter === 'ciclovia') {
-      return MENDOZA_POIS.filter(
+      return allPois.filter(
         (p) => p.category === 'taller' || p.category === 'trailhead' || p.category === 'mirador'
       );
     }
     if (selectedFilter === 'sendero_mtb') {
-      return MENDOZA_POIS.filter(
+      return allPois.filter(
         (p) =>
           p.category === 'trailhead' ||
           p.category === 'mirador' ||
           p.category === 'hidratacion' ||
           p.category === 'taller' ||
-          p.category === 'refugio_almacen'
+          p.category === 'refugio_almacen' ||
+          p.category === 'vertiente'
       );
     }
     if (selectedFilter === 'moto_trail') {
-      return MENDOZA_POIS.filter(
+      return allPois.filter(
         (p) =>
           p.category === 'trailhead' ||
           p.category === 'mirador' ||
@@ -696,7 +982,7 @@ export default function MapScreen() {
       );
     }
     if (selectedFilter === 'wine_trail') {
-      return MENDOZA_POIS.filter(
+      return allPois.filter(
         (p) =>
           p.category === 'bodega_wine' ||
           p.category === 'refugio_almacen' ||
@@ -704,8 +990,8 @@ export default function MapScreen() {
           p.category === 'hidratacion'
       );
     }
-    return MENDOZA_POIS;
-  }, [selectedFilter]);
+    return allPois;
+  }, [selectedFilter, allPois]);
 
   // Localización GPS en tiempo real
   const handleLocateUser = async () => {
@@ -807,6 +1093,14 @@ export default function MapScreen() {
         return '#00E5FF'; // Celeste cielo
       case 'vertiente':
         return '#00E676'; // Verde agua pura
+      case 'cascada':
+        return '#00E5FF'; // Celeste agua cascada
+      case 'camping':
+        return '#76FF03'; // Verde lima camping
+      case 'foto_spot':
+        return '#FF4081'; // Rosa punto fotográfico
+      case 'precaucion_lugar':
+        return '#FF9100'; // Naranja precaución
       default:
         return '#FF5252';
     }
@@ -826,6 +1120,14 @@ export default function MapScreen() {
         return <Wind size={16} color="#0B0F17" strokeWidth={2.4} />;
       case 'vertiente':
         return <Droplet size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'cascada':
+        return <Droplet size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'camping':
+        return <Trees size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'foto_spot':
+        return <Camera size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'precaucion_lugar':
+        return <AlertTriangle size={16} color="#0B0F17" strokeWidth={2.4} />;
       case 'taller':
         return <Wrench size={16} color="#0B0F17" strokeWidth={2.4} />;
       case 'bodega_wine':
@@ -1334,6 +1636,32 @@ export default function MapScreen() {
               Wine & Trail
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterPill,
+              selectedFilter === 'comunidad' && styles.filterPillActiveComunidad,
+            ]}
+            onPress={() => {
+              setSelectedFilter('comunidad');
+              setSelectedRoute(null);
+              setSelectedPoi(null);
+            }}
+            activeOpacity={0.8}
+          >
+            <Star
+              size={15}
+              color={selectedFilter === 'comunidad' ? '#FFD700' : '#94A3B8'}
+            />
+            <Text
+              style={[
+                styles.filterPillText,
+                selectedFilter === 'comunidad' && { color: '#FFD700', fontWeight: '800' },
+              ]}
+            >
+              Comunidad
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* SELECTOR DE REGIONES / ZONAS ESTILO WIKILOC */}
@@ -1479,6 +1807,18 @@ export default function MapScreen() {
             size={21}
             color={guardianSession.isActive ? '#00E676' : '#FF1744'}
           />
+        </TouchableOpacity>
+
+        {/* Botón Crowdsourcing: Añadir Ruta o Lugar a la Comunidad (Wikiloc) */}
+        <TouchableOpacity
+          style={[styles.fabButton, styles.fabCrowdsourceButton]}
+          onPress={() => setIsCrowdsourceModalVisible(true)}
+          activeOpacity={0.85}
+        >
+          <Plus size={22} color="#05080E" strokeWidth={2.8} />
+          <View style={styles.fabCrowdsourceBadge}>
+            <Text style={styles.fabCrowdsourceBadgeText}>★</Text>
+          </View>
         </TouchableOpacity>
 
         {/* Botón Waze de la Montaña: Reportar Alerta en tiempo real */}
@@ -1658,6 +1998,12 @@ export default function MapScreen() {
           <View style={styles.cardHeader}>
             <View style={{ flex: 1 }}>
               <View style={styles.cardHeaderTopRow}>
+                {selectedRoute.isCommunityCreated && (
+                  <View style={styles.crowdCommunityBanner}>
+                    <Star size={12} color="#FFD700" fill="#FFD700" />
+                    <Text style={styles.crowdCommunityBannerText}>COMUNIDAD</Text>
+                  </View>
+                )}
                 <View
                   style={[
                     styles.routeIndicatorPill,
@@ -1694,6 +2040,69 @@ export default function MapScreen() {
               <X size={20} color="#94A3B8" />
             </TouchableOpacity>
           </View>
+
+          {/* GALERÍA DE FOTOS COMUNITARIAS DE LA RUTA */}
+          {selectedRoute.photos && selectedRoute.photos.length > 0 && (
+            <View style={styles.routePhotosContainer}>
+              <View style={styles.routePhotosHeader}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Camera size={14} color="#00E5FF" />
+                  <Text style={styles.routePhotosTitle}>FOTOS DE LA AVENTURA</Text>
+                </View>
+                <Text style={styles.routePhotosCount}>{selectedRoute.photos.length} fotos</Text>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.routePhotosScroll}
+              >
+                {selectedRoute.photos.map((photoUrl, pIdx) => (
+                  <TouchableOpacity
+                    key={pIdx}
+                    style={styles.routePhotoThumbWrapper}
+                    onPress={() => handleOpenPhotoViewer(photoUrl, `${selectedRoute.name} (Foto ${pIdx + 1})`)}
+                    activeOpacity={0.85}
+                  >
+                    <Image
+                      source={{ uri: photoUrl }}
+                      style={styles.routePhotoThumb}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.routePhotoZoomBadge}>
+                      <Eye size={11} color="#FFFFFF" />
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* DESCRIPCIÓN DEL RECORRIDO */}
+          {selectedRoute.description && (
+            <View style={styles.routeDescriptionCard}>
+              <Text style={styles.routeDescriptionTitle}>📖 DESCRIPCIÓN & HUELLA</Text>
+              <Text style={styles.routeDescriptionText}>{selectedRoute.description}</Text>
+            </View>
+          )}
+
+          {/* CONSEJOS Y EQUIPAMIENTO RECOMENDADO */}
+          {(selectedRoute.equipmentTips || selectedRoute.recommendedSeason) && (
+            <View style={styles.routeTipsCard}>
+              <Text style={styles.routeTipsTitle}>💡 CONSEJOS DE MONTAÑA</Text>
+              {selectedRoute.recommendedSeason && (
+                <Text style={styles.routeTipItem}>
+                  🗓️ <Text style={{ color: '#F8FAFC', fontWeight: '700' }}>Época:</Text>{' '}
+                  {selectedRoute.recommendedSeason}
+                </Text>
+              )}
+              {selectedRoute.equipmentTips && (
+                <Text style={styles.routeTipItem}>
+                  🎒 <Text style={{ color: '#F8FAFC', fontWeight: '700' }}>Equipo:</Text>{' '}
+                  {selectedRoute.equipmentTips}
+                </Text>
+              )}
+            </View>
+          )}
 
           {/* Métricas clave de la ruta */}
           <View style={styles.metricsBox}>
@@ -1733,29 +2142,30 @@ export default function MapScreen() {
           {/* AUTOR & SOCIAL WIKILOC */}
           <View style={styles.wikilocAuthorCard}>
             <View style={styles.wikilocAuthorAvatar}>
-              <Text style={styles.wikilocAuthorAvatarText}>MD</Text>
+              <Text style={styles.wikilocAuthorAvatarText}>
+                {selectedRoute.author?.avatar || 'MD'}
+              </Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.wikilocAuthorName}>
                 {selectedRoute.author?.name || 'Maxi Di Natale'}
               </Text>
               <Text style={styles.wikilocAuthorRole}>
-                {selectedRoute.author?.role || 'Comunidad ViaTrek'} • Verificado
+                {selectedRoute.author?.role || 'Comunidad ViaTrek'} • {selectedRoute.isCommunityCreated ? 'Aporte Comunitario' : 'Verificado'}
               </Text>
             </View>
             <View style={styles.wikilocAuthorActions}>
               <TouchableOpacity
                 style={[styles.wikilocSocialPill, hasApplauded && styles.wikilocSocialPillActive]}
-                onPress={() => {
-                  setApplauseCount((c) => (hasApplauded ? c - 1 : c + 1));
-                  setHasApplauded((v) => !v);
-                }}
+                onPress={() => handleApplaudRoute(selectedRoute)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.wikilocSocialText}>👏 {applauseCount}</Text>
+                <Text style={styles.wikilocSocialText}>
+                  👏 {selectedRoute.author?.applauseCount || applauseCount}
+                </Text>
               </TouchableOpacity>
               <View style={styles.wikilocSocialPill}>
-                <Text style={styles.wikilocSocialText}>💬 6</Text>
+                <Text style={styles.wikilocSocialText}>💬 {selectedRoute.author?.commentsCount || 6}</Text>
               </View>
             </View>
           </View>
@@ -2190,6 +2600,12 @@ export default function MapScreen() {
           <View style={styles.cardHeader}>
             <View style={{ flex: 1 }}>
               <View style={styles.cardHeaderTopRow}>
+                {selectedPoi.isCommunityCreated && (
+                  <View style={styles.crowdCommunityBanner}>
+                    <Star size={12} color="#FFD700" fill="#FFD700" />
+                    <Text style={styles.crowdCommunityBannerText}>COMUNIDAD</Text>
+                  </View>
+                )}
                 <View
                   style={[
                     styles.poiDot,
@@ -2198,6 +2614,7 @@ export default function MapScreen() {
                 />
                 <Text style={styles.poiCategoryText}>
                   {selectedPoi.category.toUpperCase()}
+                  {selectedPoi.altitudeM ? ` • ${selectedPoi.altitudeM} msnm` : ''}
                 </Text>
               </View>
 
@@ -2214,7 +2631,79 @@ export default function MapScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* GALERÍA DE FOTOS DEL LUGAR */}
+          {selectedPoi.photos && selectedPoi.photos.length > 0 && (
+            <View style={styles.routePhotosContainer}>
+              <View style={styles.routePhotosHeader}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Camera size={14} color="#00E5FF" />
+                  <Text style={styles.routePhotosTitle}>FOTOS DEL LUGAR</Text>
+                </View>
+                <Text style={styles.routePhotosCount}>{selectedPoi.photos.length} fotos</Text>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.routePhotosScroll}
+              >
+                {selectedPoi.photos.map((photoUrl, pIdx) => (
+                  <TouchableOpacity
+                    key={pIdx}
+                    style={styles.routePhotoThumbWrapper}
+                    onPress={() => handleOpenPhotoViewer(photoUrl, `${selectedPoi.name} (Foto ${pIdx + 1})`)}
+                    activeOpacity={0.85}
+                  >
+                    <Image
+                      source={{ uri: photoUrl }}
+                      style={styles.routePhotoThumb}
+                      resizeMode="cover"
+                    />
+                    <View style={styles.routePhotoZoomBadge}>
+                      <Eye size={11} color="#FFFFFF" />
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
           <Text style={styles.cardDescription}>{selectedPoi.description}</Text>
+
+          {/* TIPS O CONSEJOS DEL LUGAR */}
+          {selectedPoi.tips && (
+            <View style={styles.poiTipsBox}>
+              <Text style={styles.poiTipsText}>
+                💡 <Text style={{ fontWeight: '700', color: '#F8FAFC' }}>Recomendación:</Text>{' '}
+                {selectedPoi.tips}
+              </Text>
+            </View>
+          )}
+
+          {/* AUTOR & SOCIAL DEL LUGAR */}
+          {selectedPoi.author && (
+            <View style={styles.wikilocAuthorCard}>
+              <View style={styles.wikilocAuthorAvatar}>
+                <Text style={styles.wikilocAuthorAvatarText}>
+                  {selectedPoi.author.avatar || 'VT'}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.wikilocAuthorName}>{selectedPoi.author.name}</Text>
+                <Text style={styles.wikilocAuthorRole}>
+                  {selectedPoi.author.role || 'Comunidad ViaTrek'} • {selectedPoi.createdAt || 'Aporte'}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.wikilocSocialPill, poiApplauded && styles.wikilocSocialPillActive]}
+                onPress={() => handleApplaudPoi(selectedPoi)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.wikilocSocialText}>
+                  ❤️ {selectedPoi.author.applauseCount || 12}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Botón de navegación directa */}
           <TouchableOpacity
@@ -2315,6 +2804,408 @@ export default function MapScreen() {
           </View>
         </View>
       )}
+
+      {/* MODAL: CROWDSOURCING - APORTAR RUTA O LUGAR A LA COMUNIDAD (WIKILOC) */}
+      <Modal
+        visible={isCrowdsourceModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsCrowdsourceModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderTitleRow}>
+                <Sparkles size={20} color="#FFD700" />
+                <Text style={styles.modalTitle}>Añadir a la Comunidad (Wikiloc)</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setIsCrowdsourceModalVisible(false)}
+                style={styles.modalCloseBtn}
+              >
+                <X size={20} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.modalSubtitle}>
+                Comparte senderos, miradores, cascadas o puestos para que miles de personas puedan descubrirlos.
+              </Text>
+
+              {/* Selector de Pestaña: POI vs RUTA */}
+              <View style={styles.crowdTabsRow}>
+                <TouchableOpacity
+                  style={[styles.crowdTabBtn, crowdType === 'poi' && styles.crowdTabBtnActive]}
+                  onPress={() => setCrowdType('poi')}
+                  activeOpacity={0.8}
+                >
+                  <MapPin size={16} color={crowdType === 'poi' ? '#05080E' : '#94A3B8'} />
+                  <Text style={[styles.crowdTabBtnText, crowdType === 'poi' && styles.crowdTabBtnTextActive]}>
+                    📍 Lugar / POI
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.crowdTabBtn, crowdType === 'route' && styles.crowdTabBtnActive]}
+                  onPress={() => setCrowdType('route')}
+                  activeOpacity={0.8}
+                >
+                  <Mountain size={16} color={crowdType === 'route' ? '#05080E' : '#94A3B8'} />
+                  <Text style={[styles.crowdTabBtnText, crowdType === 'route' && styles.crowdTabBtnTextActive]}>
+                    🗺️ Sendero / Ruta
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* TÍTULO / NOMBRE */}
+              <Text style={styles.inputSectionLabel}>NOMBRE DEL APORTE *</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder={crowdType === 'poi' ? 'Ej. Cascada Secreta de El Salto' : 'Ej. Sendero del Filo y Mirador Potrerillos'}
+                placeholderTextColor="#64748B"
+                value={crowdName}
+                onChangeText={setCrowdName}
+              />
+
+              {/* CAMPOS ESPECÍFICOS DE POI */}
+              {crowdType === 'poi' && (
+                <>
+                  <Text style={styles.inputSectionLabel}>CATEGORÍA DEL LUGAR</Text>
+                  <View style={styles.typeGrid}>
+                    {[
+                      { cat: 'mirador' as POICategory, label: 'Mirador', icon: '👁️' },
+                      { cat: 'cascada' as POICategory, label: 'Cascada', icon: '🌊' },
+                      { cat: 'vertiente' as POICategory, label: 'Vertiente', icon: '💧' },
+                      { cat: 'refugio_almacen' as POICategory, label: 'Refugio', icon: '🏡' },
+                      { cat: 'cumbre' as POICategory, label: 'Cumbre', icon: '⛰️' },
+                      { cat: 'trailhead' as POICategory, label: 'Inicio', icon: '🏁' },
+                      { cat: 'camping' as POICategory, label: 'Camping', icon: '⛺' },
+                      { cat: 'foto_spot' as POICategory, label: 'Foto Spot', icon: '📸' },
+                    ].map((item) => {
+                      const isChosen = crowdCategory === item.cat;
+                      return (
+                        <TouchableOpacity
+                          key={item.cat}
+                          style={[styles.typeOption, isChosen && styles.typeOptionActive]}
+                          onPress={() => setCrowdCategory(item.cat)}
+                          activeOpacity={0.8}
+                        >
+                          <Text style={styles.typeOptionIcon}>{item.icon}</Text>
+                          <Text style={[styles.typeOptionLabel, isChosen && styles.typeOptionLabelActive]}>
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  <Text style={styles.inputSectionLabel}>ALTITUD ESTIMADA (msnm)</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="Ej. 1650"
+                    placeholderTextColor="#64748B"
+                    keyboardType="numeric"
+                    value={crowdAltitudeM}
+                    onChangeText={setCrowdAltitudeM}
+                  />
+                </>
+              )}
+
+              {/* CAMPOS ESPECÍFICOS DE RUTA */}
+              {crowdType === 'route' && (
+                <>
+                  <Text style={styles.inputSectionLabel}>MODALIDAD DEPORTIVA</Text>
+                  <View style={styles.typeGrid}>
+                    {[
+                      { type: 'trekking' as RouteType, label: 'Trekking', icon: '🥾' },
+                      { type: 'sendero_mtb' as RouteType, label: 'MTB / Cerro', icon: '🚵' },
+                      { type: 'ciclovia' as RouteType, label: 'Ciclovía', icon: '🚴' },
+                      { type: 'moto_trail' as RouteType, label: 'Moto Trail', icon: '🏍️' },
+                    ].map((item) => {
+                      const isChosen = crowdRouteType === item.type;
+                      return (
+                        <TouchableOpacity
+                          key={item.type}
+                          style={[styles.typeOption, isChosen && styles.typeOptionActive]}
+                          onPress={() => setCrowdRouteType(item.type)}
+                          activeOpacity={0.8}
+                        >
+                          <Text style={styles.typeOptionIcon}>{item.icon}</Text>
+                          <Text style={[styles.typeOptionLabel, isChosen && styles.typeOptionLabelActive]}>
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  <View style={styles.crowdRowInputs}>
+                    <View style={{ flex: 1, marginRight: 8 }}>
+                      <Text style={styles.inputSectionLabel}>DISTANCIA (km)</Text>
+                      <TextInput
+                        style={styles.textInput}
+                        placeholder="Ej. 6.2"
+                        placeholderTextColor="#64748B"
+                        keyboardType="decimal-pad"
+                        value={crowdDistanceKm}
+                        onChangeText={setCrowdDistanceKm}
+                      />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.inputSectionLabel}>DESNIVEL (+m)</Text>
+                      <TextInput
+                        style={styles.textInput}
+                        placeholder="Ej. 350"
+                        placeholderTextColor="#64748B"
+                        keyboardType="numeric"
+                        value={crowdElevationGainM}
+                        onChangeText={setCrowdElevationGainM}
+                      />
+                    </View>
+                  </View>
+
+                  <Text style={styles.inputSectionLabel}>DIFICULTAD TÉCNICA</Text>
+                  <View style={styles.severityRow}>
+                    {(['Fácil', 'Moderado', 'Técnico'] as const).map((diff) => {
+                      const isChosen = crowdDifficulty === diff;
+                      return (
+                        <TouchableOpacity
+                          key={diff}
+                          style={[
+                            styles.severityOption,
+                            isChosen && {
+                              borderColor: diff === 'Fácil' ? '#00E676' : diff === 'Moderado' ? '#FFB300' : '#FF1744',
+                              backgroundColor: (diff === 'Fácil' ? '#00E676' : diff === 'Moderado' ? '#FFB300' : '#FF1744') + '20',
+                            },
+                          ]}
+                          onPress={() => setCrowdDifficulty(diff)}
+                          activeOpacity={0.8}
+                        >
+                          <Text
+                            style={[
+                              styles.severityOptionLabel,
+                              isChosen && {
+                                color: diff === 'Fácil' ? '#00E676' : diff === 'Moderado' ? '#FFB300' : '#FF1744',
+                                fontWeight: '700',
+                              },
+                            ]}
+                          >
+                            {diff}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  <Text style={styles.inputSectionLabel}>TIPO DE TRAYECTO</Text>
+                  <View style={styles.severityRow}>
+                    <TouchableOpacity
+                      style={[
+                        styles.severityOption,
+                        crowdIsCircular && { borderColor: '#FFD600', backgroundColor: '#FFD60020' },
+                      ]}
+                      onPress={() => setCrowdIsCircular(true)}
+                    >
+                      <Text style={[styles.severityOptionLabel, crowdIsCircular && { color: '#FFD600', fontWeight: '700' }]}>
+                        Circular 🔄
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.severityOption,
+                        !crowdIsCircular && { borderColor: '#00E676', backgroundColor: '#00E67620' },
+                      ]}
+                      onPress={() => setCrowdIsCircular(false)}
+                    >
+                      <Text style={[styles.severityOptionLabel, !crowdIsCircular && { color: '#00E676', fontWeight: '700' }]}>
+                        Solo ida ➡️
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
+
+              {/* ZONA / REGIÓN */}
+              <Text style={styles.inputSectionLabel}>ZONA EN MENDOZA</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Ej. Potrerillos / El Salto / Quebrada de San Isidro"
+                placeholderTextColor="#64748B"
+                value={crowdZone}
+                onChangeText={setCrowdZone}
+              />
+
+              {/* COORDENADAS GPS */}
+              <View style={styles.crowdCoordsHeaderRow}>
+                <Text style={styles.inputSectionLabel}>COORDENADAS (LAT / LNG)</Text>
+                <TouchableOpacity
+                  style={styles.crowdGpsBtn}
+                  onPress={handleUseCurrentLocationForCrowd}
+                  activeOpacity={0.8}
+                >
+                  <LocateFixed size={13} color="#00E676" />
+                  <Text style={styles.crowdGpsBtnText}>Capturar GPS Actual</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.crowdRowInputs}>
+                <TextInput
+                  style={[styles.textInput, { flex: 1, marginRight: 8 }]}
+                  placeholder="Latitud"
+                  placeholderTextColor="#64748B"
+                  value={crowdLat}
+                  onChangeText={setCrowdLat}
+                />
+                <TextInput
+                  style={[styles.textInput, { flex: 1 }]}
+                  placeholder="Longitud"
+                  placeholderTextColor="#64748B"
+                  value={crowdLng}
+                  onChangeText={setCrowdLng}
+                />
+              </View>
+
+              {/* DESCRIPCIÓN */}
+              <Text style={styles.inputSectionLabel}>DESCRIPCIÓN DETALLADA *</Text>
+              <TextInput
+                style={[styles.textInput, styles.textArea]}
+                placeholder="Describe la ruta o lugar: vistas, estado del camino, bifurcaciones clave, sombras o qué hace especial a este sitio..."
+                placeholderTextColor="#64748B"
+                multiline={true}
+                numberOfLines={3}
+                value={crowdDescription}
+                onChangeText={setCrowdDescription}
+              />
+
+              {/* CONSEJOS / TIPS */}
+              <Text style={styles.inputSectionLabel}>CONSEJOS & RECOMENDACIONES</Text>
+              <TextInput
+                style={[styles.textInput, { minHeight: 46 }]}
+                placeholder="Ej. Llevar 2L de agua, bastones de trekking, evitar en días de Zonda, calzado con agarre..."
+                placeholderTextColor="#64748B"
+                value={crowdTips}
+                onChangeText={setCrowdTips}
+              />
+
+              {/* FOTOS DE LA AVENTURA */}
+              <Text style={styles.inputSectionLabel}>FOTOS DE LA AVENTURA ({crowdPhotos.length})</Text>
+              <Text style={styles.crowdPhotoSub}>
+                Selecciona fotos rápidas de montaña o pega un enlace de imagen:
+              </Text>
+              
+              {/* Presets rápidos de fotos */}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.crowdPhotoPresetsScroll}>
+                {[
+                  { label: '🏔️ Cordón del Plata', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80' },
+                  { label: '🌊 Cascada Montaña', url: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=1200&q=80' },
+                  { label: '🥾 Sendero Andes', url: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80' },
+                  { label: '🌅 Dique Potrerillos', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80' },
+                  { label: '🚵 Flow Biker', url: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80' },
+                  { label: '🏡 Refugio Andino', url: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1200&q=80' },
+                ].map((preset, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    style={styles.crowdPhotoPresetChip}
+                    onPress={() => handleQuickAddPhoto(preset.url)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.crowdPhotoPresetText}>{preset.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              {/* Input URL de foto */}
+              <View style={styles.crowdPhotoInputRow}>
+                <TextInput
+                  style={[styles.textInput, { flex: 1, marginRight: 8, marginBottom: 0 }]}
+                  placeholder="Pegar URL de foto https://..."
+                  placeholderTextColor="#64748B"
+                  value={crowdPhotoInput}
+                  onChangeText={setCrowdPhotoInput}
+                />
+                <TouchableOpacity
+                  style={styles.crowdAddPhotoBtn}
+                  onPress={handleAddCustomPhoto}
+                  activeOpacity={0.8}
+                >
+                  <Plus size={16} color="#05080E" strokeWidth={2.8} />
+                  <Text style={styles.crowdAddPhotoBtnText}>Añadir</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Lista de miniaturas añadidas */}
+              {crowdPhotos.length > 0 && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.crowdThumbnailsRow}>
+                  {crowdPhotos.map((url, idx) => (
+                    <View key={idx} style={styles.crowdThumbItem}>
+                      <Image source={{ uri: url }} style={styles.crowdThumbImg} resizeMode="cover" />
+                      <TouchableOpacity
+                        style={styles.crowdThumbDeleteBtn}
+                        onPress={() => handleRemovePhoto(idx)}
+                      >
+                        <X size={12} color="#FFFFFF" strokeWidth={2.8} />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+
+              {/* DATOS DEL AUTOR */}
+              <Text style={styles.inputSectionLabel}>TU NOMBRE / ALIAS</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Ej. Valentina Rossi (Andinista)"
+                placeholderTextColor="#64748B"
+                value={crowdAuthorName}
+                onChangeText={setCrowdAuthorName}
+              />
+
+              {/* BOTÓN DE PUBLICACIÓN */}
+              <TouchableOpacity
+                style={styles.crowdSubmitButton}
+                onPress={handlePublishCrowdsource}
+                activeOpacity={0.88}
+              >
+                <Sparkles size={18} color="#05080E" strokeWidth={2.8} />
+                <Text style={styles.crowdSubmitButtonText}>
+                  Publicar en la Comunidad (Wikiloc)
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL: VISOR DE FOTOS LIGHTBOX A PANTALLA COMPLETA */}
+      <Modal
+        visible={isPhotoViewerVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsPhotoViewerVisible(false)}
+      >
+        <View style={styles.photoLightboxOverlay}>
+          <TouchableOpacity
+            style={[styles.photoLightboxCloseBtn, { top: insets.top + 16 }]}
+            onPress={() => setIsPhotoViewerVisible(false)}
+            activeOpacity={0.8}
+          >
+            <X size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+
+          {activePhotoUrl ? (
+            <Image
+              source={{ uri: activePhotoUrl }}
+              style={styles.photoLightboxImage}
+              resizeMode="contain"
+            />
+          ) : null}
+
+          {activePhotoCaption ? (
+            <View style={[styles.photoLightboxCaptionBox, { bottom: insets.bottom + 20 }]}>
+              <Text style={styles.photoLightboxCaptionText}>{activePhotoCaption}</Text>
+            </View>
+          ) : null}
+        </View>
+      </Modal>
 
       {/* MODAL: REPORTAR NUEVA ALERTA COMUNITARIA */}
       <Modal
@@ -5721,5 +6612,341 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
     marginTop: 1,
+  },
+
+  // ESTILOS CROWDSOURCING & FOTOS WIKILOC
+  filterPillActiveComunidad: {
+    backgroundColor: '#FFD700',
+    borderColor: '#FFD700',
+  },
+  fabCrowdsourceButton: {
+    backgroundColor: '#00E676',
+    borderColor: '#00E676',
+    borderWidth: 2,
+    position: 'relative',
+    shadowColor: '#00E676',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  fabCrowdsourceBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#FFD700',
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#0B0F17',
+  },
+  fabCrowdsourceBadgeText: {
+    color: '#0B0F17',
+    fontSize: 9,
+    fontWeight: '900',
+  },
+  crowdCommunityBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    marginRight: 6,
+  },
+  crowdCommunityBannerText: {
+    color: '#FFD700',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.4,
+  },
+  routePhotosContainer: {
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  routePhotosHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  routePhotosTitle: {
+    color: '#00E5FF',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+  },
+  routePhotosCount: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  routePhotosScroll: {
+    gap: 10,
+    paddingVertical: 2,
+  },
+  routePhotoThumbWrapper: {
+    width: 120,
+    height: 80,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#1E293B',
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  routePhotoThumb: {
+    width: '100%',
+    height: '100%',
+  },
+  routePhotoZoomBadge: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    padding: 3,
+    borderRadius: 6,
+  },
+  routeDescriptionCard: {
+    backgroundColor: '#0F172A',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  routeDescriptionTitle: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  routeDescriptionText: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '400',
+  },
+  routeTipsCard: {
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.25)',
+  },
+  routeTipsTitle: {
+    color: '#00E676',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  routeTipItem: {
+    color: '#94A3B8',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 2,
+  },
+  poiTipsBox: {
+    backgroundColor: 'rgba(255, 215, 0, 0.08)',
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.2)',
+  },
+  poiTipsText: {
+    color: '#E2E8F0',
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  crowdTabsRow: {
+    flexDirection: 'row',
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 16,
+    gap: 4,
+  },
+  crowdTabBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 6,
+  },
+  crowdTabBtnActive: {
+    backgroundColor: '#00E676',
+  },
+  crowdTabBtnText: {
+    color: '#94A3B8',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  crowdTabBtnTextActive: {
+    color: '#05080E',
+    fontWeight: '900',
+  },
+  crowdRowInputs: {
+    flexDirection: 'row',
+  },
+  crowdCoordsHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  crowdGpsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 230, 118, 0.4)',
+  },
+  crowdGpsBtnText: {
+    color: '#00E676',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  crowdPhotoSub: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginBottom: 8,
+    marginTop: -4,
+  },
+  crowdPhotoPresetsScroll: {
+    marginBottom: 10,
+  },
+  crowdPhotoPresetChip: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  crowdPhotoPresetText: {
+    color: '#E2E8F0',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  crowdPhotoInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  crowdAddPhotoBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#00E5FF',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  crowdAddPhotoBtnText: {
+    color: '#05080E',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  crowdThumbnailsRow: {
+    marginBottom: 14,
+  },
+  crowdThumbItem: {
+    width: 80,
+    height: 60,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginRight: 8,
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  crowdThumbImg: {
+    width: '100%',
+    height: '100%',
+  },
+  crowdThumbDeleteBtn: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    backgroundColor: '#FF1744',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  crowdSubmitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#00E676',
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 18,
+    shadowColor: '#00E676',
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  crowdSubmitButtonText: {
+    color: '#05080E',
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 0.3,
+  },
+  photoLightboxOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(5, 8, 14, 0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photoLightboxCloseBtn: {
+    position: 'absolute',
+    right: 18,
+    zIndex: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoLightboxImage: {
+    width: '94%',
+    height: '75%',
+    borderRadius: 12,
+  },
+  photoLightboxCaptionBox: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(15, 23, 42, 0.85)',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  photoLightboxCaptionText: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
