@@ -178,7 +178,7 @@ export default function MapScreen() {
   const [crowdDescription, setCrowdDescription] = useState<string>('');
   const [crowdTips, setCrowdTips] = useState<string>('');
   const [crowdAuthorName, setCrowdAuthorName] = useState<string>('Senderista Mendoza');
-  const [crowdAuthorRole, setCrowdAuthorRole] = useState<string>('Comunidad Wikiloc');
+  const [crowdAuthorRole, setCrowdAuthorRole] = useState<string>('Comunidad ViaTrek');
   const [crowdPhotos, setCrowdPhotos] = useState<string[]>([
     'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80',
   ]);
@@ -562,7 +562,7 @@ export default function MapScreen() {
 
   const handleExportGpx = (route: RouteItem) => {
     Alert.alert(
-      '📥 Descarga de Track GPX (Wikiloc)',
+      '📥 Descarga de Track GPX (ViaTrek)',
       `Archivo: ${route.gpxFileName || route.id + '.gpx'}\n\nListo para exportar y sincronizar con relojes Garmin, Suunto, Wahoo y apps de navegación GPS outdoor.`,
       [{ text: 'Listo', style: 'default' }]
     );
@@ -743,7 +743,7 @@ export default function MapScreen() {
         isCircular: crowdIsCircular,
         isCommunityCreated: true,
         createdAt: 'Recién',
-        description: crowdDescription.trim() || 'Sendero relevado y compartido por la comunidad Wikiloc.',
+        description: crowdDescription.trim() || 'Sendero relevado y compartido por la Comunidad ViaTrek.',
         equipmentTips: crowdTips.trim() || 'Llevar hidratación adecuada, calzado de montaña y protección solar.',
         recommendedSeason: 'Todo el año',
         photos: crowdPhotos.length > 0 ? [...crowdPhotos] : [
@@ -751,7 +751,7 @@ export default function MapScreen() {
         ],
         author: {
           name: crowdAuthorName.trim() || 'Explorador Mendocino',
-          role: crowdAuthorRole.trim() || 'Comunidad Wikiloc',
+          role: crowdAuthorRole.trim() || 'Comunidad ViaTrek',
           applauseCount: 1,
           commentsCount: 0,
           avatar: (crowdAuthorName.trim() || 'EM').slice(0, 2).toUpperCase(),
@@ -1659,7 +1659,7 @@ export default function MapScreen() {
                 selectedFilter === 'comunidad' && { color: '#FFD700', fontWeight: '800' },
               ]}
             >
-              Comunidad
+              Comunidad ViaTrek
             </Text>
           </TouchableOpacity>
         </View>
@@ -2001,7 +2001,7 @@ export default function MapScreen() {
                 {selectedRoute.isCommunityCreated && (
                   <View style={styles.crowdCommunityBanner}>
                     <Star size={12} color="#FFD700" fill="#FFD700" />
-                    <Text style={styles.crowdCommunityBannerText}>COMUNIDAD</Text>
+                    <Text style={styles.crowdCommunityBannerText}>COMUNIDAD VIATREK</Text>
                   </View>
                 )}
                 <View
@@ -2329,7 +2329,7 @@ export default function MapScreen() {
               <View style={styles.elevationProfileHeader}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <TrendingUp size={14} color="#00E676" />
-                  <Text style={styles.elevationProfileTitle}>PERFIL ALTIMÉTRICO WIKILOC</Text>
+                  <Text style={styles.elevationProfileTitle}>PERFIL ALTIMÉTRICO VIATREK</Text>
                 </View>
                 <Text style={styles.elevationProfileRangeText}>
                   {selectedRoute.elevationProfile.minElevM}m ➔ {selectedRoute.elevationProfile.maxElevM}m
@@ -2603,7 +2603,7 @@ export default function MapScreen() {
                 {selectedPoi.isCommunityCreated && (
                   <View style={styles.crowdCommunityBanner}>
                     <Star size={12} color="#FFD700" fill="#FFD700" />
-                    <Text style={styles.crowdCommunityBannerText}>COMUNIDAD</Text>
+                    <Text style={styles.crowdCommunityBannerText}>COMUNIDAD VIATREK</Text>
                   </View>
                 )}
                 <View
@@ -2817,7 +2817,7 @@ export default function MapScreen() {
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderTitleRow}>
                 <Sparkles size={20} color="#FFD700" />
-                <Text style={styles.modalTitle}>Añadir a la Comunidad (Wikiloc)</Text>
+                <Text style={styles.modalTitle}>Añadir a la Comunidad ViaTrek</Text>
               </View>
               <TouchableOpacity
                 onPress={() => setIsCrowdsourceModalVisible(false)}
@@ -2829,7 +2829,7 @@ export default function MapScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <Text style={styles.modalSubtitle}>
-                Comparte senderos, miradores, cascadas o puestos para que miles de personas puedan descubrirlos.
+                Formá parte de la Comunidad ViaTrek Mendoza. Comparte senderos, miradores, cascadas o puestos para que toda la comunidad pueda descubrirlos y disfrutarlos con seguridad.
               </Text>
 
               {/* Selector de Pestaña: POI vs RUTA */}
@@ -3167,7 +3167,7 @@ export default function MapScreen() {
               >
                 <Sparkles size={18} color="#05080E" strokeWidth={2.8} />
                 <Text style={styles.crowdSubmitButtonText}>
-                  Publicar en la Comunidad (Wikiloc)
+                  Publicar en la Comunidad ViaTrek 🚀
                 </Text>
               </TouchableOpacity>
             </ScrollView>

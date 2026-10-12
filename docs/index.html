@@ -1916,7 +1916,7 @@
         🍷 Wine & Trail
       </button>
       <button class="filter-pill" id="pill-comunidad" onclick="setFilter('comunidad')">
-        🌟 Comunidad
+        🌟 Comunidad ViaTrek
       </button>
     </div>
 
@@ -1972,8 +1972,8 @@
       🛡️
     </button>
 
-    <!-- Botón Crowdsourcing: Añadir Ruta o Lugar a la Comunidad (Wikiloc) -->
-    <button class="fab-btn crowdsource-btn" id="fab-crowdsource-btn" onclick="openCrowdsourceModal()" title="Añadir a la Comunidad (Wikiloc Crowdsourcing)" style="border-color: #00E676; background: #00E676; color: #05080E; font-size: 16px;">
+    <!-- Botón Crowdsourcing: Añadir Ruta o Lugar a la Comunidad ViaTrek -->
+    <button class="fab-btn crowdsource-btn" id="fab-crowdsource-btn" onclick="openCrowdsourceModal()" title="Añadir a la Comunidad ViaTrek (Aporte Comunitario)" style="border-color: #00E676; background: #00E676; color: #05080E; font-size: 16px;">
       ➕
       <div class="fab-badge" style="background: #FFD700; color: #05080E; font-weight: 900;">★</div>
     </button>
@@ -2034,7 +2034,7 @@
     <div class="card-header">
       <div>
         <div class="card-title-row">
-          <span class="community-pill" id="route-community-badge" style="display: none;">🌟 COMUNIDAD</span>
+          <span class="community-pill" id="route-community-badge" style="display: none;">🌟 COMUNIDAD VIATREK</span>
           <div class="color-dot" id="route-color-dot"></div>
           <span class="zone-badge" id="route-zone">Gran Mendoza</span>
           <span class="diff-pill" id="route-diff-pill">Fácil</span>
@@ -2110,7 +2110,7 @@
     <div class="elevation-profile-box" id="route-elevation-box" style="display: none;">
       <div class="elevation-profile-header">
         <div style="display: flex; align-items: center; gap: 5px; color: #00E676; font-size: 11px; font-weight: 900;">
-          📈 PERFIL ALTIMÉTRICO WIKILOC
+          📈 PERFIL ALTIMÉTRICO VIATREK
         </div>
         <div style="font-size: 11px; color: #94A3B8; font-weight: 700;" id="route-elev-range">
           -- m ➔ -- m
@@ -2208,7 +2208,7 @@
     <div class="card-header">
       <div>
         <div class="card-title-row">
-          <span class="community-pill" id="poi-community-badge" style="display: none;">🌟 COMUNIDAD</span>
+          <span class="community-pill" id="poi-community-badge" style="display: none;">🌟 COMUNIDAD VIATREK</span>
           <div class="color-dot" id="poi-color-dot"></div>
           <span class="zone-badge" id="poi-cat-badge">Punto de Interés</span>
         </div>
@@ -2337,15 +2337,15 @@
     </div>
   </div>
 
-  <!-- MODAL: CROWDSOURCING - APORTAR RUTA O LUGAR A LA COMUNIDAD (WIKILOC) -->
+  <!-- MODAL: CROWDSOURCING - APORTAR RUTA O LUGAR A LA COMUNIDAD VIATREK -->
   <div class="modal-overlay" id="crowdsource-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title">✨ Añadir a la Comunidad (Wikiloc)</div>
+        <div class="modal-title">✨ Añadir a la Comunidad ViaTrek</div>
         <button class="close-btn" onclick="closeCrowdsourceModal()">✕</button>
       </div>
       <p class="modal-subtitle">
-        Comparte senderos, miradores, cascadas o puestos para que todas las personas puedan visitarlos e informarse.
+        Formá parte de la Comunidad ViaTrek Mendoza. Comparte senderos, miradores, cascadas o puestos para que toda la comunidad pueda descubrirlos y disfrutarlos con seguridad.
       </p>
 
       <!-- Selector de Tipo: POI vs RUTA -->
@@ -2458,7 +2458,7 @@
 
       <!-- Botón Enviar -->
       <button class="btn-submit-crowd" onclick="submitCrowdsourceWeb()">
-        Publicar en la Comunidad (Wikiloc) 🚀
+        Publicar en la Comunidad ViaTrek 🚀
       </button>
     </div>
   </div>
@@ -6689,8 +6689,11 @@
       }
 
       const curRegion = MENDOZA_REGIONS.find(r => r.id === selectedRegionId);
-      const regName = curRegion && curRegion.id !== 'todas' ? curRegion.name : 'Mendoza';
-      document.getElementById('stats-badge').innerText = `${regName} • ${filteredRoutes.length} rutas • ${filteredPois.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
+      if (currentFilter === 'comunidad') {
+        document.getElementById('stats-badge').innerText = `🌟 Comunidad ViaTrek • ${filteredRoutes.length} rutas • ${filteredPois.length} lugares compartidos • Aportá con ➕`;
+      } else {
+        document.getElementById('stats-badge').innerText = `${regName} • ${filteredRoutes.length} rutas • ${filteredPois.length} POIs • ⚠️ ${filteredIncidents.length} alertas en vivo`;
+      }
       document.getElementById('fab-badge-count').innerText = filteredIncidents.length;
 
       // Áreas Protegidas (Fase 3: Semáforo de Legalidad)
@@ -8068,7 +8071,7 @@ trkpts + '\n' +
 
       const authorObj = {
         name: authorName,
-        role: 'Comunidad ViaTrek (Wikiloc)',
+        role: 'Comunidad ViaTrek',
         applauseCount: 1,
         avatar: authorName.slice(0, 2).toUpperCase()
       };
@@ -8111,7 +8114,7 @@ trkpts + '\n' +
         map.flyTo([lat, lng], 14, { duration: 1.2 });
         showPoiCard(newPoi);
 
-        alert(`🎉 ¡Lugar añadido a la comunidad con éxito!\n"${name}" ya es visible en el mapa.`);
+        alert(`🎉 ¡Lugar añadido a la Comunidad ViaTrek con éxito!\n"${name}" ya es visible en el mapa.`);
       } else {
         const dist = parseFloat(document.getElementById('crowd-dist-input').value) || 5.0;
         const elev = parseInt(document.getElementById('crowd-elev-input').value, 10) || 250;
@@ -8184,7 +8187,7 @@ trkpts + '\n' +
         map.flyTo([lat, lng], 14, { duration: 1.2 });
         showRouteCard(newRoute);
 
-        alert(`🎉 ¡Sendero publicado en la comunidad con éxito!\n"${name}" ya está trazado y disponible para descargar en GPX.`);
+        alert(`🎉 ¡Sendero publicado en la Comunidad ViaTrek con éxito!\n"${name}" ya está trazado y disponible para descargar en GPX.`);
       }
 
       document.getElementById('crowd-name-input').value = '';
