@@ -120,7 +120,7 @@ import {
   MENDOZA_REGIONS,
 } from '../data/routesAndPois';
 
-type FilterTab = 'todas' | RouteType | 'comunidad';
+type FilterTab = 'todas' | RouteType | 'comunidad' | 'cumbre';
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
@@ -805,6 +805,9 @@ export default function MapScreen() {
       if (selectedFilter === 'comunidad') {
         return routes.filter((r) => r.isCommunityCreated);
       }
+      if (selectedFilter === 'cumbre') {
+        return routes.filter((r) => r.isSummitAscent);
+      }
       routes = routes.filter((route) => {
         if (selectedFilter === 'trekking') {
           return route.type === 'trekking' || route.legality?.allowedModes?.trekking;
@@ -823,7 +826,7 @@ export default function MapScreen() {
 
   // Incidentes filtrados según el modo seleccionado
   const visibleIncidents = useMemo(() => {
-    if (selectedFilter === 'todas' || selectedFilter === 'comunidad') return incidents;
+    if (selectedFilter === 'todas' || selectedFilter === 'comunidad' || selectedFilter === 'cumbre') return incidents;
     return incidents.filter((inc) => inc.affectedModes.includes(selectedFilter as RouteType));
   }, [selectedFilter, incidents]);
 
@@ -945,6 +948,16 @@ export default function MapScreen() {
     if (selectedFilter === 'todas') return allPois;
     if (selectedFilter === 'comunidad') {
       return allPois.filter((p) => p.isCommunityCreated);
+    }
+    if (selectedFilter === 'cumbre') {
+      return allPois.filter(
+        (p) =>
+          p.category === 'cumbre' ||
+          p.category === 'trailhead' ||
+          p.category === 'refugio_almacen' ||
+          p.category === 'vertiente' ||
+          p.category === 'mirador'
+      );
     }
     if (selectedFilter === 'trekking') {
       return allPois.filter(
@@ -1264,19 +1277,21 @@ export default function MapScreen() {
         {/* HITOS Y WAYPOINTS DE LA RUTA SELECCIONADA (ESTILO WIKILOC) */}
         {selectedRoute && selectedRoute.coordinates.length > 0 && (
           <React.Fragment key="wikiloc-active-trail-markers">
-            {/* Marcador de Salida / Inicio (Verde Wikiloc) */}
+            {/* Marcador de Salida / Inicio (Verde Wikiloc o Base) */}
             <Marker
               key="route-start-pin"
               coordinate={selectedRoute.coordinates[0]}
-              title={`🟢 Salida: ${selectedRoute.name}`}
-              description="Punto de partida oficial del recorrido"
+              title={selectedRoute.isSummitAscent ? `🅿️ Base: ${selectedRoute.basePointName || selectedRoute.name}` : `🟢 Salida: ${selectedRoute.name}`}
+              description={selectedRoute.isSummitAscent && selectedRoute.baseElevationM ? `Cota base: ${selectedRoute.baseElevationM} msnm` : "Punto de partida oficial del recorrido"}
             >
               <View style={styles.wikilocStartMarker}>
-                <View style={styles.wikilocStartInner}>
-                  <Text style={{ fontSize: 13 }}>🟢</Text>
+                <View style={[styles.wikilocStartInner, selectedRoute.isSummitAscent && { backgroundColor: '#00E5FF' }]}>
+                  <Text style={{ fontSize: 13 }}>{selectedRoute.isSummitAscent ? '🅿️' : '🟢'}</Text>
                 </View>
-                <View style={styles.wikilocStartBadge}>
-                  <Text style={styles.wikilocStartBadgeText}>SALIDA</Text>
+                <View style={[styles.wikilocStartBadge, selectedRoute.isSummitAscent && { backgroundColor: '#00E5FF' }]}>
+                  <Text style={[styles.wikilocStartBadgeText, selectedRoute.isSummitAscent && { color: '#05080E' }]}>
+                    {selectedRoute.isSummitAscent ? (selectedRoute.baseElevationM ? `BASE ${selectedRoute.baseElevationM}m` : 'BASE') : 'SALIDA'}
+                  </Text>
                 </View>
               </View>
             </Marker>
@@ -1302,15 +1317,17 @@ export default function MapScreen() {
               <Marker
                 key="route-finish-pin"
                 coordinate={selectedRoute.coordinates[selectedRoute.coordinates.length - 1]}
-                title={`🏁 Meta: ${selectedRoute.name}`}
-                description="Finalización del recorrido"
+                title={selectedRoute.isSummitAscent ? `🏆 Cumbre: ${selectedRoute.summitPointName || selectedRoute.name}` : `🏁 Meta: ${selectedRoute.name}`}
+                description={selectedRoute.isSummitAscent && selectedRoute.summitElevationM ? `Altitud cumbre: ${selectedRoute.summitElevationM} msnm` : "Finalización del recorrido"}
               >
                 <View style={styles.wikilocStartMarker}>
                   <View style={[styles.wikilocStartInner, { backgroundColor: '#FFD700' }]}>
-                    <Text style={{ fontSize: 13 }}>🏁</Text>
+                    <Text style={{ fontSize: 13 }}>{selectedRoute.isSummitAscent ? '🏆' : '🏁'}</Text>
                   </View>
                   <View style={[styles.wikilocStartBadge, { backgroundColor: '#FFD700' }]}>
-                    <Text style={[styles.wikilocStartBadgeText, { color: '#05080E' }]}>LLEGADA</Text>
+                    <Text style={[styles.wikilocStartBadgeText, { color: '#05080E' }]}>
+                      {selectedRoute.isSummitAscent ? (selectedRoute.summitElevationM ? `CUMBRE ${selectedRoute.summitElevationM}m` : 'CUMBRE') : 'LLEGADA'}
+                    </Text>
                   </View>
                 </View>
               </Marker>
@@ -1536,6 +1553,36 @@ export default function MapScreen() {
           <TouchableOpacity
             style={[
               styles.filterPill,
+              selectedFilter === 'cumbre' && {
+                backgroundColor: 'rgba(255, 214, 0, 0.18)',
+                borderWidth: 1,
+                borderColor: '#FFD600',
+              },
+            ]}
+            onPress={() => {
+              setSelectedFilter('cumbre');
+              setSelectedRoute(null);
+              setSelectedPoi(null);
+            }}
+            activeOpacity={0.8}
+          >
+            <Compass
+              size={15}
+              color={selectedFilter === 'cumbre' ? '#FFD600' : '#94A3B8'}
+            />
+            <Text
+              style={[
+                styles.filterPillText,
+                selectedFilter === 'cumbre' && { color: '#FFD600', fontWeight: '800' },
+              ]}
+            >
+              ⛰️ Base a Cumbre
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterPill,
               selectedFilter === 'ciclovia' && styles.filterPillActiveCiclovia,
             ]}
             onPress={() => {
@@ -1697,7 +1744,7 @@ export default function MapScreen() {
         {/* Badge contador de rutas activas e incidentes en vivo */}
         <View style={styles.statsBadge}>
           <Text style={styles.statsBadgeText}>
-            Mendoza • {visibleRoutes.length} rutas • {visiblePois.length} POIs • ⚠️ {visibleIncidents.length} alertas en vivo
+            {selectedRegionId === 'todas' ? 'Cuyo' : (MENDOZA_REGIONS.find((r) => r.id === selectedRegionId)?.name || 'Cuyo')} • {visibleRoutes.length} rutas • {visiblePois.length} POIs • ⚠️ {visibleIncidents.length} alertas en vivo
           </Text>
         </View>
       </View>
@@ -2040,6 +2087,46 @@ export default function MapScreen() {
               <X size={20} color="#94A3B8" />
             </TouchableOpacity>
           </View>
+
+          {/* BANNER DESTACADO BASE ➔ CUMBRE */}
+          {selectedRoute.isSummitAscent && (
+            <View style={styles.summitAscentCard}>
+              <View style={styles.summitAscentHeaderRow}>
+                <View style={styles.summitAscentBadge}>
+                  <Text style={styles.summitAscentBadgeText}>⛰️ RUTA BASE ➔ CUMBRE</Text>
+                </View>
+                <Text style={styles.summitGainText}>
+                  +{selectedRoute.elevationGainM}m desnivel
+                </Text>
+              </View>
+
+              <View style={styles.summitAscentPointsRow}>
+                <View style={styles.summitPointCol}>
+                  <Text style={styles.summitPointRole}>🟢 PUNTO BASE (SALIDA)</Text>
+                  <Text style={styles.summitPointName} numberOfLines={2}>
+                    {selectedRoute.basePointName || 'Base / Trailhead'}
+                  </Text>
+                  <Text style={styles.summitPointAlt}>
+                    {selectedRoute.baseElevationM ? `${selectedRoute.baseElevationM} msnm` : 'Base'}
+                  </Text>
+                </View>
+
+                <View style={styles.summitArrowWrapper}>
+                  <Text style={styles.summitArrowText}>➔</Text>
+                </View>
+
+                <View style={styles.summitPointColRight}>
+                  <Text style={styles.summitPointRoleRight}>🏆 CUMBRE (LLEGADA)</Text>
+                  <Text style={styles.summitPointNameRight} numberOfLines={2}>
+                    {selectedRoute.summitPointName || 'Cima'}
+                  </Text>
+                  <Text style={styles.summitPointAltRight}>
+                    {selectedRoute.summitElevationM ? `${selectedRoute.summitElevationM} msnm` : 'Cumbre'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
 
           {/* GALERÍA DE FOTOS COMUNITARIAS DE LA RUTA */}
           {selectedRoute.photos && selectedRoute.photos.length > 0 && (
@@ -6082,6 +6169,94 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     fontSize: 11,
     marginBottom: 12,
+  },
+  summitAscentCard: {
+    backgroundColor: 'rgba(255, 214, 0, 0.08)',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#FFD600',
+    padding: 12,
+    marginVertical: 10,
+  },
+  summitAscentHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  summitAscentBadge: {
+    backgroundColor: '#FFD600',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  summitAscentBadgeText: {
+    color: '#05080E',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  summitGainText: {
+    color: '#00E676',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  summitAscentPointsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  summitPointCol: {
+    flex: 1,
+  },
+  summitPointColRight: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  summitArrowWrapper: {
+    paddingHorizontal: 8,
+  },
+  summitArrowText: {
+    color: '#FFD600',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  summitPointRole: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  summitPointRoleRight: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '700',
+    marginBottom: 2,
+    textAlign: 'right',
+  },
+  summitPointName: {
+    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  summitPointNameRight: {
+    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'right',
+  },
+  summitPointAlt: {
+    color: '#00E5FF',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  summitPointAltRight: {
+    color: '#FFD700',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
+    textAlign: 'right',
   },
   summitCardItem: {
     backgroundColor: '#101624',

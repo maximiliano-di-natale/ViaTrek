@@ -97,6 +97,11 @@ export interface RouteItem {
   createdAt?: string;
   recommendedSeason?: string;
   equipmentTips?: string;
+  isSummitAscent?: boolean;
+  baseElevationM?: number;
+  summitElevationM?: number;
+  basePointName?: string;
+  summitPointName?: string;
   author?: {
     name: string;
     role?: string;
@@ -265,6 +270,7 @@ export interface SummitItem {
   longitude: number;
   difficulty: 'Fácil' | 'Moderado' | 'Exigente' | 'Alta Montaña';
   zone: string;
+  province?: string;
   description: string;
   badgeTitle: string;
   badgeIcon: string;
