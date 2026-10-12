@@ -60,6 +60,10 @@ import {
   Thermometer,
   Flame,
   ChevronRight,
+  Trophy,
+  Award,
+  Flag,
+  Medal,
 } from 'lucide-react-native';
 
 import {
@@ -80,6 +84,9 @@ import {
   ZondaWeatherInfo,
   ZondaAlertLevel,
   WineRouteInfo,
+  SummitItem,
+  SummitCheckIn,
+  SummitBadge,
 } from '../types/map';
 import {
   INITIAL_MENDOZA_REGION,
@@ -93,6 +100,9 @@ import {
   MENDOZA_CONVIVENCIA_RULES,
   MENDOZA_RANGER_CONTACTS,
   INITIAL_ZONDA_WEATHER,
+  MENDOZA_SUMMITS,
+  INITIAL_SUMMIT_CHECKINS,
+  INITIAL_SUMMIT_BADGES,
 } from '../data/routesAndPois';
 
 type FilterTab = 'todas' | RouteType;
@@ -111,6 +121,14 @@ export default function MapScreen() {
   // Estados Clima & Alerta Zonda (Fase 4: Identidad Mendocina)
   const [zondaWeather, setZondaWeather] = useState<ZondaWeatherInfo>(INITIAL_ZONDA_WEATHER);
   const [isZondaModalVisible, setIsZondaModalVisible] = useState<boolean>(false);
+
+  // Estados Pasaporte de Cumbres & Gamificación (Fase 5)
+  const [summits, setSummits] = useState<SummitItem[]>(MENDOZA_SUMMITS);
+  const [checkedSummits, setCheckedSummits] = useState<Record<string, SummitCheckIn>>(INITIAL_SUMMIT_CHECKINS);
+  const [badges, setBadges] = useState<SummitBadge[]>(INITIAL_SUMMIT_BADGES);
+  const [selectedSummit, setSelectedSummit] = useState<SummitItem | null>(null);
+  const [isPassportModalVisible, setIsPassportModalVisible] = useState<boolean>(false);
+  const [passportTab, setPassportTab] = useState<'cumbres' | 'insignias'>('cumbres');
 
   // Elementos activos seleccionados
   const [selectedRoute, setSelectedRoute] = useState<RouteItem | null>(null);
@@ -358,6 +376,109 @@ export default function MapScreen() {
         updatedAt: 'Tiempo Estable • Precordillera',
       });
     }
+  };
+
+  // Métricas computadas de Gamificación y Pasaporte
+  const conqueredCount = useMemo(() => Object.keys(checkedSummits).length, [checkedSummits]);
+  const totalElevationM = useMemo(() => {
+    return Object.values(checkedSummits).reduce((acc, curr) => acc + curr.elevationGainM, 0);
+  }, [checkedSummits]);
+  const unlockedBadgesCount = useMemo(() => badges.filter((b) => b.unlocked).length, [badges]);
+
+  // Cálculo de distancia geográfica (Haversine)
+  const calculateDistanceKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  // Check-in de Cumbre con geocerca GPS o simulación
+  const handleSummitCheckIn = (summit: SummitItem, forceSimulation: boolean = false) => {
+    const alreadyConquered = !!checkedSummits[summit.id];
+    if (alreadyConquered) {
+      Alert.alert(
+        'Cumbre ya registrada',
+        `Ya conquistaste ${summit.name} (${summit.elevationM} msnm) el ${checkedSummits[summit.id].unlockedAt}.`
+      );
+      return;
+    }
+
+    let distKm = 9999;
+    if (userLocation) {
+      distKm = calculateDistanceKm(
+        userLocation.latitude,
+        userLocation.longitude,
+        summit.latitude,
+        summit.longitude
+      );
+    }
+    const distMeters = distKm * 1000;
+
+    if (!forceSimulation && distMeters > summit.radiusMeters) {
+      Alert.alert(
+        'Fuera del radio de cumbre',
+        `Estás a ${distKm.toFixed(1)} km de la cumbre de ${summit.name}.\nEl radio de check-in GPS es de ${summit.radiusMeters} metros.\n\n¿Deseas simular la llegada para validar tu pasaporte?`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Simular Cumbre GPS',
+            onPress: () => handleSummitCheckIn(summit, true),
+          },
+        ]
+      );
+      return;
+    }
+
+    const nowStr = 'Hoy ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const newCheckIn: SummitCheckIn = {
+      summitId: summit.id,
+      unlockedAt: nowStr,
+      elevationGainM: summit.elevationM,
+    };
+
+    const newChecked = { ...checkedSummits, [summit.id]: newCheckIn };
+    setCheckedSummits(newChecked);
+
+    // Evaluar y desbloquear insignias automáticamente
+    const newConqueredCount = Object.keys(newChecked).length;
+    const newTotalElev = Object.values(newChecked).reduce((acc, curr) => acc + curr.elevationGainM, 0);
+
+    const updatedBadges = badges.map((b) => {
+      if (b.id === 'badge-primera-cumbre' && newConqueredCount >= 1) {
+        return { ...b, unlocked: true, unlockedAt: nowStr };
+      }
+      if (b.id === 'badge-centinela-arco' && summit.id === 'cerro-arco') {
+        return { ...b, unlocked: true, unlockedAt: nowStr };
+      }
+      if (b.id === 'badge-gloria-urbana' && summit.id === 'cerro-de-la-gloria') {
+        return { ...b, unlocked: true, unlockedAt: nowStr };
+      }
+      if (b.id === 'badge-maestro-precordillera' && newConqueredCount >= 3) {
+        return { ...b, unlocked: true, unlockedAt: nowStr };
+      }
+      if (b.id === 'badge-desnivel-oro' && newTotalElev >= 1000) {
+        return { ...b, unlocked: true, unlockedAt: nowStr };
+      }
+      return b;
+    });
+    setBadges(updatedBadges);
+
+    Alert.alert(
+      '🎉 ¡CUMBRE CONQUISTADA!',
+      `¡Felicitaciones! Has coronado ${summit.name} (${summit.elevationM} msnm).\n\n🏔️ Desnivel acreditado: +${summit.elevationM} m\nInsignia: "${summit.badgeTitle}" (${summit.badgeIcon})\n\n¡Tu Pasaporte Mendocino ha sido actualizado!`,
+      [
+        { text: 'Ver Pasaporte', onPress: () => setIsPassportModalVisible(true) },
+        { text: 'Continuar', style: 'default' },
+      ]
+    );
   };
 
   const formatSecondsToClock = (totalSec: number) => {
@@ -835,6 +956,62 @@ export default function MapScreen() {
             </Marker>
           );
         })}
+
+        {/* CUMBRES DEL PASAPORTE MENDOCINO (FASE 5) */}
+        {summits.map((summit) => {
+          const isConquered = !!checkedSummits[summit.id];
+          const isSelected = selectedSummit?.id === summit.id;
+
+          return (
+            <Marker
+              key={summit.id}
+              coordinate={{ latitude: summit.latitude, longitude: summit.longitude }}
+              title={`${summit.name} (${summit.elevationM} msnm)`}
+              description={isConquered ? '✅ Cumbre conquistada' : `Pendiente • ${summit.difficulty}`}
+              onPress={() => {
+                setSelectedRoute(null);
+                setSelectedPoi(null);
+                setSelectedIncident(null);
+                setSelectedProtectedArea(null);
+                setSelectedSummit(summit);
+              }}
+            >
+              <View
+                style={[
+                  styles.summitMarkerCasing,
+                  isSelected && styles.summitMarkerSelected,
+                  isConquered && styles.summitMarkerConquered,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.summitMarkerInner,
+                    isConquered && { backgroundColor: '#FFD600' },
+                  ]}
+                >
+                  <Text style={styles.summitMarkerIcon}>
+                    {isConquered ? '👑' : '⛰️'}
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    styles.summitElevationBadge,
+                    isConquered && styles.summitElevationBadgeConquered,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.summitElevationText,
+                      isConquered && { color: '#05080E' },
+                    ]}
+                  >
+                    {summit.elevationM}m
+                  </Text>
+                </View>
+              </View>
+            </Marker>
+          );
+        })}
       </MapView>
 
       {/* HEADER SUPERIOR: FILTRO DE RUTAS */}
@@ -1113,6 +1290,22 @@ export default function MapScreen() {
           <Scale size={20} color={showProtectedAreas ? '#00E676' : '#F8FAFC'} />
           <View style={styles.fabMiniBadge}>
             <Text style={styles.fabMiniBadgeText}>⚖️</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Botón Pasaporte de Cumbres & Gamificación (Fase 5) */}
+        <TouchableOpacity
+          style={[
+            styles.fabButton,
+            styles.fabTrophyButton,
+            conqueredCount > 0 && styles.fabTrophyButtonActive,
+          ]}
+          onPress={() => setIsPassportModalVisible(true)}
+          activeOpacity={0.85}
+        >
+          <Trophy size={20} color={conqueredCount > 0 ? '#FFD600' : '#F8FAFC'} />
+          <View style={styles.fabTrophyBadge}>
+            <Text style={styles.fabTrophyBadgeText}>{conqueredCount}/{summits.length}</Text>
           </View>
         </TouchableOpacity>
 
@@ -1531,6 +1724,112 @@ export default function MapScreen() {
                 <Text style={styles.navigateButtonText}>Guardaparques</Text>
               </TouchableOpacity>
             )}
+          </View>
+        </View>
+      )}
+
+      {/* TARJETA INFERIOR: DETALLES DE CUMBRE SELECCIONADA (FASE 5) */}
+      {selectedSummit && (
+        <View style={[styles.bottomCard, { paddingBottom: insets.bottom + 16 }]}>
+          <View style={styles.cardHeader}>
+            <View style={{ flex: 1 }}>
+              <View style={styles.cardHeaderTopRow}>
+                <View style={styles.summitCrownBadge}>
+                  <Text style={styles.summitCrownText}>
+                    {checkedSummits[selectedSummit.id] ? '🎖️ CONQUISTADA' : '⛰️ CUMBRE PENDIENTE'}
+                  </Text>
+                </View>
+                <Text style={styles.zoneText}>{selectedSummit.zone}</Text>
+                <View
+                  style={[
+                    styles.difficultyBadge,
+                    { borderColor: getDifficultyColor(selectedSummit.difficulty === 'Exigente' ? 'Técnico' : selectedSummit.difficulty as any) },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.difficultyText,
+                      { color: getDifficultyColor(selectedSummit.difficulty === 'Exigente' ? 'Técnico' : selectedSummit.difficulty as any) },
+                    ]}
+                  >
+                    {selectedSummit.difficulty}
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={styles.cardTitle} numberOfLines={2}>
+                {selectedSummit.name}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => setSelectedSummit(null)}
+              style={styles.closeBtn}
+            >
+              <X size={20} color="#94A3B8" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Métricas de cumbre */}
+          <View style={styles.metricsBox}>
+            <View style={styles.metricItem}>
+              <Text style={styles.metricLabel}>ALTITUD</Text>
+              <Text style={styles.metricValue}>{selectedSummit.elevationM} msnm</Text>
+            </View>
+
+            <View style={styles.metricDivider} />
+
+            <View style={styles.metricItem}>
+              <Text style={styles.metricLabel}>DISTANCIA GPS</Text>
+              <Text style={styles.metricValue}>
+                {userLocation
+                  ? `${calculateDistanceKm(userLocation.latitude, userLocation.longitude, selectedSummit.latitude, selectedSummit.longitude).toFixed(1)} km`
+                  : 'Aprox. 8 km'}
+              </Text>
+            </View>
+
+            <View style={styles.metricDivider} />
+
+            <View style={styles.metricItem}>
+              <Text style={styles.metricLabel}>INSIGNIA</Text>
+              <Text style={styles.metricValue}>{selectedSummit.badgeIcon} {selectedSummit.badgeTitle}</Text>
+            </View>
+          </View>
+
+          <Text style={styles.summitDescText}>{selectedSummit.description}</Text>
+
+          {/* Botones de acción */}
+          <View style={styles.actionButtonsRow}>
+            <TouchableOpacity
+              style={[
+                styles.focusRouteButton,
+                { backgroundColor: checkedSummits[selectedSummit.id] ? 'rgba(0, 230, 118, 0.15)' : '#FFD600' },
+              ]}
+              onPress={() => handleSummitCheckIn(selectedSummit)}
+              activeOpacity={0.85}
+            >
+              <Medal size={16} color={checkedSummits[selectedSummit.id] ? '#00E676' : '#05080E'} />
+              <Text
+                style={[
+                  styles.focusRouteButtonText,
+                  { color: checkedSummits[selectedSummit.id] ? '#00E676' : '#05080E', fontWeight: '900' },
+                ]}
+              >
+                {checkedSummits[selectedSummit.id] ? 'Cumbre Ya Registrada ✓' : 'Hacer Cumbre (Check-in GPS)'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.navigateButton}
+              onPress={() => {
+                const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedSummit.latitude},${selectedSummit.longitude}`;
+                Linking.openURL(url);
+              }}
+              activeOpacity={0.85}
+            >
+              <ExternalLink size={16} color="#05080E" />
+              <Text style={styles.navigateButtonText}>Cómo Llegar</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -2531,6 +2830,208 @@ export default function MapScreen() {
                 <Text style={styles.defensaCivilBtnText}>
                   Llamar a Defensa Civil Mendoza (Línea 103)
                 </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL: PASAPORTE DE CUMBRES & GAMIFICACIÓN (FASE 5) */}
+      <Modal
+        visible={isPassportModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsPassportModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, styles.passportModalContent, { paddingBottom: insets.bottom + 20 }]}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderTitleRow}>
+                <Trophy size={22} color="#FFD600" strokeWidth={2.4} />
+                <View>
+                  <Text style={styles.modalTitle}>Pasaporte de Cumbres</Text>
+                  <Text style={styles.passportSubtitle}>Desafíos de Montaña • Gran Mendoza</Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={() => setIsPassportModalVisible(false)}
+                style={styles.modalCloseBtn}
+              >
+                <X size={20} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Pestañas del Modal: Cumbres vs Insignias */}
+            <View style={styles.passportTabsRow}>
+              <TouchableOpacity
+                style={[styles.passportTabBtn, passportTab === 'cumbres' && styles.passportTabBtnActive]}
+                onPress={() => setPassportTab('cumbres')}
+              >
+                <Text style={[styles.passportTabBtnText, passportTab === 'cumbres' && styles.passportTabBtnTextActive]}>
+                  ⛰️ Cumbres ({conqueredCount}/{summits.length})
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.passportTabBtn, passportTab === 'insignias' && styles.passportTabBtnActive]}
+                onPress={() => setPassportTab('insignias')}
+              >
+                <Text style={[styles.passportTabBtnText, passportTab === 'insignias' && styles.passportTabBtnTextActive]}>
+                  🏆 Insignias ({unlockedBadgesCount}/{badges.length})
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Tablero Resumen de Logros */}
+            <View style={styles.passportHeroBox}>
+              <View style={styles.passportHeroItem}>
+                <Text style={styles.passportHeroNum}>{conqueredCount}/{summits.length}</Text>
+                <Text style={styles.passportHeroLabel}>CUMBRES</Text>
+              </View>
+              <View style={styles.passportHeroDivider} />
+              <View style={styles.passportHeroItem}>
+                <Text style={[styles.passportHeroNum, { color: '#00E676' }]}>+{totalElevationM}m</Text>
+                <Text style={styles.passportHeroLabel}>DESNIVEL</Text>
+              </View>
+              <View style={styles.passportHeroDivider} />
+              <View style={styles.passportHeroItem}>
+                <Text style={[styles.passportHeroNum, { color: '#FFD600' }]}>{unlockedBadgesCount}/{badges.length}</Text>
+                <Text style={styles.passportHeroLabel}>INSIGNIAS</Text>
+              </View>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {passportTab === 'cumbres' ? (
+                <View>
+                  <Text style={styles.sectionHeading}>
+                    CUMBRES CLÁSICAS DE PRECORDILLERA
+                  </Text>
+                  <Text style={styles.sectionSubtitle}>
+                    Acércate a menos de 200m de la cumbre para validar tu check-in GPS.
+                  </Text>
+
+                  {summits.map((summit) => {
+                    const isConquered = !!checkedSummits[summit.id];
+                    const distKm = userLocation
+                      ? calculateDistanceKm(userLocation.latitude, userLocation.longitude, summit.latitude, summit.longitude)
+                      : null;
+
+                    return (
+                      <View
+                        key={summit.id}
+                        style={[
+                          styles.summitCardItem,
+                          isConquered && styles.summitCardItemConquered,
+                        ]}
+                      >
+                        <View style={styles.summitCardTop}>
+                          <View style={{ flex: 1 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                              <Text style={styles.summitCardName}>{summit.name}</Text>
+                              <View style={[styles.summitCardBadge, isConquered && styles.summitCardBadgeConquered]}>
+                                <Text style={[styles.summitCardBadgeText, isConquered && { color: '#05080E' }]}>
+                                  {summit.elevationM}m
+                                </Text>
+                              </View>
+                            </View>
+                            <Text style={styles.summitCardZone}>{summit.zone}</Text>
+                          </View>
+
+                          {isConquered ? (
+                            <View style={styles.conqueredStamp}>
+                              <Text style={styles.conqueredStampText}>CORONADA 🎖️</Text>
+                              <Text style={styles.conqueredStampDate}>{checkedSummits[summit.id].unlockedAt}</Text>
+                            </View>
+                          ) : (
+                            <TouchableOpacity
+                              style={styles.summitCheckInBtn}
+                              onPress={() => handleSummitCheckIn(summit)}
+                            >
+                              <Text style={styles.summitCheckInBtnText}>Check-in GPS</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+
+                        <Text style={styles.summitCardDesc}>{summit.description}</Text>
+
+                        <View style={styles.summitCardFooter}>
+                          <View style={styles.summitCardDistRow}>
+                            <MapPin size={13} color="#94A3B8" />
+                            <Text style={styles.summitCardDistText}>
+                              {distKm !== null ? `A ${distKm.toFixed(1)} km de ti` : 'Distancia: Precordillera'}
+                            </Text>
+                          </View>
+                          <TouchableOpacity
+                            style={styles.summitFocusBtn}
+                            onPress={() => {
+                              setIsPassportModalVisible(false);
+                              setSelectedSummit(summit);
+                              mapRef.current?.animateToRegion({
+                                latitude: summit.latitude,
+                                longitude: summit.longitude,
+                                latitudeDelta: 0.04,
+                                longitudeDelta: 0.04,
+                              }, 700);
+                            }}
+                          >
+                            <Text style={styles.summitFocusBtnText}>Ver en Mapa ›</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              ) : (
+                <View>
+                  <Text style={styles.sectionHeading}>
+                    GALERÍA DE INSIGNIAS Y LOGROS
+                  </Text>
+                  <Text style={styles.sectionSubtitle}>
+                    Desbloquea insignias exclusivas explorando los cerros de Mendoza.
+                  </Text>
+
+                  {badges.map((badge) => (
+                    <View
+                      key={badge.id}
+                      style={[
+                        styles.badgeCardItem,
+                        badge.unlocked && styles.badgeCardItemUnlocked,
+                      ]}
+                    >
+                      <View style={[styles.badgeIconCircle, badge.unlocked && styles.badgeIconCircleUnlocked]}>
+                        <Text style={styles.badgeIconText}>{badge.icon}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Text style={[styles.badgeTitle, badge.unlocked && styles.badgeTitleUnlocked]}>
+                            {badge.title}
+                          </Text>
+                          {badge.unlocked && (
+                            <View style={styles.badgeUnlockedPill}>
+                              <Text style={styles.badgeUnlockedPillText}>Desbloqueada ✓</Text>
+                            </View>
+                          )}
+                        </View>
+                        <Text style={styles.badgeDesc}>{badge.description}</Text>
+                        <Text style={styles.badgeReq}>Requisito: {badge.requirement}</Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* Compartir Logro en Redes / WhatsApp */}
+              <TouchableOpacity
+                style={styles.sharePassportBtn}
+                onPress={() => {
+                  const text = `🏔️ ¡Mi progreso en el Pasaporte de Cumbres ViaTrek Mendoza!\n\n👑 Cumbres coronadas: ${conqueredCount}/${summits.length}\n📈 Desnivel vertical acumulado: +${totalElevationM} m\n🏆 Insignias ganadas: ${unlockedBadgesCount}/${badges.length}\n\n¡Explorá los senderos de Mendoza conmigo en ViaTrek!`;
+                  Linking.openURL(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`).catch(() => {
+                    Alert.alert('Pasaporte ViaTrek', text);
+                  });
+                }}
+                activeOpacity={0.88}
+              >
+                <Award size={18} color="#05080E" strokeWidth={2.5} />
+                <Text style={styles.sharePassportBtnText}>Compartir mi Progreso 📲</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -4162,4 +4663,369 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '900',
   },
+
+  // Marcadores de Cumbre (Fase 5)
+  summitMarkerCasing: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summitMarkerSelected: {
+    transform: [{ scale: 1.15 }],
+  },
+  summitMarkerConquered: {},
+  summitMarkerInner: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#1E293B',
+    borderWidth: 2.5,
+    borderColor: '#FFD600',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#FFD600',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  summitMarkerIcon: {
+    fontSize: 16,
+  },
+  summitElevationBadge: {
+    backgroundColor: '#0F172A',
+    borderColor: '#FFD600',
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 8,
+    marginTop: -4,
+  },
+  summitElevationBadgeConquered: {
+    backgroundColor: '#FFD600',
+  },
+  summitElevationText: {
+    color: '#FFD600',
+    fontSize: 9,
+    fontWeight: '900',
+  },
+
+  // FAB Trophy
+  fabTrophyButton: {
+    borderColor: '#FFD600',
+    backgroundColor: '#1E293B',
+  },
+  fabTrophyButtonActive: {
+    borderColor: '#FFD600',
+    backgroundColor: '#262010',
+  },
+  fabTrophyBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: '#FFD600',
+    borderRadius: 9,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderWidth: 1,
+    borderColor: '#0B0F17',
+  },
+  fabTrophyBadgeText: {
+    color: '#05080E',
+    fontSize: 9,
+    fontWeight: '900',
+  },
+
+  // Tarjeta de Cumbre
+  summitCrownBadge: {
+    backgroundColor: 'rgba(255, 214, 0, 0.15)',
+    borderColor: '#FFD600',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginRight: 6,
+  },
+  summitCrownText: {
+    color: '#FFD600',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  summitDescText: {
+    color: '#CBD5E1',
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 8,
+    marginBottom: 6,
+  },
+
+  // Modal Pasaporte
+  passportModalContent: {
+    maxHeight: '92%',
+  },
+  passportSubtitle: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginTop: 1,
+  },
+  passportTabsRow: {
+    flexDirection: 'row',
+    backgroundColor: '#080C14',
+    borderRadius: 12,
+    padding: 3,
+    marginBottom: 12,
+  },
+  passportTabBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 9,
+  },
+  passportTabBtnActive: {
+    backgroundColor: '#1E293B',
+  },
+  passportTabBtnText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  passportTabBtnTextActive: {
+    color: '#FFD600',
+    fontWeight: '900',
+  },
+  passportHeroBox: {
+    flexDirection: 'row',
+    backgroundColor: '#131B2E',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 214, 0, 0.2)',
+    marginBottom: 14,
+  },
+  passportHeroItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  passportHeroNum: {
+    color: '#F8FAFC',
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  passportHeroLabel: {
+    color: '#94A3B8',
+    fontSize: 9,
+    fontWeight: '800',
+    marginTop: 2,
+    letterSpacing: 0.4,
+  },
+  passportHeroDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  sectionHeading: {
+    color: '#FFD600',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  sectionSubtitle: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginBottom: 12,
+  },
+  summitCardItem: {
+    backgroundColor: '#101624',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: 10,
+  },
+  summitCardItemConquered: {
+    borderColor: 'rgba(255, 214, 0, 0.4)',
+    backgroundColor: '#161924',
+  },
+  summitCardTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  summitCardName: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  summitCardBadge: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  summitCardBadgeConquered: {
+    backgroundColor: '#FFD600',
+  },
+  summitCardBadgeText: {
+    color: '#FFD600',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  summitCardZone: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  conqueredStamp: {
+    backgroundColor: 'rgba(255, 214, 0, 0.15)',
+    borderColor: '#FFD600',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  conqueredStampText: {
+    color: '#FFD600',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  conqueredStampDate: {
+    color: '#CBD5E1',
+    fontSize: 8.5,
+    marginTop: 1,
+  },
+  summitCheckInBtn: {
+    backgroundColor: '#FFD600',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  summitCheckInBtnText: {
+    color: '#05080E',
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  summitCardDesc: {
+    color: '#94A3B8',
+    fontSize: 11.5,
+    lineHeight: 16,
+    marginBottom: 8,
+  },
+  summitCardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+    paddingTop: 8,
+  },
+  summitCardDistRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  summitCardDistText: {
+    color: '#94A3B8',
+    fontSize: 11,
+  },
+  summitFocusBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  summitFocusBtnText: {
+    color: '#00E676',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  badgeCardItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#101624',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginBottom: 10,
+    gap: 12,
+    opacity: 0.65,
+  },
+  badgeCardItemUnlocked: {
+    borderColor: 'rgba(255, 214, 0, 0.4)',
+    backgroundColor: '#181C26',
+    opacity: 1,
+  },
+  badgeIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#1E293B',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  badgeIconCircleUnlocked: {
+    backgroundColor: '#262010',
+    borderColor: '#FFD600',
+  },
+  badgeIconText: {
+    fontSize: 20,
+  },
+  badgeTitle: {
+    color: '#CBD5E1',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  badgeTitleUnlocked: {
+    color: '#F8FAFC',
+  },
+  badgeUnlockedPill: {
+    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  badgeUnlockedPillText: {
+    color: '#00E676',
+    fontSize: 9.5,
+    fontWeight: '900',
+  },
+  badgeDesc: {
+    color: '#94A3B8',
+    fontSize: 11,
+    lineHeight: 15,
+    marginTop: 2,
+  },
+  badgeReq: {
+    color: '#64748B',
+    fontSize: 10,
+    fontStyle: 'italic',
+    marginTop: 3,
+  },
+  sharePassportBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFD600',
+    paddingVertical: 13,
+    borderRadius: 12,
+    gap: 8,
+    marginTop: 10,
+    marginBottom: 10,
+    shadowColor: '#FFD600',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  sharePassportBtnText: {
+    color: '#05080E',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+
 });

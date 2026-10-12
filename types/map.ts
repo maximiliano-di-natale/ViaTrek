@@ -167,3 +167,39 @@ export interface GuardianSession {
   contactName: string;
   contactPhone: string;
 }
+
+export interface SummitItem {
+  id: string;
+  name: string;
+  elevationM: number;
+  latitude: number;
+  longitude: number;
+  difficulty: 'Fácil' | 'Moderado' | 'Exigente' | 'Alta Montaña';
+  zone: string;
+  description: string;
+  badgeTitle: string;
+  badgeIcon: string;
+  radiusMeters: number;
+}
+
+export interface SummitCheckIn {
+  summitId: string;
+  unlockedAt: string;
+  elevationGainM: number;
+}
+
+export interface SummitBadge {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  unlockedAt?: string;
+  requirement: string;
+}
+
+export interface PassportStats {
+  summitsConquered: number;
+  totalElevationM: number;
+  badgesEarned: number;
+}

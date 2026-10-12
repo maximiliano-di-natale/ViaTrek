@@ -1121,6 +1121,164 @@
       color: #05080E;
       font-weight: 900;
     }
+
+    /* MARCADORES Y PASAPORTE DE CUMBRES (FASE 5) */
+    .custom-summit-marker {
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+      background: #05080E;
+      border: 2.5px solid #FFD700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(255, 215, 0, 0.45);
+      transition: transform 0.2s;
+      position: relative;
+    }
+    .custom-summit-marker:hover {
+      transform: scale(1.25);
+    }
+    .custom-summit-marker.conquered {
+      border-color: #00E676;
+      box-shadow: 0 6px 16px rgba(0, 230, 118, 0.45);
+    }
+    .summit-inner-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      background: rgba(255, 215, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .summit-inner-circle.conquered {
+      background: rgba(0, 230, 118, 0.25);
+    }
+    .summit-altitude-tag {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(11, 15, 23, 0.95);
+      border: 1px solid #FFD700;
+      color: #FFD700;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 5px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .summit-status-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid #FFD700;
+      color: #FFD700;
+      background: rgba(255, 215, 0, 0.1);
+    }
+    .summit-status-badge.conquered {
+      border-color: #00E676;
+      color: #00E676;
+      background: rgba(0, 230, 118, 0.12);
+    }
+    .summit-badge-reward-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 215, 0, 0.08);
+      border: 1px solid rgba(255, 215, 0, 0.25);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      margin-bottom: 12px;
+    }
+    .btn-simulate-summit {
+      flex: 1;
+      padding: 11px;
+      background: #1E293B;
+      border: 1px solid #FFD700;
+      color: #FFD700;
+      font-weight: 800;
+      font-size: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .passport-hero-box {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+    .passport-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .passport-stat-card {
+      background: rgba(11, 15, 23, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 8px 4px;
+    }
+    .passport-stat-num {
+      font-size: 16px;
+      font-weight: 900;
+      color: #FFD700;
+    }
+    .passport-stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #94A3B8;
+      margin-top: 2px;
+    }
+    .passport-summit-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #141C2B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .passport-summit-item.conquered {
+      border-color: rgba(0, 230, 118, 0.4);
+      background: rgba(0, 230, 118, 0.06);
+    }
+    .badge-grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .badge-tile {
+      background: #141C2B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    .badge-tile.unlocked {
+      border-color: rgba(255, 215, 0, 0.5);
+      background: rgba(255, 215, 0, 0.08);
+    }
+    .badge-tile.locked {
+      opacity: 0.55;
+      filter: grayscale(80%);
+    }
   </style>
 </head>
 <body>
@@ -1196,6 +1354,12 @@
     <button class="fab-btn" id="fab-convivencia-btn" onclick="openConvivenciaModal('manual')" title="Semáforo de Legalidad & Convivencia" style="border-color: #00E676;">
       ⚖️
       <div class="fab-badge" style="background: #00E676; color: #05080E; font-weight: 900;">3</div>
+    </button>
+
+    <!-- Botón Pasaporte de Cumbres & Desafíos Gamificados (Fase 5) -->
+    <button class="fab-btn" id="fab-passport-btn" onclick="openPassportModal()" title="Pasaporte de Cumbres Mendoza" style="border-color: #FFD700; color: #FFD700;">
+      🏆
+      <div class="fab-badge" id="fab-summit-badge" style="background: #FFD700; color: #05080E; font-weight: 900;">1/6</div>
     </button>
 
     <button class="fab-btn" onclick="toggleMapTypeMenu()" title="Tipo de mapa">
@@ -1362,6 +1526,61 @@
       <button class="vote-btn-resolved" onclick="voteResolvedCurrentIncident()">
         ✅ Ya se despejó (<span id="inc-resolved-count">0</span>)
       </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM CARD: DETALLE DE CUMBRE (FASE 5) -->
+  <div class="bottom-card" id="summit-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title-row">
+          <span class="summit-status-badge" id="summit-card-status">🏆 CUMBRE CONQUISTADA</span>
+          <span class="zone-badge" id="summit-card-zone">El Challao</span>
+        </div>
+        <div class="card-title" id="summit-card-title">Cerro Arco (1.680 msnm)</div>
+      </div>
+      <button class="close-btn" onclick="closeCards()">✕</button>
+    </div>
+
+    <div class="metrics-container">
+      <div class="metric-item">
+        <span class="metric-label">Altitud</span>
+        <span class="metric-val" style="color: #FFD700;" id="summit-card-elev">1.680 m</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-item">
+        <span class="metric-label">Distancia GPS</span>
+        <span class="metric-val" id="summit-card-dist">-- km</span>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-item">
+        <span class="metric-label">Dificultad</span>
+        <span class="metric-val" id="summit-card-diff">Moderado</span>
+      </div>
+    </div>
+
+    <p class="card-description" id="summit-card-desc"></p>
+
+    <div class="summit-badge-reward-box" id="summit-badge-reward-box">
+      <span style="font-size: 24px;" id="summit-reward-icon">🏹</span>
+      <div>
+        <div style="font-size: 11px; font-weight: 800; color: #FFD700;" id="summit-reward-title">Insignia: Centinela del Challao</div>
+        <div style="font-size: 11px; color: #94A3B8;" id="summit-reward-desc">Desbloquea una medalla única de cumbre en tu Pasaporte.</div>
+      </div>
+    </div>
+
+    <div class="action-row" style="margin-top: 8px;">
+      <button class="btn-focus" id="summit-btn-checkin" onclick="handleSummitCheckInWeb(false)">
+        📍 Check-in Cumbre (<span id="summit-radius-label">200m</span>)
+      </button>
+      <button class="btn-simulate-summit" onclick="handleSummitCheckInWeb(true)">
+        ⚡ Simular GPS
+      </button>
+    </div>
+    <div style="margin-top: 8px;">
+      <a class="btn-nav" id="summit-nav-link" href="#" target="_blank" style="display: block; width: 100%; box-sizing: border-box;">
+        Cómo llegar a la Base y Cumbre (Google Maps)
+      </a>
     </div>
   </div>
 
@@ -1664,6 +1883,69 @@
       <a href="tel:103" style="display: flex; align-items: center; justify-content: center; background: #FF1744; color: #FFFFFF; font-weight: 900; font-size: 13px; padding: 12px; border-radius: 12px; text-decoration: none; gap: 8px; box-shadow: 0 4px 14px rgba(255,23,68,0.4); margin-bottom: 6px;">
         📞 Llamar a Defensa Civil Mendoza (103)
       </a>
+    </div>
+  </div>
+
+  <!-- MODAL: PASAPORTE DE CUMBRES & DESAFÍOS GAMIFICADOS (FASE 5) -->
+  <div class="modal-overlay" id="passport-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" style="color: #FFD700;">
+          🏆 Pasaporte de Cumbres Mendoza
+        </div>
+        <button class="close-btn" onclick="closePassportModal()">✕</button>
+      </div>
+
+      <p class="modal-subtitle">
+        Desafíos de montaña geolocalizados: registrá cumbres mediante geocerca GPS, coleccioná insignias y acumulá metros de desnivel.
+      </p>
+
+      <!-- HERO STATS CARD -->
+      <div class="passport-hero-box">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; font-weight: 800; color: #F8FAFC;">Nivel: Explorador Mendocino</span>
+          <span class="summit-status-badge" id="passport-level-badge">🏔️ Nivel 2</span>
+        </div>
+        <div class="passport-stats-grid">
+          <div class="passport-stat-card">
+            <div class="passport-stat-num" id="stat-conquered-count">1 / 6</div>
+            <div class="passport-stat-label">Cumbres</div>
+          </div>
+          <div class="passport-stat-card">
+            <div class="passport-stat-num" id="stat-elevation-m" style="color: #00E676;">+120 m</div>
+            <div class="passport-stat-label">Desnivel Total</div>
+          </div>
+          <div class="passport-stat-card">
+            <div class="passport-stat-num" id="stat-badges-count" style="color: #FF9100;">2 / 5</div>
+            <div class="passport-stat-label">Insignias</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS: CUMBRES vs INSIGNIAS -->
+      <div class="safety-tab-bar" style="margin-bottom: 12px;">
+        <button class="safety-tab-btn active" id="pass-tab-summits" onclick="switchPassportTab('summits')">
+          🏔️ Cumbres (6)
+        </button>
+        <button class="safety-tab-btn" id="pass-tab-badges" onclick="switchPassportTab('badges')">
+          🎖️ Insignias (5)
+        </button>
+      </div>
+
+      <!-- PANE 1: LISTADO DE CUMBRES -->
+      <div id="pane-pass-summits">
+        <div id="passport-summits-list"></div>
+      </div>
+
+      <!-- PANE 2: GALERÍA DE INSIGNIAS -->
+      <div id="pane-pass-badges" style="display: none;">
+        <div class="badge-grid-container" id="passport-badges-grid"></div>
+      </div>
+
+      <!-- BOTÓN COMPARTIR WHATSAPP -->
+      <button class="btn-focus" style="width: 100%; margin-top: 14px; background: rgba(0, 230, 118, 0.15); border-color: #00E676; color: #00E676;" onclick="sharePassportWhatsApp()">
+        📲 Compartir mi Pasaporte en WhatsApp
+      </button>
     </div>
   </div>
 
@@ -2221,6 +2503,141 @@
       }
     ];
 
+    // PASAPORTE DE CUMBRES & DESAFÍOS GAMIFICADOS (FASE 5)
+    const MENDOZA_SUMMITS = [
+      {
+        id: 'cerro-arco',
+        name: 'Cerro Arco (Antenas)',
+        elevationM: 1680,
+        latitude: -32.8280,
+        longitude: -68.9560,
+        difficulty: 'Moderado',
+        zone: 'El Challao / Las Heras',
+        description: 'El coloso clásico de los mendocinos. Coroná la cumbre junto a las antenas y contemplá una vista panorámica de 360° al Gran Mendoza y el Cordón del Plata.',
+        badgeTitle: 'Centinela del Challao',
+        badgeIcon: '🏹',
+        radiusMeters: 200
+      },
+      {
+        id: 'cerro-de-la-gloria',
+        name: 'Cerro de la Gloria',
+        elevationM: 980,
+        latitude: -32.8868,
+        longitude: -68.8930,
+        difficulty: 'Fácil',
+        zone: 'Ciudad / Parque San Martín',
+        description: 'Hito histórico y cumbre urbana por excelencia. Coroná en la cima del Monumento al Ejército de Los Andes con vista al Parque y la ciudad.',
+        badgeTitle: 'Corona de la Gloria',
+        badgeIcon: '🦅',
+        radiusMeters: 150
+      },
+      {
+        id: 'cerro-santo-tomas',
+        name: 'Cerro Santo Tomás',
+        elevationM: 1820,
+        latitude: -32.8210,
+        longitude: -68.9720,
+        difficulty: 'Exigente',
+        zone: 'Precordillera Profunda / Challao',
+        description: 'Cumbre agreste al norte del Cerro Arco. Filo ventoso con avistaje frecuente de cóndores andinos y vistas vírgenes hacia Uspallata.',
+        badgeTitle: 'Guardián del Filo',
+        badgeIcon: '⛰️',
+        radiusMeters: 200
+      },
+      {
+        id: 'cerro-aspero',
+        name: 'Cerro Áspero',
+        elevationM: 1450,
+        latitude: -32.8480,
+        longitude: -68.9410,
+        difficulty: 'Moderado',
+        zone: 'El Challao / Quebrada San Isidro',
+        description: 'Pendiente pronunciada con sendero técnico de acarreos y rocas sueltas. Gran reto de fuerza y entrenamiento para trail runners.',
+        badgeTitle: 'Furia del Áspero',
+        badgeIcon: '⚡',
+        radiusMeters: 180
+      },
+      {
+        id: 'cerro-comision',
+        name: 'Cerro Comisión',
+        elevationM: 1890,
+        latitude: -32.8710,
+        longitude: -68.9680,
+        difficulty: 'Exigente',
+        zone: 'Precordillera Central',
+        description: 'Una de las cumbres más emblemáticas de la precordillera mendocina, coronando el hito geodésico superior sobre el Dique Frías y San Isidro.',
+        badgeTitle: 'Cumbre de la Comisión',
+        badgeIcon: '🎖️',
+        radiusMeters: 200
+      },
+      {
+        id: 'cerro-pelado',
+        name: 'Cerro Pelado',
+        elevationM: 1750,
+        latitude: -32.8120,
+        longitude: -68.9510,
+        difficulty: 'Exigente',
+        zone: 'Reserva Villavicencio / Precordillera Norte',
+        description: 'Cumbre panorámica abierta sin vegetación arbórea. Vista panorámica a los antiguos caracoles de Villavicencio y la precordillera norte.',
+        badgeTitle: 'Viento Puro de Cumbre',
+        badgeIcon: '🌬️',
+        radiusMeters: 220
+      }
+    ];
+
+    let userSummitCheckIns = {
+      'cerro-de-la-gloria': {
+        summitId: 'cerro-de-la-gloria',
+        unlockedAt: 'Ayer 18:45',
+        elevationGainM: 120
+      }
+    };
+
+    let userSummitBadges = [
+      {
+        id: 'badge-primera-cumbre',
+        title: 'Bautismo de Cumbre',
+        description: 'Conquistaste tu primera cima registrada en Mendoza.',
+        icon: '🥾',
+        unlocked: true,
+        unlockedAt: 'Ayer',
+        requirement: 'Hacer 1 cumbre'
+      },
+      {
+        id: 'badge-gloria-urbana',
+        title: 'Corona de la Gloria',
+        description: 'Hiciste cumbre en el Monumento del Cerro de la Gloria.',
+        icon: '🦅',
+        unlocked: true,
+        unlockedAt: 'Ayer',
+        requirement: 'Hacer cumbre en Cerro de la Gloria'
+      },
+      {
+        id: 'badge-centinela-arco',
+        title: 'Cazador del Arco',
+        description: 'Alcanzaste las míticas antenas del Cerro Arco (1.680 m).',
+        icon: '🏹',
+        unlocked: false,
+        requirement: 'Hacer cumbre en Cerro Arco'
+      },
+      {
+        id: 'badge-maestro-precordillera',
+        title: 'Maestro Precordillerano',
+        description: 'Conquistaste 3 o más cumbres del Pasaporte Mendocino.',
+        icon: '👑',
+        unlocked: false,
+        requirement: 'Hacer 3 cumbres'
+      },
+      {
+        id: 'badge-desnivel-oro',
+        title: 'Señor del Desnivel (+1.000m)',
+        description: 'Superaste los 1.000 metros de desnivel vertical acumulado.',
+        icon: '📈',
+        unlocked: false,
+        requirement: '+1.000m de desnivel acumulado'
+      }
+    ];
+
     // INICIALIZACIÓN DEL MAPA
     const initialCoords = [-32.8895, -68.8650];
     let currentUserCoords = initialCoords;
@@ -2279,8 +2696,10 @@
     let markerLayers = [];
     let incidentLayers = [];
     let polygonLayers = [];
+    let summitLayers = [];
     let showProtectedAreasWeb = true;
     let userMarker = null;
+    let currentActiveSummit = null;
 
     function getIncidentIconEmoji(type) {
       switch (type) {
@@ -2312,6 +2731,8 @@
       incidentLayers = [];
       polygonLayers.forEach(pl => map.removeLayer(pl));
       polygonLayers = [];
+      summitLayers.forEach(s => map.removeLayer(s));
+      summitLayers = [];
 
       const filteredRoutes = currentFilter === 'todas'
         ? MENDOZA_ROUTES
@@ -2402,6 +2823,35 @@
         marker.on('click', () => showIncidentCard(incident));
         incidentLayers.push(marker);
       });
+
+      // Cumbres Precordilleranas (Fase 5: Pasaporte de Cumbres)
+      MENDOZA_SUMMITS.forEach(summit => {
+        const isConquered = !!userSummitCheckIns[summit.id];
+        const markerClass = isConquered ? 'custom-summit-marker conquered' : 'custom-summit-marker';
+        const innerClass = isConquered ? 'summit-inner-circle conquered' : 'summit-inner-circle';
+        const badgeIcon = isConquered ? '🏆' : (summit.badgeIcon || '⛰️');
+        const altText = isConquered ? `✓ ${summit.elevationM}m` : `${summit.elevationM}m`;
+
+        const summitIcon = L.divIcon({
+          className: '',
+          html: `<div class="${markerClass}">
+                  <div class="${innerClass}">${badgeIcon}</div>
+                  <div class="summit-altitude-tag">${altText}</div>
+                 </div>`,
+          iconSize: [38, 38],
+          iconAnchor: [19, 19]
+        });
+
+        const marker = L.marker([summit.latitude, summit.longitude], { icon: summitIcon }).addTo(map);
+        marker.on('click', () => showSummitCard(summit));
+        summitLayers.push(marker);
+      });
+
+      const conqueredCount = Object.keys(userSummitCheckIns).length;
+      const summitBadgeEl = document.getElementById('fab-summit-badge');
+      if (summitBadgeEl) {
+        summitBadgeEl.innerText = `${conqueredCount}/${MENDOZA_SUMMITS.length}`;
+      }
     }
 
     function setFilter(filter) {
@@ -2566,6 +3016,251 @@
       document.getElementById('poi-card').classList.remove('open');
       document.getElementById('incident-card').classList.remove('open');
       document.getElementById('protected-area-card').classList.remove('open');
+      document.getElementById('summit-card').classList.remove('open');
+    }
+
+    // --- PASAPORTE DE CUMBRES & GAMIFICACIÓN (FASE 5) ---
+    function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Radio de la Tierra en km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function showSummitCard(summit) {
+      currentActiveSummit = summit;
+      closeCards();
+
+      const isConquered = !!userSummitCheckIns[summit.id];
+      const distKm = calculateDistanceKm(currentUserCoords[0], currentUserCoords[1], summit.latitude, summit.longitude);
+
+      const statusBadge = document.getElementById('summit-card-status');
+      if (isConquered) {
+        statusBadge.className = 'summit-status-badge conquered';
+        statusBadge.innerText = '🏆 CUMBRE CONQUISTADA';
+      } else {
+        statusBadge.className = 'summit-status-badge';
+        statusBadge.innerText = '🔒 PENDIENTE DE CONQUISTA';
+      }
+
+      document.getElementById('summit-card-zone').innerText = summit.zone;
+      document.getElementById('summit-card-title').innerText = `${summit.name}`;
+      document.getElementById('summit-card-elev').innerText = `${summit.elevationM} m`;
+      document.getElementById('summit-card-dist').innerText = `${distKm.toFixed(1)} km`;
+      document.getElementById('summit-card-diff').innerText = summit.difficulty;
+      document.getElementById('summit-card-desc').innerText = summit.description;
+
+      document.getElementById('summit-reward-icon').innerText = summit.badgeIcon || '🎖️';
+      document.getElementById('summit-reward-title').innerText = `Insignia: ${summit.badgeTitle}`;
+      document.getElementById('summit-reward-desc').innerText = isConquered
+        ? `Registrado el ${userSummitCheckIns[summit.id].unlockedAt}. ¡Felicitaciones!`
+        : `Acercate a menos de ${summit.radiusMeters}m de la cima para desbloquearla.`;
+
+      document.getElementById('summit-radius-label').innerText = `${summit.radiusMeters}m`;
+
+      const checkInBtn = document.getElementById('summit-btn-checkin');
+      if (isConquered) {
+        checkInBtn.innerText = '✓ Cumbre Ya Registrada';
+        checkInBtn.style.opacity = '0.7';
+      } else {
+        checkInBtn.innerText = `📍 Check-in Cumbre (${summit.radiusMeters}m)`;
+        checkInBtn.style.opacity = '1';
+      }
+
+      const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${summit.latitude},${summit.longitude}`;
+      document.getElementById('summit-nav-link').href = navUrl;
+
+      document.getElementById('summit-card').classList.add('open');
+    }
+
+    function handleSummitCheckInWeb(simulate = false) {
+      if (!currentActiveSummit) return;
+      const summit = currentActiveSummit;
+      const distKm = calculateDistanceKm(currentUserCoords[0], currentUserCoords[1], summit.latitude, summit.longitude);
+      const distM = distKm * 1000;
+
+      if (!simulate && distM > summit.radiusMeters) {
+        const confirmSim = confirm(
+          `Te encuentras a ${distKm.toFixed(2)} km de la cumbre de ${summit.name}.\n` +
+          `Para registrar cumbre real debes estar a menos de ${summit.radiusMeters}m.\n\n` +
+          `¿Deseas simular el check-in GPS de todos modos para probar el pasaporte?`
+        );
+        if (!confirmSim) return;
+      }
+
+      const nowStr = 'Hoy ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      userSummitCheckIns[summit.id] = {
+        summitId: summit.id,
+        unlockedAt: nowStr,
+        elevationGainM: summit.elevationM
+      };
+
+      // Evaluar insignias
+      const conqueredCount = Object.keys(userSummitCheckIns).length;
+      let totalElev = 0;
+      Object.keys(userSummitCheckIns).forEach(id => {
+        const s = MENDOZA_SUMMITS.find(item => item.id === id);
+        if (s) totalElev += s.elevationM;
+      });
+
+      let newlyUnlockedBadges = [];
+
+      userSummitBadges.forEach(b => {
+        if (!b.unlocked) {
+          if (b.id === 'badge-primera-cumbre' && conqueredCount >= 1) {
+            b.unlocked = true;
+            b.unlockedAt = 'Hoy';
+            newlyUnlockedBadges.push(b);
+          } else if (b.id === 'badge-gloria-urbana' && userSummitCheckIns['cerro-de-la-gloria']) {
+            b.unlocked = true;
+            b.unlockedAt = 'Hoy';
+            newlyUnlockedBadges.push(b);
+          } else if (b.id === 'badge-centinela-arco' && userSummitCheckIns['cerro-arco']) {
+            b.unlocked = true;
+            b.unlockedAt = 'Hoy';
+            newlyUnlockedBadges.push(b);
+          } else if (b.id === 'badge-maestro-precordillera' && conqueredCount >= 3) {
+            b.unlocked = true;
+            b.unlockedAt = 'Hoy';
+            newlyUnlockedBadges.push(b);
+          } else if (b.id === 'badge-desnivel-oro' && totalElev >= 1000) {
+            b.unlocked = true;
+            b.unlockedAt = 'Hoy';
+            newlyUnlockedBadges.push(b);
+          }
+        }
+      });
+
+      renderMapElements();
+      showSummitCard(summit);
+
+      let msg = `🎉 ¡CUMBRE CONQUISTADA!\n\n` +
+        `Coronaste con éxito ${summit.name} (${summit.elevationM} msnm).\n` +
+        `🎖️ Insignia de Cumbre: "${summit.badgeTitle}".\n` +
+        `📈 Cumbres en tu pasaporte: ${conqueredCount} de ${MENDOZA_SUMMITS.length}.`;
+
+      if (newlyUnlockedBadges.length > 0) {
+        msg += `\n\n🏆 ¡DESBLOQUEASTE NUEVAS MEDALLAS!\n` +
+          newlyUnlockedBadges.map(b => `• ${b.icon} ${b.title}: ${b.description}`).join('\n');
+      }
+
+      alert(msg);
+    }
+
+    function openPassportModal() {
+      renderPassportContent();
+      document.getElementById('passport-modal').classList.add('open');
+    }
+
+    function closePassportModal() {
+      document.getElementById('passport-modal').classList.remove('open');
+    }
+
+    function switchPassportTab(tab) {
+      document.querySelectorAll('#passport-modal .safety-tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('pass-tab-' + tab).classList.add('active');
+
+      document.getElementById('pane-pass-summits').style.display = tab === 'summits' ? 'block' : 'none';
+      document.getElementById('pane-pass-badges').style.display = tab === 'badges' ? 'block' : 'none';
+    }
+
+    function renderPassportContent() {
+      const conqueredCount = Object.keys(userSummitCheckIns).length;
+      let totalElev = 0;
+      Object.keys(userSummitCheckIns).forEach(id => {
+        const s = MENDOZA_SUMMITS.find(item => item.id === id);
+        if (s) totalElev += s.elevationM;
+      });
+      const unlockedBadgesCount = userSummitBadges.filter(b => b.unlocked).length;
+
+      // Stats
+      document.getElementById('stat-conquered-count').innerText = `${conqueredCount} / ${MENDOZA_SUMMITS.length}`;
+      document.getElementById('stat-elevation-m').innerText = `+${totalElev.toLocaleString()} m`;
+      document.getElementById('stat-badges-count').innerText = `${unlockedBadgesCount} / ${userSummitBadges.length}`;
+
+      const levelBadge = document.getElementById('passport-level-badge');
+      if (conqueredCount >= 4) {
+        levelBadge.innerText = '🦅 Señor del Filo';
+      } else if (conqueredCount >= 2) {
+        levelBadge.innerText = '🧗 Montañista';
+      } else {
+        levelBadge.innerText = '🥾 Caminante';
+      }
+
+      // Summits list
+      const summitsList = document.getElementById('passport-summits-list');
+      summitsList.innerHTML = MENDOZA_SUMMITS.map(summit => {
+        const isConquered = !!userSummitCheckIns[summit.id];
+        const checkinInfo = userSummitCheckIns[summit.id];
+        return `
+          <div class="passport-summit-item ${isConquered ? 'conquered' : ''}">
+            <div style="display:flex; align-items:center; gap: 10px;">
+              <span style="font-size: 22px;">${isConquered ? '🏆' : '⛰️'}</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 800; color: #F8FAFC;">
+                  ${summit.name}
+                </div>
+                <div style="font-size: 11px; color: #94A3B8;">
+                  ${summit.elevationM} msnm • ${summit.zone}
+                </div>
+                ${isConquered ? `<div style="font-size: 10px; color: #00E676; font-weight: 700;">✓ Conquistado (${checkinInfo.unlockedAt})</div>` : ''}
+              </div>
+            </div>
+            <div>
+              <button class="btn-focus" style="padding: 6px 10px; font-size: 11px;" onclick="closePassportModal(); showSummitCard(MENDOZA_SUMMITS.find(s => s.id === '${summit.id}')); map.flyTo([${summit.latitude}, ${summit.longitude}], 14);">
+                ${isConquered ? 'Ver' : 'Ir'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Badges grid
+      const badgesGrid = document.getElementById('passport-badges-grid');
+      badgesGrid.innerHTML = userSummitBadges.map(b => `
+        <div class="badge-tile ${b.unlocked ? 'unlocked' : 'locked'}">
+          <div style="font-size: 28px; margin-bottom: 4px;">${b.icon}</div>
+          <div style="font-size: 12px; font-weight: 800; color: ${b.unlocked ? '#FFD700' : '#94A3B8'}; margin-bottom: 2px;">
+            ${b.title}
+          </div>
+          <div style="font-size: 10.5px; color: #CBD5E1; line-height: 1.3; margin-bottom: 4px;">
+            ${b.description}
+          </div>
+          <div style="font-size: 9.5px; font-weight: 700; color: ${b.unlocked ? '#00E676' : '#64748B'};">
+            ${b.unlocked ? `✓ Desbloqueada (${b.unlockedAt || 'Activa'})` : `🔒 ${b.requirement}`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function sharePassportWhatsApp() {
+      const conqueredCount = Object.keys(userSummitCheckIns).length;
+      let totalElev = 0;
+      Object.keys(userSummitCheckIns).forEach(id => {
+        const s = MENDOZA_SUMMITS.find(item => item.id === id);
+        if (s) totalElev += s.elevationM;
+      });
+
+      const conqueredNames = Object.keys(userSummitCheckIns).map(id => {
+        const s = MENDOZA_SUMMITS.find(item => item.id === id);
+        return s ? `• ${s.name} (${s.elevationM} msnm)` : '';
+      }).filter(Boolean).join('\n');
+
+      const text = encodeURIComponent(
+        `🏔️ *MI PASAPORTE DE CUMBRES VIATREK MENDOZA* 🏆\n\n` +
+        `¡Mirá mi progreso en la montaña!\n` +
+        `✅ Cumbres Conquistadas: ${conqueredCount} de ${MENDOZA_SUMMITS.length}\n` +
+        `📈 Desnivel Acumulado: +${totalElev.toLocaleString()} m\n\n` +
+        `Cimas registradas:\n${conqueredNames}\n\n` +
+        `Explorá los senderos y cumbres en ViaTrek:\nhttps://maximiliano-di-natale.github.io/ViaTrek/`
+      );
+
+      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
     }
 
     // GESTIÓN DEL MODAL DE CONVIVENCIA Y ÁREAS PROTEGIDAS (FASE 3)

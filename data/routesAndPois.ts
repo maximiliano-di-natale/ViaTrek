@@ -8,6 +8,9 @@ import {
   ConvivenciaRuleItem,
   ZondaWeatherInfo,
   WineRouteInfo,
+  SummitItem,
+  SummitCheckIn,
+  SummitBadge,
 } from '../types/map';
 
 export const INITIAL_MENDOZA_REGION: MapRegion = {
@@ -618,5 +621,143 @@ export const MENDOZA_RANGER_CONTACTS = [
     phone: '2614815460',
     address: 'Destacamento El Challao',
     note: 'Denuncias de motos en áreas protegidas y caza furtiva',
+  },
+];
+
+// ============================================================================
+// PASAPORTE DE CUMBRES & GAMIFICACIÓN (FASE 5)
+// ============================================================================
+
+export const MENDOZA_SUMMITS: SummitItem[] = [
+  {
+    id: 'cerro-arco',
+    name: 'Cerro Arco (Antenas)',
+    elevationM: 1680,
+    latitude: -32.8280,
+    longitude: -68.9560,
+    difficulty: 'Moderado',
+    zone: 'El Challao / Las Heras',
+    description: 'El coloso clásico de los mendocinos. Coroná la cumbre junto a las antenas y contemplá una vista panorámica de 360° al Gran Mendoza y el Cordón del Plata.',
+    badgeTitle: 'Centinela del Challao',
+    badgeIcon: '🏹',
+    radiusMeters: 200,
+  },
+  {
+    id: 'cerro-de-la-gloria',
+    name: 'Cerro de la Gloria',
+    elevationM: 980,
+    latitude: -32.8868,
+    longitude: -68.8930,
+    difficulty: 'Fácil',
+    zone: 'Ciudad / Parque San Martín',
+    description: 'Hito histórico y cumbre urbana por excelencia. Coroná en la cima del Monumento al Ejército de Los Andes con vista al Parque y la ciudad.',
+    badgeTitle: 'Corona de la Gloria',
+    badgeIcon: '🦅',
+    radiusMeters: 150,
+  },
+  {
+    id: 'cerro-santo-tomas',
+    name: 'Cerro Santo Tomás',
+    elevationM: 1820,
+    latitude: -32.8210,
+    longitude: -68.9720,
+    difficulty: 'Exigente',
+    zone: 'Precordillera Profunda / Challao',
+    description: 'Cumbre agreste al norte del Cerro Arco. Filo ventoso con avistaje frecuente de cóndores andinos y vistas vírgenes hacia Uspallata.',
+    badgeTitle: 'Guardián del Filo',
+    badgeIcon: '⛰️',
+    radiusMeters: 200,
+  },
+  {
+    id: 'cerro-aspero',
+    name: 'Cerro Áspero',
+    elevationM: 1450,
+    latitude: -32.8480,
+    longitude: -68.9410,
+    difficulty: 'Moderado',
+    zone: 'El Challao / Quebrada San Isidro',
+    description: 'Pendiente pronunciada con sendero técnico de acarreos y rocas sueltas. Gran reto de fuerza y entrenamiento para trail runners.',
+    badgeTitle: 'Furia del Áspero',
+    badgeIcon: '⚡',
+    radiusMeters: 180,
+  },
+  {
+    id: 'cerro-comision',
+    name: 'Cerro Comisión',
+    elevationM: 1890,
+    latitude: -32.8710,
+    longitude: -68.9680,
+    difficulty: 'Exigente',
+    zone: 'Precordillera Central',
+    description: 'Una de las cumbres más emblemáticas de la precordillera mendocina, coronando el hito geodésico superior sobre el Dique Frías y San Isidro.',
+    badgeTitle: 'Cumbre de la Comisión',
+    badgeIcon: '🎖️',
+    radiusMeters: 200,
+  },
+  {
+    id: 'cerro-pelado',
+    name: 'Cerro Pelado',
+    elevationM: 1750,
+    latitude: -32.8120,
+    longitude: -68.9510,
+    difficulty: 'Exigente',
+    zone: 'Reserva Villavicencio / Precordillera Norte',
+    description: 'Cumbre panorámica abierta sin vegetación arbórea. Vista panorámica a los antiguos caracoles de Villavicencio y la precordillera norte.',
+    badgeTitle: 'Viento Puro de Cumbre',
+    badgeIcon: '🌬️',
+    radiusMeters: 220,
+  },
+];
+
+export const INITIAL_SUMMIT_CHECKINS: Record<string, SummitCheckIn> = {
+  'cerro-de-la-gloria': {
+    summitId: 'cerro-de-la-gloria',
+    unlockedAt: 'Ayer 18:45',
+    elevationGainM: 120,
+  },
+};
+
+export const INITIAL_SUMMIT_BADGES: SummitBadge[] = [
+  {
+    id: 'badge-primera-cumbre',
+    title: 'Bautismo de Cumbre',
+    description: 'Conquistaste tu primera cima registrada en Mendoza.',
+    icon: '🥾',
+    unlocked: true,
+    unlockedAt: 'Ayer',
+    requirement: 'Hacer 1 cumbre',
+  },
+  {
+    id: 'badge-gloria-urbana',
+    title: 'Corona de la Gloria',
+    description: 'Hiciste cumbre en el Monumento del Cerro de la Gloria.',
+    icon: '🦅',
+    unlocked: true,
+    unlockedAt: 'Ayer',
+    requirement: 'Hacer cumbre en Cerro de la Gloria',
+  },
+  {
+    id: 'badge-centinela-arco',
+    title: 'Cazador del Arco',
+    description: 'Alcanzaste las míticas antenas del Cerro Arco (1.680 m).',
+    icon: '🏹',
+    unlocked: false,
+    requirement: 'Hacer cumbre en Cerro Arco',
+  },
+  {
+    id: 'badge-maestro-precordillera',
+    title: 'Maestro Precordillerano',
+    description: 'Conquistaste 3 o más cumbres del Pasaporte Mendocino.',
+    icon: '👑',
+    unlocked: false,
+    requirement: 'Hacer 3 cumbres',
+  },
+  {
+    id: 'badge-desnivel-oro',
+    title: 'Señor del Desnivel (+1.000m)',
+    description: 'Superaste los 1.000 metros de desnivel vertical acumulado.',
+    icon: '📈',
+    unlocked: false,
+    requirement: '+1.000m de desnivel acumulado',
   },
 ];
