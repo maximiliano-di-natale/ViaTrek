@@ -6,7 +6,7 @@ export interface Coordinate {
 // Alias compatible con react-native-maps y utilidades
 export type LatLng = Coordinate;
 
-export type RouteType = 'ciclovia' | 'sendero_mtb' | 'moto_trail' | 'wine_trail';
+export type RouteType = 'ciclovia' | 'sendero_mtb' | 'moto_trail' | 'wine_trail' | 'trekking';
 
 export type LegalityLevel = 'libre' | 'compartido_precaucion' | 'prohibido_motor' | 'circuito_enduro';
 
@@ -117,7 +117,10 @@ export type POICategory =
   | 'mirador'
   | 'taller'
   | 'bodega_wine'
-  | 'refugio_almacen';
+  | 'refugio_almacen'
+  | 'cumbre'
+  | 'parapente'
+  | 'vertiente';
 
 export interface POIItem {
   id: string;
@@ -126,6 +129,9 @@ export interface POIItem {
   latitude: number;
   longitude: number;
   description: string;
+  altitudeM?: number;
+  icon?: string;
+  color?: string;
 }
 
 // Alias compatible

@@ -65,6 +65,7 @@ import {
   Flag,
   Medal,
   Download,
+  Footprints,
 } from 'lucide-react-native';
 
 import {
@@ -514,14 +515,25 @@ export default function MapScreen() {
     );
   };
 
-  // Rutas filtradas por región geográfica y modalidad
+  // Rutas filtradas por región geográfica y modalidad (soporte inteligente para rutas multimodales)
   const visibleRoutes = useMemo(() => {
     let routes = MENDOZA_ROUTES;
     if (selectedRegionId !== 'todas') {
       routes = routes.filter((r) => r.regionId === selectedRegionId);
     }
     if (selectedFilter !== 'todas') {
-      routes = routes.filter((route) => route.type === selectedFilter);
+      routes = routes.filter((route) => {
+        if (selectedFilter === 'trekking') {
+          return route.type === 'trekking' || route.legality?.allowedModes?.trekking;
+        }
+        if (selectedFilter === 'sendero_mtb') {
+          return route.type === 'sendero_mtb' || route.legality?.allowedModes?.bicycle;
+        }
+        if (selectedFilter === 'moto_trail') {
+          return route.type === 'moto_trail' || route.legality?.allowedModes?.moto;
+        }
+        return route.type === selectedFilter;
+      });
     }
     return routes;
   }, [selectedFilter, selectedRegionId]);
@@ -648,6 +660,16 @@ export default function MapScreen() {
   // POIs filtrados (visibles según relevancia de la categoría o si están en 'todas')
   const visiblePois = useMemo(() => {
     if (selectedFilter === 'todas') return MENDOZA_POIS;
+    if (selectedFilter === 'trekking') {
+      return MENDOZA_POIS.filter(
+        (p) =>
+          p.category === 'trailhead' ||
+          p.category === 'mirador' ||
+          p.category === 'cumbre' ||
+          p.category === 'vertiente' ||
+          p.category === 'refugio_almacen'
+      );
+    }
     if (selectedFilter === 'ciclovia') {
       return MENDOZA_POIS.filter(
         (p) => p.category === 'taller' || p.category === 'trailhead' || p.category === 'mirador'
@@ -655,7 +677,20 @@ export default function MapScreen() {
     }
     if (selectedFilter === 'sendero_mtb') {
       return MENDOZA_POIS.filter(
-        (p) => p.category === 'trailhead' || p.category === 'mirador' || p.category === 'hidratacion'
+        (p) =>
+          p.category === 'trailhead' ||
+          p.category === 'mirador' ||
+          p.category === 'hidratacion' ||
+          p.category === 'taller' ||
+          p.category === 'refugio_almacen'
+      );
+    }
+    if (selectedFilter === 'moto_trail') {
+      return MENDOZA_POIS.filter(
+        (p) =>
+          p.category === 'trailhead' ||
+          p.category === 'mirador' ||
+          p.category === 'refugio_almacen'
       );
     }
     if (selectedFilter === 'wine_trail') {
@@ -764,8 +799,12 @@ export default function MapScreen() {
         return '#FFD600'; // Amarillo neón
       case 'bodega_wine':
         return '#E91E63'; // Rosa Malbec / Enoturismo
-      case 'refugio_almacen':
-        return '#FF9100'; // Naranja pulpería
+      case 'cumbre':
+        return '#FFD700'; // Dorado cumbre
+      case 'parapente':
+        return '#00E5FF'; // Celeste cielo
+      case 'vertiente':
+        return '#00E676'; // Verde agua pura
       default:
         return '#FF5252';
     }
@@ -779,6 +818,12 @@ export default function MapScreen() {
         return <Droplet size={16} color="#0B0F17" strokeWidth={2.4} />;
       case 'mirador':
         return <Eye size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'cumbre':
+        return <Mountain size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'parapente':
+        return <Wind size={16} color="#0B0F17" strokeWidth={2.4} />;
+      case 'vertiente':
+        return <Droplet size={16} color="#0B0F17" strokeWidth={2.4} />;
       case 'taller':
         return <Wrench size={16} color="#0B0F17" strokeWidth={2.4} />;
       case 'bodega_wine':
@@ -1072,6 +1117,32 @@ export default function MapScreen() {
               ]}
             >
               Todas
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.filterPill,
+              selectedFilter === 'trekking' && styles.filterPillActiveTrekking,
+            ]}
+            onPress={() => {
+              setSelectedFilter('trekking');
+              setSelectedRoute(null);
+              setSelectedPoi(null);
+            }}
+            activeOpacity={0.8}
+          >
+            <Footprints
+              size={15}
+              color={selectedFilter === 'trekking' ? '#00E676' : '#94A3B8'}
+            />
+            <Text
+              style={[
+                styles.filterPillText,
+                selectedFilter === 'trekking' && { color: '#00E676', fontWeight: '700' },
+              ]}
+            >
+              Trekking
             </Text>
           </TouchableOpacity>
 
@@ -3244,6 +3315,11 @@ const styles = StyleSheet.create({
   },
   filterPillActive: {
     backgroundColor: '#1E293B',
+  },
+  filterPillActiveTrekking: {
+    backgroundColor: 'rgba(0, 230, 118, 0.16)',
+    borderWidth: 1,
+    borderColor: '#00E676',
   },
   filterPillActiveCiclovia: {
     backgroundColor: 'rgba(0, 230, 118, 0.16)',
