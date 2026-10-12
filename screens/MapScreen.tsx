@@ -153,6 +153,7 @@ export default function MapScreen() {
   const [checkedSummits, setCheckedSummits] = useState<Record<string, SummitCheckIn>>(INITIAL_SUMMIT_CHECKINS);
   const [badges, setBadges] = useState<SummitBadge[]>(INITIAL_SUMMIT_BADGES);
   const [selectedSummit, setSelectedSummit] = useState<SummitItem | null>(null);
+  const [activeApproachSummit, setActiveApproachSummit] = useState<SummitItem | null>(null);
   const [isPassportModalVisible, setIsPassportModalVisible] = useState<boolean>(false);
   const [passportTab, setPassportTab] = useState<'cumbres' | 'insignias'>('cumbres');
 
@@ -565,6 +566,33 @@ export default function MapScreen() {
       '📥 Descarga de Track GPX (ViaTrek)',
       `Archivo: ${route.gpxFileName || route.id + '.gpx'}\n\nListo para exportar y sincronizar con relojes Garmin, Suunto, Wahoo y apps de navegación GPS outdoor.`,
       [{ text: 'Listo', style: 'default' }]
+    );
+  };
+
+  // Trazado dinámico de ruta de aproximación desde la ubicación del usuario a la cumbre
+  const handleToggleSummitApproach = (summit: SummitItem) => {
+    if (activeApproachSummit?.id === summit.id) {
+      setActiveApproachSummit(null);
+      return;
+    }
+    setActiveApproachSummit(summit);
+    const uLat = userLocation?.latitude ?? INITIAL_MENDOZA_REGION.latitude;
+    const uLng = userLocation?.longitude ?? INITIAL_MENDOZA_REGION.longitude;
+    const bLat = summit.baseCoordinates?.latitude ?? summit.latitude;
+    const bLng = summit.baseCoordinates?.longitude ?? summit.longitude;
+    const sLat = summit.latitude;
+    const sLng = summit.longitude;
+
+    mapRef.current?.fitToCoordinates(
+      [
+        { latitude: uLat, longitude: uLng },
+        { latitude: bLat, longitude: bLng },
+        { latitude: sLat, longitude: sLng },
+      ],
+      {
+        edgePadding: { top: 140, right: 60, bottom: 360, left: 60 },
+        animated: true,
+      }
     );
   };
 
@@ -1469,7 +1497,111 @@ export default function MapScreen() {
             </Marker>
           );
         })}
+
+        {/* TRAZADO DINÁMICO DE RUTA DESDE UBICACIÓN DEL USUARIO A CUMBRE */}
+        {activeApproachSummit && (
+          <React.Fragment key={`approach-route-${activeApproachSummit.id}`}>
+            {/* Tramo 1: Aproximación Vehicular (Usuario -> Base del Cerro) */}
+            <Polyline
+              coordinates={[
+                userLocation || { latitude: INITIAL_MENDOZA_REGION.latitude, longitude: INITIAL_MENDOZA_REGION.longitude },
+                activeApproachSummit.baseCoordinates || { latitude: activeApproachSummit.latitude, longitude: activeApproachSummit.longitude },
+              ]}
+              strokeColor="#05080E"
+              strokeWidth={8}
+              lineDashPattern={[8, 8]}
+              lineCap="round"
+            />
+            <Polyline
+              coordinates={[
+                userLocation || { latitude: INITIAL_MENDOZA_REGION.latitude, longitude: INITIAL_MENDOZA_REGION.longitude },
+                activeApproachSummit.baseCoordinates || { latitude: activeApproachSummit.latitude, longitude: activeApproachSummit.longitude },
+              ]}
+              strokeColor="#00E5FF"
+              strokeWidth={4.5}
+              lineDashPattern={[8, 8]}
+              lineCap="round"
+            />
+
+            {/* Tramo 2: Sendero de Subida a Pie (Base -> Cumbre) */}
+            <Polyline
+              coordinates={[
+                activeApproachSummit.baseCoordinates || { latitude: activeApproachSummit.latitude, longitude: activeApproachSummit.longitude },
+                { latitude: activeApproachSummit.latitude, longitude: activeApproachSummit.longitude },
+              ]}
+              strokeColor="#05080E"
+              strokeWidth={11}
+              lineCap="round"
+              lineJoin="round"
+            />
+            <Polyline
+              coordinates={[
+                activeApproachSummit.baseCoordinates || { latitude: activeApproachSummit.latitude, longitude: activeApproachSummit.longitude },
+                { latitude: activeApproachSummit.latitude, longitude: activeApproachSummit.longitude },
+              ]}
+              strokeColor="#FFD600"
+              strokeWidth={6.5}
+              lineCap="round"
+              lineJoin="round"
+            />
+
+            {/* Marcador de Punto Base / Trailhead */}
+            {activeApproachSummit.baseCoordinates && (
+              <Marker
+                key="approach-base-marker"
+                coordinate={activeApproachSummit.baseCoordinates}
+                title={`🅿️ Base: ${activeApproachSummit.baseTrailheadName || 'Punto de Inicio'}`}
+                description={`Cota: ${activeApproachSummit.baseElevationM || 0} msnm • Desnivel a cumbre: +${activeApproachSummit.elevationGainM || 0}m`}
+              >
+                <View style={styles.approachBasePin}>
+                  <Text style={{ fontSize: 13 }}>🅿️</Text>
+                  <View style={styles.approachBaseBadge}>
+                    <Text style={styles.approachBaseBadgeText}>BASE SALIDA</Text>
+                  </View>
+                </View>
+              </Marker>
+            )}
+          </React.Fragment>
+        )}
       </MapView>
+
+      {/* BANNER FLOTANTE DE APROXIMACIÓN A CUMBRE ACTIVA */}
+      {activeApproachSummit && (
+        <View style={[styles.approachBannerFloating, { top: insets.top + (selectedRoute ? 74 : 8) }]}>
+          <View style={{ flex: 1 }}>
+            <View style={styles.approachBannerRow}>
+              <View style={styles.approachBannerPill}>
+                <Text style={styles.approachBannerPillText}>🗺️ RUTA A CUMBRE ACTIVA</Text>
+              </View>
+              <Text style={styles.approachBannerPeak} numberOfLines={1}>
+                {activeApproachSummit.name}
+              </Text>
+            </View>
+            <Text style={styles.approachBannerSub}>
+              🚗 A base: {userLocation
+                ? `${calculateDistanceKm(
+                    userLocation.latitude,
+                    userLocation.longitude,
+                    activeApproachSummit.baseCoordinates?.latitude || activeApproachSummit.latitude,
+                    activeApproachSummit.baseCoordinates?.longitude || activeApproachSummit.longitude
+                  ).toFixed(1)} km (~${Math.max(10, Math.round((calculateDistanceKm(
+                    userLocation.latitude,
+                    userLocation.longitude,
+                    activeApproachSummit.baseCoordinates?.latitude || activeApproachSummit.latitude,
+                    activeApproachSummit.baseCoordinates?.longitude || activeApproachSummit.longitude
+                  ) / 45) * 60))} min)`
+                : 'Calculando...'} ➔ 🥾 Subida: {activeApproachSummit.estimatedAscentTime || '3h'} (+{activeApproachSummit.elevationGainM || 0}m)
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => setActiveApproachSummit(null)}
+            style={styles.approachBannerCloseBtn}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <X size={16} color="#94A3B8" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* BANNER FLOTANTE DE RECORRIDO ENFOCADO (ESTILO WIKILOC) */}
       {selectedRoute && (
@@ -2578,106 +2710,214 @@ export default function MapScreen() {
       {/* TARJETA INFERIOR: DETALLES DE CUMBRE SELECCIONADA (FASE 5) */}
       {selectedSummit && (
         <View style={[styles.bottomCard, { paddingBottom: insets.bottom + 16 }]}>
-          <View style={styles.cardHeader}>
-            <View style={{ flex: 1 }}>
-              <View style={styles.cardHeaderTopRow}>
-                <View style={styles.summitCrownBadge}>
-                  <Text style={styles.summitCrownText}>
-                    {checkedSummits[selectedSummit.id] ? '🎖️ CONQUISTADA' : '⛰️ CUMBRE PENDIENTE'}
-                  </Text>
-                </View>
-                <Text style={styles.zoneText}>{selectedSummit.zone}</Text>
-                <View
-                  style={[
-                    styles.difficultyBadge,
-                    { borderColor: getDifficultyColor(selectedSummit.difficulty === 'Exigente' ? 'Técnico' : selectedSummit.difficulty as any) },
-                  ]}
-                >
-                  <Text
+          <ScrollView style={{ maxHeight: 420 }} showsVerticalScrollIndicator={false}>
+            <View style={styles.cardHeader}>
+              <View style={{ flex: 1 }}>
+                <View style={styles.cardHeaderTopRow}>
+                  <View style={styles.summitCrownBadge}>
+                    <Text style={styles.summitCrownText}>
+                      {checkedSummits[selectedSummit.id] ? '🎖️ CONQUISTADA' : '⛰️ CUMBRE PENDIENTE'}
+                    </Text>
+                  </View>
+                  <Text style={styles.zoneText}>{selectedSummit.zone}</Text>
+                  <View
                     style={[
-                      styles.difficultyText,
-                      { color: getDifficultyColor(selectedSummit.difficulty === 'Exigente' ? 'Técnico' : selectedSummit.difficulty as any) },
+                      styles.difficultyBadge,
+                      { borderColor: getDifficultyColor(selectedSummit.difficulty === 'Exigente' ? 'Técnico' : selectedSummit.difficulty as any) },
                     ]}
                   >
-                    {selectedSummit.difficulty}
+                    <Text
+                      style={[
+                        styles.difficultyText,
+                        { color: getDifficultyColor(selectedSummit.difficulty === 'Exigente' ? 'Técnico' : selectedSummit.difficulty as any) },
+                      ]}
+                    >
+                      {selectedSummit.difficulty}
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={styles.cardTitle} numberOfLines={2}>
+                  {selectedSummit.name}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => setSelectedSummit(null)}
+                style={styles.closeBtn}
+              >
+                <X size={20} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+
+            {/* SECCIÓN ACCESIBILIDAD: ¿SE PUEDE LLEGAR FÁCIL O NO? */}
+            <View
+              style={[
+                styles.accessibilityCard,
+                {
+                  borderColor: selectedSummit.isEasyAccess ? '#00E676' : '#FF5252',
+                  backgroundColor: selectedSummit.isEasyAccess ? 'rgba(0, 230, 118, 0.08)' : 'rgba(255, 82, 82, 0.08)',
+                },
+              ]}
+            >
+              <View style={styles.accessibilityHeaderRow}>
+                <View
+                  style={[
+                    styles.accessibilityBadge,
+                    { backgroundColor: selectedSummit.isEasyAccess ? '#00E676' : '#FF5252' },
+                  ]}
+                >
+                  <Text style={styles.accessibilityBadgeText}>
+                    {selectedSummit.isEasyAccess ? '🟢 ACCESO FÁCIL / MODERADO' : '🔴 ACCESO EXIGENTE / ALTA MONTAÑA'}
                   </Text>
+                </View>
+                <Text style={styles.accessibilityPrompt}>¿Se puede llegar fácil?</Text>
+              </View>
+              <Text style={styles.accessibilityDescText}>
+                {selectedSummit.accessibility || (selectedSummit.isEasyAccess ? 'Sendero accesible para senderistas de nivel medio.' : 'Exige experiencia de montaña, aclimatación o físico entrenado.')}
+              </Text>
+            </View>
+
+            {/* Métricas de cumbre */}
+            <View style={styles.metricsBox}>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>ALTITUD</Text>
+                <Text style={styles.metricValue}>{selectedSummit.elevationM} msnm</Text>
+              </View>
+
+              <View style={styles.metricDivider} />
+
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>DESNIVEL</Text>
+                <Text style={styles.metricValue}>
+                  +{selectedSummit.elevationGainM || (selectedSummit.elevationM - (selectedSummit.baseElevationM || 0))} m
+                </Text>
+              </View>
+
+              <View style={styles.metricDivider} />
+
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>TIEMPO SUBIDA</Text>
+                <Text style={styles.metricValue}>{selectedSummit.estimatedAscentTime || '3-4 h'}</Text>
+              </View>
+
+              <View style={styles.metricDivider} />
+
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>DISTANCIA GPS</Text>
+                <Text style={styles.metricValue}>
+                  {userLocation
+                    ? `${calculateDistanceKm(userLocation.latitude, userLocation.longitude, selectedSummit.latitude, selectedSummit.longitude).toFixed(1)} km`
+                    : 'Aprox. 8 km'}
+                </Text>
+              </View>
+            </View>
+
+            {/* SECCIÓN DETALLADA: RUTA DE SUBIDA Y APROXIMACIÓN */}
+            <View style={styles.ascentRouteDetailsCard}>
+              <Text style={styles.ascentRouteDetailsTitle}>🥾 RUTA DE SUBIDA A LA CUMBRE</Text>
+              
+              <View style={styles.ascentPointsRow}>
+                <View style={styles.ascentPointCol}>
+                  <Text style={styles.ascentPointTag}>🅿️ PUNTO BASE (SALIDA)</Text>
+                  <Text style={styles.ascentPointName} numberOfLines={2}>
+                    {selectedSummit.baseTrailheadName || 'Punto de Inicio'}
+                  </Text>
+                  <Text style={styles.ascentPointAlt}>
+                    {selectedSummit.baseElevationM ? `${selectedSummit.baseElevationM} msnm` : 'Base'}
+                  </Text>
+                </View>
+                <Text style={styles.ascentPointArrow}>➔</Text>
+                <View style={styles.ascentPointCol}>
+                  <Text style={styles.ascentPointTag}>🏆 CUMBRE (LLEGADA)</Text>
+                  <Text style={styles.ascentPointName} numberOfLines={2}>
+                    {selectedSummit.name}
+                  </Text>
+                  <Text style={styles.ascentPointAlt}>{selectedSummit.elevationM} msnm</Text>
                 </View>
               </View>
 
-              <Text style={styles.cardTitle} numberOfLines={2}>
-                {selectedSummit.name}
-              </Text>
+              {selectedSummit.ascentRouteSummary && (
+                <View style={styles.ascentSummaryBox}>
+                  <Text style={styles.ascentSummaryLabel}>Itinerario Paso a Paso:</Text>
+                  <Text style={styles.ascentSummaryText}>{selectedSummit.ascentRouteSummary}</Text>
+                </View>
+              )}
+
+              {selectedSummit.equipmentTips && (
+                <View style={styles.ascentTipRow}>
+                  <Text style={styles.ascentTipLabel}>🎒 Equipo sugerido:</Text>
+                  <Text style={styles.ascentTipText}>{selectedSummit.equipmentTips}</Text>
+                </View>
+              )}
+
+              {selectedSummit.approachDriveTip && (
+                <View style={styles.ascentTipRow}>
+                  <Text style={styles.ascentTipLabel}>🚗 Acceso vehicular:</Text>
+                  <Text style={styles.ascentTipText}>{selectedSummit.approachDriveTip}</Text>
+                </View>
+              )}
             </View>
 
-            <TouchableOpacity
-              onPress={() => setSelectedSummit(null)}
-              style={styles.closeBtn}
-            >
-              <X size={20} color="#94A3B8" />
-            </TouchableOpacity>
-          </View>
+            <Text style={styles.summitDescText}>{selectedSummit.description}</Text>
 
-          {/* Métricas de cumbre */}
-          <View style={styles.metricsBox}>
-            <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>ALTITUD</Text>
-              <Text style={styles.metricValue}>{selectedSummit.elevationM} msnm</Text>
-            </View>
-
-            <View style={styles.metricDivider} />
-
-            <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>DISTANCIA GPS</Text>
-              <Text style={styles.metricValue}>
-                {userLocation
-                  ? `${calculateDistanceKm(userLocation.latitude, userLocation.longitude, selectedSummit.latitude, selectedSummit.longitude).toFixed(1)} km`
-                  : 'Aprox. 8 km'}
-              </Text>
-            </View>
-
-            <View style={styles.metricDivider} />
-
-            <View style={styles.metricItem}>
-              <Text style={styles.metricLabel}>INSIGNIA</Text>
-              <Text style={styles.metricValue}>{selectedSummit.badgeIcon} {selectedSummit.badgeTitle}</Text>
-            </View>
-          </View>
-
-          <Text style={styles.summitDescText}>{selectedSummit.description}</Text>
-
-          {/* Botones de acción */}
-          <View style={styles.actionButtonsRow}>
-            <TouchableOpacity
-              style={[
-                styles.focusRouteButton,
-                { backgroundColor: checkedSummits[selectedSummit.id] ? 'rgba(0, 230, 118, 0.15)' : '#FFD600' },
-              ]}
-              onPress={() => handleSummitCheckIn(selectedSummit)}
-              activeOpacity={0.85}
-            >
-              <Medal size={16} color={checkedSummits[selectedSummit.id] ? '#00E676' : '#05080E'} />
-              <Text
+            {/* Botones de acción */}
+            <View style={[styles.actionButtonsRow, { marginTop: 8 }]}>
+              <TouchableOpacity
                 style={[
-                  styles.focusRouteButtonText,
-                  { color: checkedSummits[selectedSummit.id] ? '#00E676' : '#05080E', fontWeight: '900' },
+                  styles.approachRouteBtn,
+                  activeApproachSummit?.id === selectedSummit.id && styles.approachRouteBtnActive,
                 ]}
+                onPress={() => handleToggleSummitApproach(selectedSummit)}
+                activeOpacity={0.85}
               >
-                {checkedSummits[selectedSummit.id] ? 'Cumbre Ya Registrada ✓' : 'Hacer Cumbre (Check-in GPS)'}
-              </Text>
-            </TouchableOpacity>
+                <Compass size={16} color={activeApproachSummit?.id === selectedSummit.id ? '#05080E' : '#00E5FF'} />
+                <Text
+                  style={[
+                    styles.approachRouteBtnText,
+                    activeApproachSummit?.id === selectedSummit.id && styles.approachRouteBtnTextActive,
+                  ]}
+                >
+                  {activeApproachSummit?.id === selectedSummit.id ? '✕ Quitar Trazado' : '🗺️ Trazar Ruta desde mi Ubicación'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
-              style={styles.navigateButton}
-              onPress={() => {
-                const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedSummit.latitude},${selectedSummit.longitude}`;
-                Linking.openURL(url);
-              }}
-              activeOpacity={0.85}
-            >
-              <ExternalLink size={16} color="#05080E" />
-              <Text style={styles.navigateButtonText}>Cómo Llegar</Text>
-            </TouchableOpacity>
-          </View>
+            <View style={[styles.actionButtonsRow, { marginTop: 6 }]}>
+              <TouchableOpacity
+                style={[
+                  styles.focusRouteButton,
+                  { backgroundColor: checkedSummits[selectedSummit.id] ? 'rgba(0, 230, 118, 0.15)' : '#FFD600' },
+                ]}
+                onPress={() => handleSummitCheckIn(selectedSummit)}
+                activeOpacity={0.85}
+              >
+                <Medal size={16} color={checkedSummits[selectedSummit.id] ? '#00E676' : '#05080E'} />
+                <Text
+                  style={[
+                    styles.focusRouteButtonText,
+                    { color: checkedSummits[selectedSummit.id] ? '#00E676' : '#05080E', fontWeight: '900' },
+                  ]}
+                >
+                  {checkedSummits[selectedSummit.id] ? 'Cumbre Ya Registrada ✓' : 'Hacer Cumbre (Check-in GPS)'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.navigateButton}
+                onPress={() => {
+                  const targetLat = selectedSummit.baseCoordinates?.latitude || selectedSummit.latitude;
+                  const targetLng = selectedSummit.baseCoordinates?.longitude || selectedSummit.longitude;
+                  const url = `https://www.google.com/maps/dir/?api=1&destination=${targetLat},${targetLng}`;
+                  Linking.openURL(url);
+                }}
+                activeOpacity={0.85}
+              >
+                <ExternalLink size={16} color="#05080E" />
+                <Text style={styles.navigateButtonText}>Navegar a Base</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
         </View>
       )}
 
@@ -4279,6 +4519,31 @@ export default function MapScreen() {
                           )}
                         </View>
 
+                        {/* Accesibilidad y Desnivel en Pasaporte */}
+                        <View style={styles.summitCardAccessRow}>
+                          <View
+                            style={[
+                              styles.accessMiniPill,
+                              {
+                                backgroundColor: summit.isEasyAccess ? 'rgba(0, 230, 118, 0.15)' : 'rgba(255, 82, 82, 0.15)',
+                                borderColor: summit.isEasyAccess ? '#00E676' : '#FF5252',
+                              },
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.accessMiniPillText,
+                                { color: summit.isEasyAccess ? '#00E676' : '#FF5252' },
+                              ]}
+                            >
+                              {summit.isEasyAccess ? '🟢 Fácil/Mod' : '🔴 Exigente'}
+                            </Text>
+                          </View>
+                          <Text style={styles.summitCardGainText}>
+                            +{summit.elevationGainM || (summit.elevationM - (summit.baseElevationM || 0))}m desnivel • {summit.estimatedAscentTime || '3h'}
+                          </Text>
+                        </View>
+
                         <Text style={styles.summitCardDesc}>{summit.description}</Text>
 
                         <View style={styles.summitCardFooter}>
@@ -4288,21 +4553,35 @@ export default function MapScreen() {
                               {distKm !== null ? `A ${distKm.toFixed(1)} km de ti` : 'Distancia: Precordillera'}
                             </Text>
                           </View>
-                          <TouchableOpacity
-                            style={styles.summitFocusBtn}
-                            onPress={() => {
-                              setIsPassportModalVisible(false);
-                              setSelectedSummit(summit);
-                              mapRef.current?.animateToRegion({
-                                latitude: summit.latitude,
-                                longitude: summit.longitude,
-                                latitudeDelta: 0.04,
-                                longitudeDelta: 0.04,
-                              }, 700);
-                            }}
-                          >
-                            <Text style={styles.summitFocusBtnText}>Ver en Mapa ›</Text>
-                          </TouchableOpacity>
+
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <TouchableOpacity
+                              style={[styles.summitFocusBtn, { backgroundColor: 'rgba(0, 229, 255, 0.12)', borderRadius: 6 }]}
+                              onPress={() => {
+                                setIsPassportModalVisible(false);
+                                setSelectedSummit(summit);
+                                handleToggleSummitApproach(summit);
+                              }}
+                            >
+                              <Text style={[styles.summitFocusBtnText, { color: '#00E5FF' }]}>🗺️ Trazar</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              style={styles.summitFocusBtn}
+                              onPress={() => {
+                                setIsPassportModalVisible(false);
+                                setSelectedSummit(summit);
+                                mapRef.current?.animateToRegion({
+                                  latitude: summit.latitude,
+                                  longitude: summit.longitude,
+                                  latitudeDelta: 0.04,
+                                  longitudeDelta: 0.04,
+                                }, 700);
+                              }}
+                            >
+                              <Text style={styles.summitFocusBtnText}>Ver en Mapa ›</Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
                       </View>
                     );
@@ -6089,6 +6368,247 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 8,
     marginBottom: 6,
+  },
+
+  // Marcador de Base de Aproximación
+  approachBasePin: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  approachBaseBadge: {
+    backgroundColor: '#00E5FF',
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#05080E',
+    marginTop: 2,
+  },
+  approachBaseBadgeText: {
+    color: '#05080E',
+    fontSize: 8.5,
+    fontWeight: '900',
+  },
+
+  // Banner Flotante Superior de Ruta Activa
+  approachBannerFloating: {
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    backgroundColor: 'rgba(10, 14, 23, 0.96)',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1.5,
+    borderColor: '#00E5FF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 990,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  approachBannerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  approachBannerPill: {
+    backgroundColor: 'rgba(0, 229, 255, 0.2)',
+    borderColor: '#00E5FF',
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  approachBannerPillText: {
+    color: '#00E5FF',
+    fontSize: 9.5,
+    fontWeight: '900',
+  },
+  approachBannerPeak: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '800',
+    flex: 1,
+  },
+  approachBannerSub: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginTop: 3,
+  },
+  approachBannerCloseBtn: {
+    padding: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 20,
+    marginLeft: 8,
+  },
+
+  // Tarjeta de Accesibilidad en Bottom Sheet
+  accessibilityCard: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 10,
+    marginBottom: 6,
+  },
+  accessibilityHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  accessibilityBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 6,
+  },
+  accessibilityBadgeText: {
+    color: '#05080E',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  accessibilityPrompt: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  accessibilityDescText: {
+    color: '#CBD5E1',
+    fontSize: 11.5,
+    lineHeight: 16,
+  },
+
+  // Sección Detallada de Ascenso
+  ascentRouteDetailsCard: {
+    backgroundColor: 'rgba(15, 23, 42, 0.7)',
+    borderRadius: 12,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginTop: 8,
+    marginBottom: 6,
+  },
+  ascentRouteDetailsTitle: {
+    color: '#FFD600',
+    fontSize: 10.5,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+    marginBottom: 8,
+  },
+  ascentPointsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  ascentPointCol: {
+    flex: 1,
+  },
+  ascentPointTag: {
+    color: '#94A3B8',
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  ascentPointName: {
+    color: '#F8FAFC',
+    fontSize: 11.5,
+    fontWeight: '700',
+    marginTop: 1,
+  },
+  ascentPointAlt: {
+    color: '#00E5FF',
+    fontSize: 10.5,
+    fontWeight: '600',
+    marginTop: 1,
+  },
+  ascentPointArrow: {
+    color: '#FFD600',
+    fontSize: 14,
+    fontWeight: '900',
+    marginHorizontal: 8,
+  },
+  ascentSummaryBox: {
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 6,
+  },
+  ascentSummaryLabel: {
+    color: '#F8FAFC',
+    fontSize: 10.5,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  ascentSummaryText: {
+    color: '#94A3B8',
+    fontSize: 11,
+    lineHeight: 15,
+  },
+  ascentTipRow: {
+    marginTop: 3,
+  },
+  ascentTipLabel: {
+    color: '#F8FAFC',
+    fontSize: 10.5,
+    fontWeight: '700',
+  },
+  ascentTipText: {
+    color: '#94A3B8',
+    fontSize: 10.5,
+    lineHeight: 14,
+    marginTop: 1,
+  },
+
+  // Botón Trazar Ruta
+  approachRouteBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(0, 229, 255, 0.12)',
+    borderWidth: 1.5,
+    borderColor: '#00E5FF',
+    borderRadius: 12,
+    paddingVertical: 10,
+  },
+  approachRouteBtnActive: {
+    backgroundColor: '#00E5FF',
+    borderColor: '#00E5FF',
+  },
+  approachRouteBtnText: {
+    color: '#00E5FF',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  approachRouteBtnTextActive: {
+    color: '#05080E',
+    fontWeight: '900',
+  },
+
+  // Pasaporte Card Access Row
+  summitCardAccessRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  accessMiniPill: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+    borderWidth: 1,
+  },
+  accessMiniPillText: {
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  summitCardGainText: {
+    color: '#94A3B8',
+    fontSize: 10.5,
   },
 
   // Modal Pasaporte

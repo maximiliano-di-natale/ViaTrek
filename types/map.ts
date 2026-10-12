@@ -275,6 +275,16 @@ export interface SummitItem {
   badgeTitle: string;
   badgeIcon: string;
   radiusMeters: number;
+  accessibility?: string;
+  isEasyAccess?: boolean;
+  baseTrailheadName?: string;
+  baseCoordinates?: Coordinate;
+  baseElevationM?: number;
+  elevationGainM?: number;
+  ascentRouteSummary?: string;
+  estimatedAscentTime?: string;
+  equipmentTips?: string;
+  approachDriveTip?: string;
 }
 
 export interface SummitCheckIn {
